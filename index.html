@@ -389,6 +389,10 @@
             <input data-subir="data" type="file" accept=".xlsx,.xls,.csv" class="hidden">
           </label>
         </div>
+        <label class="flex items-center gap-1.5 text-xs text-on-surface-variant mt-2">
+          <input type="checkbox" data-modo="data" class="rounded border-outline-variant">
+          Reemplazar los datos existentes en el Sheet (en vez de agregar al final)
+        </label>
         <p data-status="data" class="text-xs mt-2"></p>
       </div>
       <input id="dataFilter" type="text" placeholder="Filtrar por código, descripción o ubicación..." class="w-full mb-3 rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm">
@@ -424,6 +428,10 @@
             <input data-subir="ubicaciones" type="file" accept=".xlsx,.xls,.csv" class="hidden">
           </label>
         </div>
+        <label class="flex items-center gap-1.5 text-xs text-on-surface-variant mt-2">
+          <input type="checkbox" data-modo="ubicaciones" class="rounded border-outline-variant">
+          Reemplazar los datos existentes en el Sheet (en vez de agregar al final)
+        </label>
         <p data-status="ubicaciones" class="text-xs mt-2"></p>
       </div>
       <input id="ubiFilter" type="text" placeholder="Filtrar por rack, nivel o ubicación..." class="w-full mb-3 rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm">
@@ -455,6 +463,10 @@
             <input data-subir="maestra" type="file" accept=".xlsx,.xls,.csv" class="hidden">
           </label>
         </div>
+        <label class="flex items-center gap-1.5 text-xs text-on-surface-variant mt-2">
+          <input type="checkbox" data-modo="maestra" class="rounded border-outline-variant">
+          Reemplazar los datos existentes en el Sheet (en vez de agregar al final)
+        </label>
         <p data-status="maestra" class="text-xs mt-2"></p>
       </div>
       <input id="maestraFilter" type="text" placeholder="Filtrar por código o descripción..." class="w-full mb-3 rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm">
@@ -509,6 +521,10 @@
             <input data-subir="usuario" type="file" accept=".xlsx,.xls,.csv" class="hidden">
           </label>
         </div>
+        <label class="flex items-center gap-1.5 text-xs text-on-surface-variant mt-2">
+          <input type="checkbox" data-modo="usuario" class="rounded border-outline-variant">
+          Reemplazar los datos existentes en el Sheet (en vez de agregar al final)
+        </label>
         <p data-status="usuario" class="text-xs mt-2"></p>
       </div>
       <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
@@ -1278,27 +1294,61 @@ function leerArchivoComoFilas(file) {
   });
 }
 
-async function manejarSubidaArchivo(sheetKey, file, statusEl) {
+async function manejarSubidaArchivo(sheetKey, file, statusEl, modo) {
   if (!file) return;
   const t = SHEET_TEMPLATES[sheetKey];
   statusEl.textContent = 'Leyendo archivo...';
   statusEl.className = 'text-xs text-on-surface-variant mt-2';
+  let rows;
   try {
-    const rows = await leerArchivoComoFilas(file);
+    rows = await leerArchivoComoFilas(file);
     if (!rows || rows.length === 0) {
       statusEl.textContent = 'El archivo no tiene filas de datos.';
       statusEl.className = 'text-xs text-error mt-2';
       return;
     }
-    DB[t.dbKey] = rows;
-    statusEl.textContent = `Se cargaron ${rows.length} filas en ${t.label}. Esto actualiza la app en esta sesión del navegador — aún no se guardó en Google Sheets.`;
-    statusEl.className = 'text-xs text-success mt-2';
-    if (sheetKey === 'data') { renderDataTable(); renderDashboard(); }
-    if (sheetKey === 'ubicaciones') { renderUbiTable(); }
-    if (sheetKey === 'maestra') { renderMaestraTable(); }
-    if (sheetKey === 'usuario') { renderUsuariosTable(); }
   } catch (err) {
     statusEl.textContent = 'Error al leer el archivo: ' + err.message;
+    statusEl.className = 'text-xs text-error mt-2';
+    return;
+  }
+
+  // Carga inmediata en la app (para que se vea al instante, aunque el guardado en el Sheet tarde/falle)
+  DB[t.dbKey] = rows;
+  if (sheetKey === 'data') { renderDataTable(); renderDashboard(); }
+  if (sheetKey === 'ubicaciones') { renderUbiTable(); }
+  if (sheetKey === 'maestra') { renderMaestraTable(); }
+  if (sheetKey === 'usuario') { renderUsuariosTable(); }
+
+  if (!GAS_URL) {
+    statusEl.textContent = `Se cargaron ${rows.length} filas en ${t.label} solo en esta sesión del navegador (configura GAS_URL para guardarlo también en el Sheet).`;
+    statusEl.className = 'text-xs text-on-surface-variant mt-2';
+    return;
+  }
+
+  if (modo === 'reemplazar') {
+    const conf = confirm(`Vas a REEMPLAZAR todas las filas existentes de la hoja ${t.label} en Google Sheets por las ${rows.length} filas del archivo subido. Esta acción no se puede deshacer. ¿Continuar?`);
+    if (!conf) {
+      statusEl.textContent = `Se cargaron ${rows.length} filas en ${t.label} solo en esta sesión del navegador (no se guardó en el Sheet).`;
+      statusEl.className = 'text-xs text-on-surface-variant mt-2';
+      return;
+    }
+  }
+
+  statusEl.textContent = `Guardando ${rows.length} filas en la hoja ${t.label} de Google Sheets...`;
+  statusEl.className = 'text-xs text-on-surface-variant mt-2';
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ importar: { hoja: t.label, filas: rows, modo: modo || 'agregar' } })
+    });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Error desconocido en el servidor.');
+    statusEl.textContent = `Listo: ${json.importar.filasEscritas} filas ${json.importar.modo === 'reemplazar' ? 'reemplazadas' : 'agregadas'} en la hoja ${t.label} de Google Sheets.`;
+    statusEl.className = 'text-xs text-success mt-2';
+  } catch (err) {
+    statusEl.textContent = `Se cargó en la app, pero no se pudo guardar en el Sheet: ${err.message}`;
     statusEl.className = 'text-xs text-error mt-2';
   }
 }
@@ -1310,8 +1360,10 @@ document.querySelectorAll('[data-subir]').forEach(input => {
   input.addEventListener('change', () => {
     const sheetKey = input.dataset.subir;
     const statusEl = document.querySelector(`[data-status="${sheetKey}"]`);
+    const modoEl = document.querySelector(`[data-modo="${sheetKey}"]`);
+    const modo = modoEl && modoEl.checked ? 'reemplazar' : 'agregar';
     const file = input.files[0];
-    manejarSubidaArchivo(sheetKey, file, statusEl);
+    manejarSubidaArchivo(sheetKey, file, statusEl, modo);
     input.value = '';
   });
 });
