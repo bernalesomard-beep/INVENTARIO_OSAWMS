@@ -127,43 +127,135 @@
 
   <!-- MAIN CONTENT -->
   <main class="ml-64 flex-1 p-6 max-w-[1400px]">
-    <div id="globalStatus" class="mb-4 hidden items-center gap-2 text-sm text-on-surface-variant">
-      <span class="material-symbols-outlined spin text-[16px]">progress_activity</span> Cargando datos desde Google Sheets...
+    <div class="flex items-center justify-between gap-3 mb-4">
+      <div id="globalStatus" class="hidden items-center gap-2 text-sm text-on-surface-variant">
+        <span class="material-symbols-outlined spin text-[16px]">progress_activity</span> Cargando datos desde Google Sheets...
+      </div>
+      <div id="lastSync" class="text-xs text-on-surface-variant"></div>
+      <button id="btnRefreshAll" class="ml-auto flex items-center gap-1.5 text-sm border border-outline-variant rounded-lg px-3 py-2 hover:bg-surface-container-low bg-white shrink-0">
+        <span id="btnRefreshIcon" class="material-symbols-outlined text-[18px]">refresh</span> Actualizar información
+      </button>
     </div>
 
     <!-- ===== PANEL: DASHBOARD ===== -->
     <section id="panelDashboard" class="tab-panel active">
-      <h2 class="text-2xl font-bold font-headline mb-1">Panel de Control</h2>
-      <p class="text-on-surface-variant text-sm mb-6">Resumen ejecutivo de todas las hojas conectadas.</p>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white border border-outline-variant rounded-xl p-4">
-          <p class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Items en Data</p>
-          <p id="kpiData" class="text-3xl font-bold font-data mt-1">-</p>
+      <div class="flex flex-wrap justify-between items-end gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-bold font-headline mb-1">Resumen Ejecutivo</h2>
+          <p class="text-on-surface-variant text-sm">Monitoreo de inventario en tiempo real y precisión de líneas.</p>
         </div>
-        <div class="bg-white border border-outline-variant rounded-xl p-4">
-          <p class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Ubicaciones</p>
-          <p id="kpiUbi" class="text-3xl font-bold font-data mt-1">-</p>
-        </div>
-        <div class="bg-white border border-outline-variant rounded-xl p-4">
-          <p class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">SKUs en Maestra</p>
-          <p id="kpiMaestra" class="text-3xl font-bold font-data mt-1">-</p>
-        </div>
-        <div class="bg-white border border-outline-variant rounded-xl p-4">
-          <p class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Contados esta sesión</p>
-          <p id="kpiConteo" class="text-3xl font-bold font-data mt-1">0</p>
+        <div class="flex bg-surface-container-high p-1 rounded-lg">
+          <button data-rango="hoy" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded bg-white shadow-sm text-primary transition-colors">Hoy</button>
+          <button data-rango="semana" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded text-on-surface-variant hover:bg-white/60 transition-colors">Semana</button>
+          <button data-rango="mes" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded text-on-surface-variant hover:bg-white/60 transition-colors">Mes</button>
+          <button data-rango="trimestre" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded text-on-surface-variant hover:bg-white/60 transition-colors">Trimestre</button>
         </div>
       </div>
-      <div class="bg-white border border-outline-variant rounded-xl p-4">
-        <h3 class="font-semibold mb-3">Últimos conteos de esta sesión</h3>
-        <div class="overflow-x-auto">
+
+      <!-- KPI Row -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+          <div class="flex justify-between items-start">
+            <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Líneas Totales</span>
+            <span class="material-symbols-outlined text-on-surface-variant opacity-50 text-[18px]">list_alt</span>
+          </div>
+          <p id="kpiLineasTotales" class="text-3xl font-bold font-data">-</p>
+        </div>
+        <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+          <div class="flex justify-between items-start">
+            <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Líneas Correctas</span>
+            <span class="material-symbols-outlined text-success opacity-70 text-[18px]">check_circle</span>
+          </div>
+          <p id="kpiLineasCorrectas" class="text-3xl font-bold font-data text-success">-</p>
+        </div>
+        <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+          <div class="flex justify-between items-start">
+            <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Diferencias</span>
+            <span class="material-symbols-outlined text-error opacity-70 text-[18px]">warning</span>
+          </div>
+          <p id="kpiDiferencias" class="text-3xl font-bold font-data text-error">-</p>
+        </div>
+        <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+          <div class="flex justify-between items-start">
+            <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Progreso Global</span>
+            <span class="material-symbols-outlined text-primary-fixed-dim opacity-70 text-[18px]">donut_large</span>
+          </div>
+          <div>
+            <p id="kpiProgresoGlobal" class="text-3xl font-bold font-data">-</p>
+            <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-1.5 overflow-hidden">
+              <div id="kpiProgresoBar" class="bg-primary h-full rounded-full transition-all" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <div class="bg-white border border-outline-variant rounded-xl p-4 h-72 flex flex-col">
+          <h3 class="font-semibold mb-3 text-sm">Progreso por Rango de Fechas</h3>
+          <div id="chartRangoFechas" class="flex-1 flex items-end gap-2 border-l border-b border-outline-variant px-2 pb-1"></div>
+        </div>
+        <div class="bg-white border border-outline-variant rounded-xl p-4 h-72 flex flex-col overflow-y-auto">
+          <h3 class="font-semibold mb-3 text-sm">Progreso por Rack</h3>
+          <div id="chartPorRack" class="flex-1 flex flex-col justify-center gap-3"></div>
+        </div>
+      </div>
+
+      <!-- Detailed table (independent date range + filters) -->
+      <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
+        <div class="p-4 border-b border-outline-variant bg-surface-container-low flex flex-col gap-3">
+          <h3 class="font-semibold">Resumen de Precisión de Líneas</h3>
+          <div class="flex flex-wrap gap-3">
+            <div class="relative flex-1 min-w-[160px]">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+              <input id="dashFiltroCodigo" type="text" autocomplete="off" placeholder="Filtrar por código" class="w-full pl-9 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+            </div>
+            <div class="relative flex-1 min-w-[160px]">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">location_on</span>
+              <input id="dashFiltroUbicacion" type="text" autocomplete="off" placeholder="Filtrar por ubicación" class="w-full pl-9 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+            </div>
+            <div class="relative flex-1 min-w-[160px]">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">filter_alt</span>
+              <select id="dashFiltroEstatus" class="w-full pl-9 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm appearance-none bg-white">
+                <option value="">Todos los Estatus</option>
+                <option value="OK">Conforme</option>
+                <option value="SOBRANTE">Sobrante</option>
+                <option value="FALTANTE">Faltante</option>
+                <option value="PENDIENTE">Pendiente</option>
+              </select>
+            </div>
+            <div class="flex items-center gap-2 flex-1 min-w-[240px]">
+              <label class="text-xs text-on-surface-variant shrink-0">Desde</label>
+              <input id="dashFiltroDesde" type="date" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+              <label class="text-xs text-on-surface-variant shrink-0">Hasta</label>
+              <input id="dashFiltroHasta" type="date" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+              <button id="dashFiltroLimpiar" title="Quitar filtro de fecha" class="text-on-surface-variant hover:text-error shrink-0"><span class="material-symbols-outlined text-[18px]">close</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="overflow-x-auto max-h-[55vh] overflow-y-auto">
           <table class="w-full text-sm">
-            <thead><tr class="text-left text-on-surface-variant border-b border-outline-variant">
-              <th class="py-2 pr-4 font-semibold">Código</th><th class="py-2 pr-4 font-semibold">Ubicación</th>
-              <th class="py-2 pr-4 font-semibold">Saldo Sistema</th><th class="py-2 pr-4 font-semibold">Cant. Física</th>
-              <th class="py-2 pr-4 font-semibold">Estatus</th>
+            <thead class="sticky top-0 bg-surface-container-low z-10"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
+              <th class="py-2 pl-3 pr-1 w-8"><input id="dashSelAll" type="checkbox" class="rounded border-outline-variant"></th>
+              <th class="py-2 px-3 font-semibold">Rack</th><th class="py-2 px-3 font-semibold">Nivel</th>
+              <th class="py-2 px-3 font-semibold">Ubicación</th><th class="py-2 px-3 font-semibold">Código</th>
+              <th class="py-2 px-3 font-semibold text-right">Saldo</th><th class="py-2 px-3 font-semibold text-right">Cantidad</th>
+              <th class="py-2 px-3 font-semibold text-right">Diferencia</th><th class="py-2 px-3 font-semibold">Estatus</th>
             </tr></thead>
-            <tbody id="dashboardRecent"><tr><td colspan="5" class="py-6 text-center text-on-surface-variant">Aún no registras conteos.</td></tr></tbody>
+            <tbody id="dashDetailTableBody"></tbody>
           </table>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-2 p-3 border-t border-outline-variant">
+          <p id="dashDetailRowCount" class="text-xs text-on-surface-variant"></p>
+          <div class="flex items-center gap-2">
+            <span id="dashSelCount" class="text-xs text-on-surface-variant hidden"></span>
+            <button id="btnExportDashSel" class="hidden items-center gap-1.5 text-xs border border-outline-variant rounded-lg px-3 py-1.5 hover:bg-surface-container-low">
+              <span class="material-symbols-outlined text-[16px]">download</span> Exportar seleccionados
+            </button>
+            <button id="btnExportDashAll" class="flex items-center gap-1.5 text-xs border border-outline-variant rounded-lg px-3 py-1.5 hover:bg-surface-container-low">
+              <span class="material-symbols-outlined text-[16px]">download</span> Exportar a Excel
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -287,6 +379,18 @@
     <section id="panelData" class="tab-panel">
       <h2 class="text-2xl font-bold font-headline mb-1">Datos de Inventario</h2>
       <p class="text-on-surface-variant text-sm mb-4">Hoja <span class="font-data">DATA</span> — stock actual por ubicación.</p>
+      <div class="bg-white border border-outline-variant rounded-xl p-4 mb-4">
+        <p class="text-sm font-semibold mb-1">Cargar datos desde archivo</p>
+        <p class="text-xs text-on-surface-variant mb-3">Descarga la plantilla, complétala y súbela aquí en vez de pegar directamente en el Sheet. Los datos se cargan en la app para esta sesión del navegador.</p>
+        <div class="flex flex-wrap items-center gap-2">
+          <button data-plantilla="data" class="btn-plantilla flex items-center gap-1.5 text-sm border border-outline-variant rounded-lg px-3 py-2 hover:bg-surface-container-low"><span class="material-symbols-outlined text-[18px]">description</span> Descargar plantilla</button>
+          <label class="flex items-center gap-1.5 text-sm bg-primary text-white rounded-lg px-3 py-2 hover:opacity-90 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">upload</span> Subir archivo
+            <input data-subir="data" type="file" accept=".xlsx,.xls,.csv" class="hidden">
+          </label>
+        </div>
+        <p data-status="data" class="text-xs mt-2"></p>
+      </div>
       <input id="dataFilter" type="text" placeholder="Filtrar por código, descripción o ubicación..." class="w-full mb-3 rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm">
       <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
         <div class="overflow-x-auto max-h-[65vh] overflow-y-auto">
@@ -310,6 +414,18 @@
     <section id="panelUbicaciones" class="tab-panel">
       <h2 class="text-2xl font-bold font-headline mb-1">Ubicaciones</h2>
       <p class="text-on-surface-variant text-sm mb-4">Hoja <span class="font-data">UBICACIONES</span>.</p>
+      <div class="bg-white border border-outline-variant rounded-xl p-4 mb-4">
+        <p class="text-sm font-semibold mb-1">Cargar datos desde archivo</p>
+        <p class="text-xs text-on-surface-variant mb-3">Descarga la plantilla, complétala y súbela aquí en vez de pegar directamente en el Sheet. Los datos se cargan en la app para esta sesión del navegador.</p>
+        <div class="flex flex-wrap items-center gap-2">
+          <button data-plantilla="ubicaciones" class="btn-plantilla flex items-center gap-1.5 text-sm border border-outline-variant rounded-lg px-3 py-2 hover:bg-surface-container-low"><span class="material-symbols-outlined text-[18px]">description</span> Descargar plantilla</button>
+          <label class="flex items-center gap-1.5 text-sm bg-primary text-white rounded-lg px-3 py-2 hover:opacity-90 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">upload</span> Subir archivo
+            <input data-subir="ubicaciones" type="file" accept=".xlsx,.xls,.csv" class="hidden">
+          </label>
+        </div>
+        <p data-status="ubicaciones" class="text-xs mt-2"></p>
+      </div>
       <input id="ubiFilter" type="text" placeholder="Filtrar por rack, nivel o ubicación..." class="w-full mb-3 rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm">
       <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
         <div class="overflow-x-auto max-h-[65vh] overflow-y-auto">
@@ -329,6 +445,18 @@
     <section id="panelMaestra" class="tab-panel">
       <h2 class="text-2xl font-bold font-headline mb-1">Maestra de Artículos</h2>
       <p class="text-on-surface-variant text-sm mb-4">Hoja <span class="font-data">MAESTRA</span>.</p>
+      <div class="bg-white border border-outline-variant rounded-xl p-4 mb-4">
+        <p class="text-sm font-semibold mb-1">Cargar datos desde archivo</p>
+        <p class="text-xs text-on-surface-variant mb-3">Descarga la plantilla, complétala y súbela aquí en vez de pegar directamente en el Sheet. Los datos se cargan en la app para esta sesión del navegador.</p>
+        <div class="flex flex-wrap items-center gap-2">
+          <button data-plantilla="maestra" class="btn-plantilla flex items-center gap-1.5 text-sm border border-outline-variant rounded-lg px-3 py-2 hover:bg-surface-container-low"><span class="material-symbols-outlined text-[18px]">description</span> Descargar plantilla</button>
+          <label class="flex items-center gap-1.5 text-sm bg-primary text-white rounded-lg px-3 py-2 hover:opacity-90 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">upload</span> Subir archivo
+            <input data-subir="maestra" type="file" accept=".xlsx,.xls,.csv" class="hidden">
+          </label>
+        </div>
+        <p data-status="maestra" class="text-xs mt-2"></p>
+      </div>
       <input id="maestraFilter" type="text" placeholder="Filtrar por código o descripción..." class="w-full mb-3 rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm">
       <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
         <div class="overflow-x-auto max-h-[65vh] overflow-y-auto">
@@ -371,6 +499,18 @@
     <section id="panelUsuarios" class="tab-panel">
       <h2 class="text-2xl font-bold font-headline mb-1">Usuarios</h2>
       <p class="text-on-surface-variant text-sm mb-4">Hoja <span class="font-data">USUARIO</span> — vista informativa, sin restricciones por rol todavía.</p>
+      <div class="bg-white border border-outline-variant rounded-xl p-4 mb-4">
+        <p class="text-sm font-semibold mb-1">Cargar datos desde archivo</p>
+        <p class="text-xs text-on-surface-variant mb-3">Descarga la plantilla, complétala y súbela aquí en vez de pegar directamente en el Sheet. Los datos se cargan en la app para esta sesión del navegador.</p>
+        <div class="flex flex-wrap items-center gap-2">
+          <button data-plantilla="usuario" class="btn-plantilla flex items-center gap-1.5 text-sm border border-outline-variant rounded-lg px-3 py-2 hover:bg-surface-container-low"><span class="material-symbols-outlined text-[18px]">description</span> Descargar plantilla</button>
+          <label class="flex items-center gap-1.5 text-sm bg-primary text-white rounded-lg px-3 py-2 hover:opacity-90 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">upload</span> Subir archivo
+            <input data-subir="usuario" type="file" accept=".xlsx,.xls,.csv" class="hidden">
+          </label>
+        </div>
+        <p data-status="usuario" class="text-xs mt-2"></p>
+      </div>
       <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
         <div class="overflow-x-auto max-h-[65vh] overflow-y-auto">
           <table class="w-full text-sm">
@@ -417,8 +557,12 @@ function fetchCsv(url) {
 }
 
 async function loadAllData() {
+  const btn = document.getElementById('btnRefreshAll');
+  const icon = document.getElementById('btnRefreshIcon');
   document.getElementById('globalStatus').classList.remove('hidden');
   document.getElementById('globalStatus').classList.add('flex');
+  if (btn) btn.disabled = true;
+  if (icon) icon.classList.add('spin');
   const [usuario, ubicaciones, data, manual, maestra] = await Promise.all([
     fetchCsv(SHEET_URLS.usuario), fetchCsv(SHEET_URLS.ubicaciones),
     fetchCsv(SHEET_URLS.data), fetchCsv(SHEET_URLS.manual), fetchCsv(SHEET_URLS.maestra)
@@ -426,6 +570,11 @@ async function loadAllData() {
   DB = { usuario, ubicaciones, data, manual, maestra };
   document.getElementById('globalStatus').classList.add('hidden');
   document.getElementById('globalStatus').classList.remove('flex');
+  if (btn) btn.disabled = false;
+  if (icon) icon.classList.remove('spin');
+  const syncEl = document.getElementById('lastSync');
+  if (syncEl) syncEl.textContent = 'Última actualización: ' + new Date().toLocaleTimeString('es-PE');
+  dashSelected.clear();
   renderDashboard();
   renderDataTable();
   renderUbiTable();
@@ -433,6 +582,8 @@ async function loadAllData() {
   renderManualTable();
   renderUsuariosTable();
 }
+
+document.getElementById('btnRefreshAll').addEventListener('click', loadAllData);
 
 /* ==================== LOGIN ==================== */
 document.getElementById('loginBtn').addEventListener('click', doLogin);
@@ -489,32 +640,284 @@ document.querySelectorAll('[data-nav-item]').forEach(btn => {
 });
 document.querySelector('[data-nav-item]').classList.add('active');
 
-/* ==================== DASHBOARD ==================== */
-function renderDashboard() {
-  document.getElementById('kpiData').textContent = DB.data.length;
-  document.getElementById('kpiUbi').textContent = DB.ubicaciones.length;
-  document.getElementById('kpiMaestra').textContent = DB.maestra.length;
-}
+/* ==================== DASHBOARD EJECUTIVO ==================== */
+let dashRango = 'hoy'; // controla KPIs + gráficos (independiente de la tabla de detalle)
 
-function renderSessionKpi() {
-  document.getElementById('kpiConteo').textContent = sessionCounts.length;
-  const tbody = document.getElementById('dashboardRecent');
-  if (sessionCounts.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-on-surface-variant">Aún no registras conteos.</td></tr>';
-    return;
+// Acepta ISO, "dd/mm/aaaa[, hh:mm:ss]" (formato de toLocaleString('es-PE')), etc.
+function parseFechaRegistro(v) {
+  if (!v) return null;
+  const s = String(v).trim();
+  if (!s) return null;
+  let d = new Date(s);
+  if (!isNaN(d)) return d;
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:,?\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+  if (m) {
+    let [, dd, mm, yyyy, hh, min, ss] = m;
+    if (yyyy.length === 2) yyyy = '20' + yyyy;
+    d = new Date(+yyyy, +mm - 1, +dd, +(hh || 0), +(min || 0), +(ss || 0));
+    if (!isNaN(d)) return d;
   }
-  tbody.innerHTML = sessionCounts.slice(-5).reverse().map(c => `
-    <tr class="border-b border-surface-variant last:border-0">
-      <td class="py-2 pr-4 font-data">${c.CODIGO}</td><td class="py-2 pr-4">${c.UBICACION}</td>
-      <td class="py-2 pr-4 font-data">${c.SALDO_SISTEMA}</td><td class="py-2 pr-4 font-data">${c.CANTIDAD_FISICA}</td>
-      <td class="py-2 pr-4">${estatusBadgeHtml(c.ESTATUS)}</td>
-    </tr>`).join('');
+  return null;
 }
 
+function getRangoFechas(tipo) {
+  const ahora = new Date();
+  const hasta = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 23, 59, 59);
+  let desde;
+  if (tipo === 'hoy') { desde = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 0, 0, 0); }
+  else if (tipo === 'semana') { desde = new Date(ahora); desde.setDate(desde.getDate() - 6); desde.setHours(0, 0, 0, 0); }
+  else if (tipo === 'mes') { desde = new Date(ahora); desde.setDate(desde.getDate() - 29); desde.setHours(0, 0, 0, 0); }
+  else { desde = new Date(ahora); desde.setMonth(desde.getMonth() - 3); desde.setHours(0, 0, 0, 0); }
+  return { desde, hasta };
+}
+
+function normalizarEstatus(e) {
+  const v = (e || '').toString().trim().toUpperCase();
+  if (!v) return 'PENDIENTE';
+  if (v === 'OK' || v === 'CONFORME') return 'OK';
+  if (v.startsWith('SOBR')) return 'SOBRANTE';
+  if (v.startsWith('FALT')) return 'FALTANTE';
+  return v;
+}
+
+function estatusBadgeHtmlV2(estNorm) {
+  const map = {
+    OK: { cls: 'bg-success-container text-on-success-container border-[#A7F3D0]', icon: 'check', label: 'Conforme' },
+    SOBRANTE: { cls: 'bg-[#fef7e0] text-[#b06000] border-[#fce8b2]', icon: 'add_circle', label: 'Sobrante' },
+    FALTANTE: { cls: 'bg-error-container text-on-error-container border-[#FECACA]', icon: 'warning', label: 'Faltante' },
+    PENDIENTE: { cls: 'bg-surface-container-high text-on-surface-variant border-outline-variant', icon: 'schedule', label: 'Pendiente' },
+  };
+  const s = map[estNorm] || map.PENDIENTE;
+  return `<span class="inline-flex items-center gap-1 ${s.cls} px-2 py-1 rounded-full text-[11px] font-semibold border"><span class="material-symbols-outlined text-[12px]">${s.icon}</span>${s.label}</span>`;
+}
+
+// Estatus, mantenido por compatibilidad con badges de sesión (Toma de Inventario)
 function estatusBadgeHtml(estatus) {
   if (estatus === 'OK') return `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-success-container text-on-success-container text-[11px] font-semibold border border-[#A7F3D0]"><span class="w-1.5 h-1.5 rounded-full bg-success"></span>OK</span>`;
   return `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-error-container text-on-error-container text-[11px] font-semibold border border-[#FECACA]"><span class="w-1.5 h-1.5 rounded-full bg-error"></span>${estatus}</span>`;
 }
+
+function renderDashboard() {
+  renderDashKpisYCharts();
+  renderDashDetailTable();
+}
+
+// KPIs + gráficos: se filtran por dashRango (Hoy / Semana / Mes / Trimestre)
+function renderDashKpisYCharts() {
+  const { desde, hasta } = getRangoFechas(dashRango);
+  const enRango = DB.data.filter(r => {
+    const f = parseFechaRegistro(r.REGISTRO || r.FECHA);
+    return f && f >= desde && f <= hasta;
+  });
+  const totales = enRango.length;
+  const correctas = enRango.filter(r => normalizarEstatus(r.ESTATUS) === 'OK').length;
+  const diferencias = enRango.filter(r => ['SOBRANTE', 'FALTANTE'].includes(normalizarEstatus(r.ESTATUS))).length;
+  const progreso = totales > 0 ? (correctas / totales * 100) : 0;
+
+  document.getElementById('kpiLineasTotales').textContent = totales.toLocaleString('es-PE');
+  document.getElementById('kpiLineasCorrectas').textContent = correctas.toLocaleString('es-PE');
+  document.getElementById('kpiDiferencias').textContent = diferencias.toLocaleString('es-PE');
+  document.getElementById('kpiProgresoGlobal').textContent = totales > 0 ? progreso.toFixed(1) + '%' : '—';
+  document.getElementById('kpiProgresoBar').style.width = progreso.toFixed(1) + '%';
+
+  renderChartRangoFechas(desde, hasta);
+  renderChartPorRack(desde, hasta);
+}
+
+function renderChartRangoFechas(desde, hasta) {
+  const cont = document.getElementById('chartRangoFechas');
+  const totalMs = hasta - desde;
+  const numBins = dashRango === 'hoy' ? 6 : (dashRango === 'semana' ? 7 : 6);
+  const binMs = totalMs / numBins;
+  const bins = Array.from({ length: numBins }, (_, i) => ({
+    desde: new Date(desde.getTime() + i * binMs), count: 0
+  }));
+  DB.data.forEach(r => {
+    const f = parseFechaRegistro(r.REGISTRO || r.FECHA);
+    if (!f || f < desde || f > hasta) return;
+    const idx = Math.min(numBins - 1, Math.floor((f - desde) / binMs));
+    bins[idx].count++;
+  });
+  const max = Math.max(1, ...bins.map(b => b.count));
+  if (bins.every(b => b.count === 0)) {
+    cont.innerHTML = '<p class="text-sm text-on-surface-variant self-center w-full text-center">Sin conteos registrados en este período.</p>';
+    return;
+  }
+  cont.innerHTML = bins.map((b, i) => {
+    const h = Math.max(4, Math.round((b.count / max) * 100));
+    const isLast = i === bins.length - 1;
+    const label = dashRango === 'hoy' ? b.desde.getHours() + 'h' : b.desde.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit' });
+    return `<div class="flex-1 flex flex-col items-center justify-end gap-1 h-full">
+      <div class="${isLast ? 'bg-primary' : 'bg-primary-fixed-dim'} w-full rounded-t transition-all" style="height:${h}%" title="${b.count} líneas"></div>
+      <span class="text-[10px] text-on-surface-variant font-data">${label}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderChartPorRack(desde, hasta) {
+  const cont = document.getElementById('chartPorRack');
+  const racks = {};
+  DB.data.forEach(r => {
+    const rack = (r.RACK || r['RACK '] || '—').toString().trim() || '—';
+    if (!racks[rack]) racks[rack] = { total: 0, contados: 0 };
+    racks[rack].total++;
+    const f = parseFechaRegistro(r.REGISTRO || r.FECHA);
+    if (f && f >= desde && f <= hasta && normalizarEstatus(r.ESTATUS) !== 'PENDIENTE') racks[rack].contados++;
+  });
+  const arr = Object.entries(racks)
+    .map(([rack, v]) => ({ rack, pct: v.total > 0 ? (v.contados / v.total * 100) : 0 }))
+    .sort((a, b) => b.pct - a.pct).slice(0, 6);
+  if (arr.length === 0) { cont.innerHTML = '<p class="text-sm text-on-surface-variant">Sin datos de racks.</p>'; return; }
+  cont.innerHTML = arr.map(r => `
+    <div class="flex items-center gap-3">
+      <span class="font-data text-xs text-on-surface-variant w-16 shrink-0 truncate">${r.rack}</span>
+      <div class="flex-1 bg-surface-container-high h-2.5 rounded-full overflow-hidden">
+        <div class="${r.pct >= 100 ? 'bg-primary' : r.pct >= 50 ? 'bg-primary-fixed-dim' : 'bg-error-container'} h-full rounded-full" style="width:${Math.min(100, r.pct)}%"></div>
+      </div>
+      <span class="font-data text-xs w-10 text-right ${r.pct >= 50 ? 'text-primary' : 'text-error'}">${r.pct.toFixed(0)}%</span>
+    </div>`).join('');
+}
+
+// Tabla de detalle: filtros propios de código, ubicación, estatus y rango de fechas INDEPENDIENTE del de arriba
+let dashFilteredRows = []; // última lista filtrada (para exportar "todo lo filtrado")
+let dashSelected = new Set(); // keys de filas marcadas con checkbox
+
+function dashRowKey(r, i) {
+  return r.ID_DATA ? String(r.ID_DATA) : `${r.CODIGO || ''}__${r.UBICACION || ''}__${i}`;
+}
+
+function renderDashDetailTable() {
+  const codigo = (document.getElementById('dashFiltroCodigo').value || '').toUpperCase().trim();
+  const ubicacion = (document.getElementById('dashFiltroUbicacion').value || '').toUpperCase().trim();
+  const estatusSel = document.getElementById('dashFiltroEstatus').value;
+  const desdeVal = document.getElementById('dashFiltroDesde').value;
+  const hastaVal = document.getElementById('dashFiltroHasta').value;
+  const desde = desdeVal ? new Date(desdeVal + 'T00:00:00') : null;
+  const hasta = hastaVal ? new Date(hastaVal + 'T23:59:59') : null;
+
+  const rows = DB.data.filter(r => {
+    if (codigo && !(r.CODIGO || '').toString().toUpperCase().includes(codigo)) return false;
+    if (ubicacion && !(r.UBICACION || '').toString().toUpperCase().includes(ubicacion)) return false;
+    const estNorm = normalizarEstatus(r.ESTATUS);
+    if (estatusSel && estNorm !== estatusSel) return false;
+    if (desde || hasta) {
+      const f = parseFechaRegistro(r.REGISTRO || r.FECHA);
+      if (!f) return false;
+      if (desde && f < desde) return false;
+      if (hasta && f > hasta) return false;
+    }
+    return true;
+  });
+  dashFilteredRows = rows;
+
+  document.getElementById('dashDetailTableBody').innerHTML = rows.slice(0, 500).map((r, i) => {
+    const saldo = parseFloat(r.SALDO);
+    const cant = parseFloat(r.CANTIDAD);
+    const diff = (!isNaN(saldo) && !isNaN(cant)) ? (cant - saldo) : null;
+    const diffTxt = diff === null ? '-' : (diff > 0 ? '+' + diff : String(diff));
+    const diffCls = diff === null ? 'text-on-surface-variant' : diff === 0 ? '' : (diff > 0 ? 'text-[#b06000]' : 'text-error');
+    const key = dashRowKey(r, i);
+    const checked = dashSelected.has(key) ? 'checked' : '';
+    return `<tr class="border-b border-surface-variant hover:bg-surface-container-low">
+      <td class="py-2 pl-3 pr-1"><input type="checkbox" data-dashrow="${key}" class="dash-row-check rounded border-outline-variant" ${checked}></td>
+      <td class="py-2 px-3 font-data font-semibold text-primary">${r.RACK || ''}</td>
+      <td class="py-2 px-3 font-data">${r.NIVEL || ''}</td>
+      <td class="py-2 px-3 font-data">${r.UBICACION || ''}</td>
+      <td class="py-2 px-3 font-data">${r.CODIGO || ''}</td>
+      <td class="py-2 px-3 font-data text-right">${r.SALDO || ''}</td>
+      <td class="py-2 px-3 font-data text-right">${r.CANTIDAD || '-'}</td>
+      <td class="py-2 px-3 font-data text-right ${diffCls}">${diffTxt}</td>
+      <td class="py-2 px-3">${estatusBadgeHtmlV2(normalizarEstatus(r.ESTATUS))}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('dashDetailRowCount').textContent = `Mostrando ${Math.min(rows.length, 500)} de ${rows.length} filas (de ${DB.data.length} totales).`;
+
+  document.querySelectorAll('.dash-row-check').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) dashSelected.add(cb.dataset.dashrow); else dashSelected.delete(cb.dataset.dashrow);
+      updateDashSelUi();
+    });
+  });
+  const selAll = document.getElementById('dashSelAll');
+  selAll.checked = rows.length > 0 && rows.every((r, i) => dashSelected.has(dashRowKey(r, i)));
+  updateDashSelUi();
+}
+
+function updateDashSelUi() {
+  const n = dashSelected.size;
+  const countEl = document.getElementById('dashSelCount');
+  const btnSel = document.getElementById('btnExportDashSel');
+  if (n > 0) {
+    countEl.textContent = `${n} seleccionado(s)`;
+    countEl.classList.remove('hidden');
+    btnSel.classList.remove('hidden');
+    btnSel.classList.add('flex');
+  } else {
+    countEl.classList.add('hidden');
+    btnSel.classList.add('hidden');
+    btnSel.classList.remove('flex');
+  }
+}
+
+document.getElementById('dashSelAll').addEventListener('change', (e) => {
+  if (e.target.checked) {
+    dashFilteredRows.slice(0, 500).forEach((r, i) => dashSelected.add(dashRowKey(r, i)));
+  } else {
+    dashFilteredRows.slice(0, 500).forEach((r, i) => dashSelected.delete(dashRowKey(r, i)));
+  }
+  renderDashDetailTable();
+});
+
+function exportarDashboardExcel(soloSeleccionados) {
+  let rows = dashFilteredRows;
+  if (soloSeleccionados) {
+    rows = dashFilteredRows.filter((r, i) => dashSelected.has(dashRowKey(r, i)));
+  }
+  if (rows.length === 0) { alert('No hay filas para exportar.'); return; }
+  const data = rows.map(r => {
+    const saldo = parseFloat(r.SALDO);
+    const cant = parseFloat(r.CANTIDAD);
+    const diff = (!isNaN(saldo) && !isNaN(cant)) ? (cant - saldo) : '';
+    return {
+      RACK: r.RACK || '', NIVEL: r.NIVEL || '', UBICACION: r.UBICACION || '', CODIGO: r.CODIGO || '',
+      DESCRIPCCION: r.DESCRIPCCION || '', SALDO: r.SALDO || '', CANTIDAD: r.CANTIDAD || '',
+      DIFERENCIA: diff, ESTATUS: normalizarEstatus(r.ESTATUS), REGISTRO: r.REGISTRO || r.FECHA || ''
+    };
+  });
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'Precision Lineas');
+  const fecha = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `Resumen_Precision_${fecha}.xlsx`);
+}
+
+document.getElementById('btnExportDashAll').addEventListener('click', () => exportarDashboardExcel(false));
+document.getElementById('btnExportDashSel').addEventListener('click', () => exportarDashboardExcel(true));
+
+document.querySelectorAll('.dash-rango-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    dashRango = btn.dataset.rango;
+    document.querySelectorAll('.dash-rango-btn').forEach(b => b.classList.remove('bg-white', 'shadow-sm', 'text-primary'));
+    document.querySelectorAll('.dash-rango-btn').forEach(b => b.classList.add('text-on-surface-variant'));
+    btn.classList.remove('text-on-surface-variant');
+    btn.classList.add('bg-white', 'shadow-sm', 'text-primary');
+    renderDashKpisYCharts();
+  });
+});
+
+['dashFiltroCodigo', 'dashFiltroUbicacion'].forEach(id => {
+  document.getElementById(id).addEventListener('input', debounce(renderDashDetailTable, 200));
+});
+['dashFiltroEstatus', 'dashFiltroDesde', 'dashFiltroHasta'].forEach(id => {
+  document.getElementById(id).addEventListener('change', renderDashDetailTable);
+});
+document.getElementById('dashFiltroLimpiar').addEventListener('click', () => {
+  document.getElementById('dashFiltroDesde').value = '';
+  document.getElementById('dashFiltroHasta').value = '';
+  renderDashDetailTable();
+});
+
+// Ya no depende de la sesión actual: el dashboard ejecutivo se basa en DB.data (hoja DATA en Sheets)
+function renderSessionKpi() { }
 
 /* ==================== TOMA DE INVENTARIO ==================== */
 const conteoSearch = document.getElementById('conteoSearch');
@@ -820,6 +1223,98 @@ function renderUsuariosTable() {
       <td class="py-1.5 px-3"><span class="inline-flex items-center px-2 py-1 rounded bg-surface-container-high text-on-surface-variant text-[10px] uppercase tracking-wide border border-outline-variant">${u.ROL||''}</span></td>
     </tr>`).join('');
 }
+
+/* ==================== PLANTILLAS Y CARGA DE ARCHIVOS ==================== */
+const SHEET_TEMPLATES = {
+  data: {
+    label: 'DATA', dbKey: 'data',
+    headers: ['RACK', 'POSICION', 'NIVEL', 'UBICACION', 'CODIGO', 'DESCRIPCCION', 'EAN13', 'LOTE', 'EXPIRA', 'SALDO', 'CANTIDAD', 'ESTATUS', 'REGISTRO', 'USUARIO'],
+    example: ['A-01', '01', '1', 'A-01-1-01', 'SKU-10023', 'Producto de ejemplo', '7501234567890', 'L001', '31/12/2026', '150', '', '', '', ''],
+  },
+  ubicaciones: {
+    label: 'UBICACIONES', dbKey: 'ubicaciones',
+    headers: ['FECHA', 'RACK', 'NIVEL', 'UBICACIÓN'],
+    example: ['21/08/2026', 'A-01', '1', 'A-01-1-01'],
+  },
+  maestra: {
+    label: 'MAESTRA', dbKey: 'maestra',
+    headers: ['COD', 'CODIGO', 'DESCRIPCCION', 'EAN 13', 'OBS'],
+    example: ['1', 'SKU-10023', 'Producto de ejemplo', '7501234567890', ''],
+  },
+  usuario: {
+    label: 'USUARIO', dbKey: 'usuario',
+    headers: ['ID_USUARIO', 'CONTRASEÑA', 'ROL'],
+    example: ['OBERNALES', '1234', 'ADMIN'],
+  },
+};
+
+function descargarPlantilla(sheetKey) {
+  const t = SHEET_TEMPLATES[sheetKey];
+  if (!t) return;
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([t.headers, t.example]);
+  XLSX.utils.book_append_sheet(wb, ws, t.label.slice(0, 31));
+  XLSX.writeFile(wb, `Plantilla_${t.label}.xlsx`);
+}
+
+function leerArchivoComoFilas(file) {
+  return new Promise((resolve, reject) => {
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    if (ext === 'csv') {
+      Papa.parse(file, { header: true, skipEmptyLines: true, complete: (res) => resolve(res.data), error: reject });
+    } else {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const wb = XLSX.read(e.target.result, { type: 'array' });
+          const firstSheet = wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: '', raw: false });
+          resolve(rows);
+        } catch (err) { reject(err); }
+      };
+      reader.onerror = () => reject(new Error('No se pudo leer el archivo.'));
+      reader.readAsArrayBuffer(file);
+    }
+  });
+}
+
+async function manejarSubidaArchivo(sheetKey, file, statusEl) {
+  if (!file) return;
+  const t = SHEET_TEMPLATES[sheetKey];
+  statusEl.textContent = 'Leyendo archivo...';
+  statusEl.className = 'text-xs text-on-surface-variant mt-2';
+  try {
+    const rows = await leerArchivoComoFilas(file);
+    if (!rows || rows.length === 0) {
+      statusEl.textContent = 'El archivo no tiene filas de datos.';
+      statusEl.className = 'text-xs text-error mt-2';
+      return;
+    }
+    DB[t.dbKey] = rows;
+    statusEl.textContent = `Se cargaron ${rows.length} filas en ${t.label}. Esto actualiza la app en esta sesión del navegador — aún no se guardó en Google Sheets.`;
+    statusEl.className = 'text-xs text-success mt-2';
+    if (sheetKey === 'data') { renderDataTable(); renderDashboard(); }
+    if (sheetKey === 'ubicaciones') { renderUbiTable(); }
+    if (sheetKey === 'maestra') { renderMaestraTable(); }
+    if (sheetKey === 'usuario') { renderUsuariosTable(); }
+  } catch (err) {
+    statusEl.textContent = 'Error al leer el archivo: ' + err.message;
+    statusEl.className = 'text-xs text-error mt-2';
+  }
+}
+
+document.querySelectorAll('.btn-plantilla').forEach(btn => {
+  btn.addEventListener('click', () => descargarPlantilla(btn.dataset.plantilla));
+});
+document.querySelectorAll('[data-subir]').forEach(input => {
+  input.addEventListener('change', () => {
+    const sheetKey = input.dataset.subir;
+    const statusEl = document.querySelector(`[data-status="${sheetKey}"]`);
+    const file = input.files[0];
+    manejarSubidaArchivo(sheetKey, file, statusEl);
+    input.value = '';
+  });
+});
 
 /* ==================== UTIL ==================== */
 function debounce(fn, ms) {
