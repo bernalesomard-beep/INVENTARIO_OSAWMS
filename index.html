@@ -144,45 +144,54 @@
           <h2 class="text-2xl font-bold font-headline mb-1">Resumen Ejecutivo</h2>
           <p class="text-on-surface-variant text-sm">Monitoreo de inventario en tiempo real y precisión de líneas.</p>
         </div>
-        <div class="flex bg-surface-container-high p-1 rounded-lg">
-          <button data-rango="hoy" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded bg-white shadow-sm text-primary transition-colors">Hoy</button>
-          <button data-rango="semana" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded text-on-surface-variant hover:bg-white/60 transition-colors">Semana</button>
-          <button data-rango="mes" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded text-on-surface-variant hover:bg-white/60 transition-colors">Mes</button>
-          <button data-rango="trimestre" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded text-on-surface-variant hover:bg-white/60 transition-colors">Trimestre</button>
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="flex bg-surface-container-high p-1 rounded-lg">
+            <button data-rango="hoy" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded bg-white shadow-sm text-primary transition-colors">Hoy</button>
+            <button data-rango="semana" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded text-on-surface-variant hover:bg-white/60 transition-colors">Semana</button>
+            <button data-rango="mes" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded text-on-surface-variant hover:bg-white/60 transition-colors">Mes</button>
+            <button data-rango="trimestre" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded text-on-surface-variant hover:bg-white/60 transition-colors">Trimestre</button>
+          </div>
+          <div class="flex items-center gap-1.5 bg-white border border-outline-variant rounded-lg px-2 py-1">
+            <span class="text-xs text-on-surface-variant pl-1">Desde</span>
+            <input id="dashKpiDesde" type="date" class="rounded-md border-0 focus:ring-primary text-xs font-data py-1 px-1.5">
+            <span class="text-xs text-on-surface-variant">Hasta</span>
+            <input id="dashKpiHasta" type="date" class="rounded-md border-0 focus:ring-primary text-xs font-data py-1 px-1.5">
+            <button id="dashKpiLimpiar" title="Quitar rango personalizado" class="text-on-surface-variant hover:text-error shrink-0"><span class="material-symbols-outlined text-[16px]">close</span></button>
+          </div>
         </div>
       </div>
 
       <!-- KPI Row -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-6">
+        <div class="bg-white border border-outline-variant rounded-xl p-5 flex flex-col justify-between h-32">
           <div class="flex justify-between items-start">
             <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Líneas Totales</span>
-            <span class="material-symbols-outlined text-on-surface-variant opacity-50 text-[18px]">list_alt</span>
+            <span class="material-symbols-outlined text-on-surface-variant opacity-50 text-[20px]">list_alt</span>
           </div>
-          <p id="kpiLineasTotales" class="text-3xl font-bold font-data">-</p>
+          <p id="kpiLineasTotales" class="text-4xl font-bold font-data">-</p>
         </div>
-        <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+        <div class="bg-white border border-outline-variant rounded-xl p-5 flex flex-col justify-between h-32">
           <div class="flex justify-between items-start">
             <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Líneas Correctas</span>
-            <span class="material-symbols-outlined text-success opacity-70 text-[18px]">check_circle</span>
+            <span class="material-symbols-outlined text-success opacity-70 text-[20px]">check_circle</span>
           </div>
-          <p id="kpiLineasCorrectas" class="text-3xl font-bold font-data text-success">-</p>
+          <p id="kpiLineasCorrectas" class="text-4xl font-bold font-data text-success">-</p>
         </div>
-        <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+        <div class="bg-white border border-outline-variant rounded-xl p-5 flex flex-col justify-between h-32">
           <div class="flex justify-between items-start">
             <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Diferencias</span>
-            <span class="material-symbols-outlined text-error opacity-70 text-[18px]">warning</span>
+            <span class="material-symbols-outlined text-error opacity-70 text-[20px]">warning</span>
           </div>
-          <p id="kpiDiferencias" class="text-3xl font-bold font-data text-error">-</p>
+          <p id="kpiDiferencias" class="text-4xl font-bold font-data text-error">-</p>
         </div>
-        <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+        <div class="bg-white border border-outline-variant rounded-xl p-5 flex flex-col justify-between h-32">
           <div class="flex justify-between items-start">
             <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Progreso Global</span>
-            <span class="material-symbols-outlined text-primary-fixed-dim opacity-70 text-[18px]">donut_large</span>
+            <span class="material-symbols-outlined text-primary-fixed-dim opacity-70 text-[20px]">donut_large</span>
           </div>
           <div>
-            <p id="kpiProgresoGlobal" class="text-3xl font-bold font-data">-</p>
-            <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-1.5 overflow-hidden">
+            <p id="kpiProgresoGlobal" class="text-4xl font-bold font-data">-</p>
+            <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
               <div id="kpiProgresoBar" class="bg-primary h-full rounded-full transition-all" style="width:0%"></div>
             </div>
           </div>
@@ -190,12 +199,26 @@
       </div>
 
       <!-- Charts Row -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-        <div class="bg-white border border-outline-variant rounded-xl p-4 h-72 flex flex-col">
-          <h3 class="font-semibold mb-3 text-sm">Progreso por Rango de Fechas</h3>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+        <div class="bg-white border border-outline-variant rounded-xl p-5 h-80 flex flex-col">
+          <h3 class="font-semibold mb-1 text-sm">Progreso por Rango de Fechas</h3>
+          <div class="grid grid-cols-3 gap-3 mb-3">
+            <div class="bg-surface-container-low rounded-lg px-3 py-2">
+              <p class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold">Unid. trabajadas</p>
+              <p id="statUnidadesTrabajadas" class="text-lg font-bold font-data">-</p>
+            </div>
+            <div class="bg-surface-container-low rounded-lg px-3 py-2">
+              <p class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold">Ubicaciones</p>
+              <p id="statUbicaciones" class="text-lg font-bold font-data">-</p>
+            </div>
+            <div class="bg-surface-container-low rounded-lg px-3 py-2">
+              <p class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold">Códigos</p>
+              <p id="statCodigos" class="text-lg font-bold font-data">-</p>
+            </div>
+          </div>
           <div id="chartRangoFechas" class="flex-1 flex items-end gap-2 border-l border-b border-outline-variant px-2 pb-1"></div>
         </div>
-        <div class="bg-white border border-outline-variant rounded-xl p-4 h-72 flex flex-col overflow-y-auto">
+        <div class="bg-white border border-outline-variant rounded-xl p-5 h-80 flex flex-col overflow-y-auto">
           <h3 class="font-semibold mb-3 text-sm">Progreso por Rack</h3>
           <div id="chartPorRack" class="flex-1 flex flex-col justify-center gap-3"></div>
         </div>
@@ -203,7 +226,7 @@
 
       <!-- Detailed table (independent date range + filters) -->
       <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
-        <div class="p-4 border-b border-outline-variant bg-surface-container-low flex flex-col gap-3">
+        <div class="p-5 border-b border-outline-variant bg-surface-container-low flex flex-col gap-3">
           <h3 class="font-semibold">Resumen de Precisión de Líneas</h3>
           <div class="flex flex-wrap gap-3">
             <div class="relative flex-1 min-w-[160px]">
@@ -236,16 +259,17 @@
         <div class="overflow-x-auto max-h-[55vh] overflow-y-auto">
           <table class="w-full text-sm">
             <thead class="sticky top-0 bg-surface-container-low z-10"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
-              <th class="py-2 pl-3 pr-1 w-8"><input id="dashSelAll" type="checkbox" class="rounded border-outline-variant"></th>
-              <th class="py-2 px-3 font-semibold">Rack</th><th class="py-2 px-3 font-semibold">Nivel</th>
-              <th class="py-2 px-3 font-semibold">Ubicación</th><th class="py-2 px-3 font-semibold">Código</th>
-              <th class="py-2 px-3 font-semibold text-right">Saldo</th><th class="py-2 px-3 font-semibold text-right">Cantidad</th>
-              <th class="py-2 px-3 font-semibold text-right">Diferencia</th><th class="py-2 px-3 font-semibold">Estatus</th>
+              <th class="py-3 pl-4 pr-1 w-8"><input id="dashSelAll" type="checkbox" class="rounded border-outline-variant"></th>
+              <th class="py-3 px-4 font-semibold">Rack</th><th class="py-3 px-4 font-semibold">Nivel</th>
+              <th data-sort="UBICACION" class="dash-sort-th py-3 px-4 font-semibold cursor-pointer select-none hover:text-on-surface">Ubicación <span class="sort-icon text-[10px] opacity-40">↕</span></th>
+              <th data-sort="CODIGO" class="dash-sort-th py-3 px-4 font-semibold cursor-pointer select-none hover:text-on-surface">Código <span class="sort-icon text-[10px] opacity-40">↕</span></th>
+              <th class="py-3 px-4 font-semibold text-right">Saldo</th><th class="py-3 px-4 font-semibold text-right">Cantidad</th>
+              <th class="py-3 px-4 font-semibold text-right">Diferencia</th><th class="py-3 px-4 font-semibold">Estatus</th>
             </tr></thead>
             <tbody id="dashDetailTableBody"></tbody>
           </table>
         </div>
-        <div class="flex flex-wrap items-center justify-between gap-2 p-3 border-t border-outline-variant">
+        <div class="flex flex-wrap items-center justify-between gap-2 p-4 border-t border-outline-variant">
           <p id="dashDetailRowCount" class="text-xs text-on-surface-variant"></p>
           <div class="flex items-center gap-2">
             <span id="dashSelCount" class="text-xs text-on-surface-variant hidden"></span>
@@ -325,39 +349,22 @@
         </button>
       </div>
 
-      <!-- Sesión de conteo (coincide con DATA) -->
-      <div class="bg-white border border-outline-variant rounded-xl p-4 mb-6">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="font-semibold">Conteo de esta sesión — DATA (<span id="conteoCount">0</span>)</h3>
+      <!-- Sesión de conteo (coincide con DATA) — solo contador, sin mostrar el detalle -->
+      <div class="bg-white border border-outline-variant rounded-xl p-4 mb-4 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">inventory_2</span>
+          <span class="font-semibold">Conteo de esta sesión (DATA)</span>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead><tr class="text-left text-on-surface-variant border-b border-outline-variant">
-              <th class="py-2 pr-4 font-semibold">Código</th><th class="py-2 pr-4 font-semibold">Descripción</th>
-              <th class="py-2 pr-4 font-semibold">Ubicación</th><th class="py-2 pr-4 font-semibold">Lote</th>
-              <th class="py-2 pr-4 font-semibold">Saldo Sist.</th><th class="py-2 pr-4 font-semibold">Cant. Física</th>
-              <th class="py-2 pr-4 font-semibold">Estatus</th><th class="py-2 font-semibold"></th>
-            </tr></thead>
-            <tbody id="conteoTableBody"><tr><td colspan="8" class="py-6 text-center text-on-surface-variant">Sin registros todavía.</td></tr></tbody>
-          </table>
-        </div>
+        <span id="conteoCount" class="text-2xl font-bold font-data">0</span>
       </div>
 
-      <!-- Sesión de manuales (no encontrados en DATA) -->
-      <div class="bg-white border border-outline-variant rounded-xl p-4 mb-6">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="font-semibold">No encontrados en DATA — Hoja Manual (<span id="manualCount">0</span>)</h3>
+      <!-- Sesión de manuales (no encontrados en DATA) — solo contador, sin mostrar el detalle -->
+      <div class="bg-white border border-outline-variant rounded-xl p-4 mb-6 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">note_add</span>
+          <span class="font-semibold">No encontrados en DATA (Hoja Manual)</span>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead><tr class="text-left text-on-surface-variant border-b border-outline-variant">
-              <th class="py-2 pr-4 font-semibold">Código</th><th class="py-2 pr-4 font-semibold">Descripción</th>
-              <th class="py-2 pr-4 font-semibold">Ubicación</th><th class="py-2 pr-4 font-semibold">Cantidad</th>
-              <th class="py-2 font-semibold"></th>
-            </tr></thead>
-            <tbody id="manualSessionTableBody"><tr><td colspan="5" class="py-6 text-center text-on-surface-variant">Sin registros todavía.</td></tr></tbody>
-          </table>
-        </div>
+        <span id="manualCount" class="text-2xl font-bold font-data">0</span>
       </div>
 
       <!-- Guardar / Exportar -->
@@ -677,6 +684,11 @@ function parseFechaRegistro(v) {
 }
 
 function getRangoFechas(tipo) {
+  const desdeVal = document.getElementById('dashKpiDesde') ? document.getElementById('dashKpiDesde').value : '';
+  const hastaVal = document.getElementById('dashKpiHasta') ? document.getElementById('dashKpiHasta').value : '';
+  if (desdeVal && hastaVal) {
+    return { desde: new Date(desdeVal + 'T00:00:00'), hasta: new Date(hastaVal + 'T23:59:59'), personalizado: true };
+  }
   const ahora = new Date();
   const hasta = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 23, 59, 59);
   let desde;
@@ -684,7 +696,7 @@ function getRangoFechas(tipo) {
   else if (tipo === 'semana') { desde = new Date(ahora); desde.setDate(desde.getDate() - 6); desde.setHours(0, 0, 0, 0); }
   else if (tipo === 'mes') { desde = new Date(ahora); desde.setDate(desde.getDate() - 29); desde.setHours(0, 0, 0, 0); }
   else { desde = new Date(ahora); desde.setMonth(desde.getMonth() - 3); desde.setHours(0, 0, 0, 0); }
-  return { desde, hasta };
+  return { desde, hasta, personalizado: false };
 }
 
 function normalizarEstatus(e) {
@@ -718,7 +730,7 @@ function renderDashboard() {
   renderDashDetailTable();
 }
 
-// KPIs + gráficos: se filtran por dashRango (Hoy / Semana / Mes / Trimestre)
+// KPIs + gráficos: se filtran por dashRango (Hoy / Semana / Mes / Trimestre) o por rango personalizado
 function renderDashKpisYCharts() {
   const { desde, hasta } = getRangoFechas(dashRango);
   const enRango = DB.data.filter(r => {
@@ -735,6 +747,17 @@ function renderDashKpisYCharts() {
   document.getElementById('kpiDiferencias').textContent = diferencias.toLocaleString('es-PE');
   document.getElementById('kpiProgresoGlobal').textContent = totales > 0 ? progreso.toFixed(1) + '%' : '—';
   document.getElementById('kpiProgresoBar').style.width = progreso.toFixed(1) + '%';
+
+  // Unidades trabajadas (suma de CANTIDAD contada), ubicaciones y códigos únicos dentro del rango
+  const unidades = enRango.reduce((sum, r) => {
+    const c = parseFloat(r.CANTIDAD);
+    return sum + (isNaN(c) ? 0 : c);
+  }, 0);
+  const ubicacionesUnicas = new Set(enRango.map(r => (r.UBICACION || '').toString().trim()).filter(Boolean)).size;
+  const codigosUnicos = new Set(enRango.map(r => (r.CODIGO || '').toString().trim()).filter(Boolean)).size;
+  document.getElementById('statUnidadesTrabajadas').textContent = unidades.toLocaleString('es-PE');
+  document.getElementById('statUbicaciones').textContent = ubicacionesUnicas.toLocaleString('es-PE');
+  document.getElementById('statCodigos').textContent = codigosUnicos.toLocaleString('es-PE');
 
   renderChartRangoFechas(desde, hasta);
   renderChartPorRack(desde, hasta);
@@ -797,6 +820,8 @@ function renderChartPorRack(desde, hasta) {
 // Tabla de detalle: filtros propios de código, ubicación, estatus y rango de fechas INDEPENDIENTE del de arriba
 let dashFilteredRows = []; // última lista filtrada (para exportar "todo lo filtrado")
 let dashSelected = new Set(); // keys de filas marcadas con checkbox
+let dashSortField = null; // 'CODIGO' | 'UBICACION' | null
+let dashSortDir = 'asc';
 
 function dashRowKey(r, i) {
   return r.ID_DATA ? String(r.ID_DATA) : `${r.CODIGO || ''}__${r.UBICACION || ''}__${i}`;
@@ -811,7 +836,7 @@ function renderDashDetailTable() {
   const desde = desdeVal ? new Date(desdeVal + 'T00:00:00') : null;
   const hasta = hastaVal ? new Date(hastaVal + 'T23:59:59') : null;
 
-  const rows = DB.data.filter(r => {
+  let rows = DB.data.filter(r => {
     if (codigo && !(r.CODIGO || '').toString().toUpperCase().includes(codigo)) return false;
     if (ubicacion && !(r.UBICACION || '').toString().toUpperCase().includes(ubicacion)) return false;
     const estNorm = normalizarEstatus(r.ESTATUS);
@@ -824,7 +849,29 @@ function renderDashDetailTable() {
     }
     return true;
   });
+
+  if (dashSortField) {
+    const dir = dashSortDir === 'asc' ? 1 : -1;
+    rows = rows.slice().sort((a, b) => {
+      const va = (a[dashSortField] || '').toString();
+      const vb = (b[dashSortField] || '').toString();
+      return va.localeCompare(vb, 'es', { numeric: true, sensitivity: 'base' }) * dir;
+    });
+  }
   dashFilteredRows = rows;
+
+  document.querySelectorAll('.dash-sort-th').forEach(th => {
+    const icon = th.querySelector('.sort-icon');
+    if (th.dataset.sort === dashSortField) {
+      icon.textContent = dashSortDir === 'asc' ? '↑' : '↓';
+      icon.classList.remove('opacity-40');
+      icon.classList.add('text-primary', 'opacity-100');
+    } else {
+      icon.textContent = '↕';
+      icon.classList.add('opacity-40');
+      icon.classList.remove('text-primary', 'opacity-100');
+    }
+  });
 
   document.getElementById('dashDetailTableBody').innerHTML = rows.slice(0, 500).map((r, i) => {
     const saldo = parseFloat(r.SALDO);
@@ -912,11 +959,49 @@ document.getElementById('btnExportDashSel').addEventListener('click', () => expo
 document.querySelectorAll('.dash-rango-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     dashRango = btn.dataset.rango;
+    document.getElementById('dashKpiDesde').value = '';
+    document.getElementById('dashKpiHasta').value = '';
     document.querySelectorAll('.dash-rango-btn').forEach(b => b.classList.remove('bg-white', 'shadow-sm', 'text-primary'));
     document.querySelectorAll('.dash-rango-btn').forEach(b => b.classList.add('text-on-surface-variant'));
     btn.classList.remove('text-on-surface-variant');
     btn.classList.add('bg-white', 'shadow-sm', 'text-primary');
     renderDashKpisYCharts();
+  });
+});
+
+['dashKpiDesde', 'dashKpiHasta'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    const d = document.getElementById('dashKpiDesde').value;
+    const h = document.getElementById('dashKpiHasta').value;
+    if (d && h) {
+      document.querySelectorAll('.dash-rango-btn').forEach(b => b.classList.remove('bg-white', 'shadow-sm', 'text-primary'));
+      document.querySelectorAll('.dash-rango-btn').forEach(b => b.classList.add('text-on-surface-variant'));
+    }
+    renderDashKpisYCharts();
+  });
+});
+document.getElementById('dashKpiLimpiar').addEventListener('click', () => {
+  document.getElementById('dashKpiDesde').value = '';
+  document.getElementById('dashKpiHasta').value = '';
+  document.querySelectorAll('.dash-rango-btn').forEach(b => b.classList.remove('bg-white', 'shadow-sm', 'text-primary', 'text-on-surface-variant'));
+  document.querySelectorAll('.dash-rango-btn').forEach(b => b.classList.add('text-on-surface-variant'));
+  const hoyBtn = document.querySelector('.dash-rango-btn[data-rango="hoy"]');
+  hoyBtn.classList.remove('text-on-surface-variant');
+  hoyBtn.classList.add('bg-white', 'shadow-sm', 'text-primary');
+  dashRango = 'hoy';
+  renderDashKpisYCharts();
+});
+
+document.querySelectorAll('.dash-sort-th').forEach(th => {
+  th.addEventListener('click', () => {
+    const field = th.dataset.sort;
+    if (dashSortField === field) {
+      dashSortDir = dashSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      dashSortField = field;
+      dashSortDir = 'asc';
+    }
+    renderDashDetailTable();
   });
 });
 
@@ -1036,21 +1121,7 @@ document.getElementById('mfAdd').addEventListener('click', () => {
 });
 
 function renderManualSessionTable() {
-  const tbody = document.getElementById('manualSessionTableBody');
   document.getElementById('manualCount').textContent = sessionManual.length;
-  if (sessionManual.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-on-surface-variant">Sin registros todavía.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = sessionManual.map((m, i) => `
-    <tr class="border-b border-surface-variant last:border-0 hover:bg-surface-container-low">
-      <td class="py-2 pr-4 font-data">${m.CODIGO}</td><td class="py-2 pr-4">${m.DESCRIPCION}</td>
-      <td class="py-2 pr-4 font-data">${m.UBICACION}</td><td class="py-2 pr-4 font-data">${m.CANTIDAD}</td>
-      <td class="py-2"><button data-removemanual="${i}" class="text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[18px]">delete</span></button></td>
-    </tr>`).join('');
-  tbody.querySelectorAll('[data-removemanual]').forEach(btn => {
-    btn.addEventListener('click', () => { sessionManual.splice(+btn.dataset.removemanual, 1); renderManualSessionTable(); });
-  });
 }
 
 document.getElementById('cfCantidad').addEventListener('input', () => {
@@ -1086,27 +1157,7 @@ document.getElementById('cfAdd').addEventListener('click', () => {
 });
 
 function renderConteoTable() {
-  const tbody = document.getElementById('conteoTableBody');
   document.getElementById('conteoCount').textContent = sessionCounts.length;
-  if (sessionCounts.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" class="py-6 text-center text-on-surface-variant">Sin registros todavía.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = sessionCounts.map((c, i) => `
-    <tr class="border-b border-surface-variant last:border-0 hover:bg-surface-container-low">
-      <td class="py-2 pr-4 font-data">${c.CODIGO}</td><td class="py-2 pr-4">${c.DESCRIPCCION}</td>
-      <td class="py-2 pr-4 font-data">${c.UBICACION}</td><td class="py-2 pr-4 font-data">${c.LOTE}</td>
-      <td class="py-2 pr-4 font-data text-right">${c.SALDO_SISTEMA}</td><td class="py-2 pr-4 font-data text-right">${c.CANTIDAD_FISICA}</td>
-      <td class="py-2 pr-4">${estatusBadgeHtml(c.ESTATUS)}</td>
-      <td class="py-2"><button data-remove="${i}" class="text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[18px]">delete</span></button></td>
-    </tr>`).join('');
-  tbody.querySelectorAll('[data-remove]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      sessionCounts.splice(+btn.dataset.remove, 1);
-      renderConteoTable();
-      renderSessionKpi();
-    });
-  });
 }
 
 document.getElementById('btnClearSession').addEventListener('click', () => {
