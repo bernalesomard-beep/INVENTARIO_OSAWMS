@@ -314,6 +314,110 @@
           </div>
         </div>
       </div>
+
+      <!-- ===== SALDO INICIAL (BPCS vs Cliente) ===== -->
+      <div class="mt-6">
+        <h3 class="text-lg font-bold font-headline mb-1">Control de Saldo Inicial</h3>
+        <p class="text-on-surface-variant text-sm mb-4">Comparación entre el saldo inicial por código (BPCS/Cliente) y lo inventariado.</p>
+
+        <!-- KPIs de avance -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
+          <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+            <div class="flex justify-between items-start">
+              <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Códigos con Saldo</span>
+              <span class="material-symbols-outlined text-on-surface-variant opacity-50 text-[18px]">list_alt</span>
+            </div>
+            <p id="kpiSaldoTotalCodigos" class="text-3xl font-bold font-data">-</p>
+          </div>
+          <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+            <div class="flex justify-between items-start">
+              <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Inventariados</span>
+              <span class="material-symbols-outlined text-success opacity-70 text-[18px]">check_circle</span>
+            </div>
+            <p id="kpiSaldoContados" class="text-3xl font-bold font-data text-success">-</p>
+          </div>
+          <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+            <div class="flex justify-between items-start">
+              <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">% Avance</span>
+              <span class="material-symbols-outlined text-primary-fixed-dim opacity-70 text-[18px]">donut_large</span>
+            </div>
+            <div>
+              <p id="kpiSaldoPorcentaje" class="text-3xl font-bold font-data">-</p>
+              <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-1.5 overflow-hidden">
+                <div id="saldoProgresoBar" class="bg-primary h-full rounded-full transition-all" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+            <div class="flex justify-between items-start">
+              <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Diferencia Neta</span>
+              <span class="material-symbols-outlined text-error opacity-70 text-[18px]">warning</span>
+            </div>
+            <p id="kpiSaldoDiferencia" class="text-3xl font-bold font-data">-</p>
+          </div>
+        </div>
+
+        <!-- Gráfico por estatus -->
+        <div class="bg-white border border-outline-variant rounded-xl p-5 mb-5">
+          <h4 class="font-semibold mb-3 text-sm">Distribución por Estatus</h4>
+          <div id="chartSaldoEstatus" class="flex items-end justify-around gap-6 border-l border-b border-outline-variant px-4 pb-1 min-h-[140px]"></div>
+        </div>
+
+        <!-- Detalle -->
+        <div class="bg-white border border-outline-variant rounded-xl">
+          <div class="p-5 border-b border-outline-variant bg-surface-container-low flex flex-col gap-3 rounded-t-xl">
+            <h4 class="font-semibold">Detalle de Saldo por Código</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+                <input id="saldoFiltroCodigo" type="text" autocomplete="off" placeholder="Filtrar por código BPCS o Cliente" class="w-full pl-9 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+              </div>
+              <div class="relative" id="saldoEstatusWrap">
+                <button id="saldoEstatusBtn" type="button" class="w-full flex items-center pl-9 pr-2 py-2 rounded-lg border border-outline-variant focus:border-primary focus:ring-primary text-sm bg-white text-left relative">
+                  <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">filter_alt</span>
+                  <span id="saldoEstatusLabel" class="truncate">Todos los Estatus</span>
+                  <span class="material-symbols-outlined ml-auto text-on-surface-variant text-[18px]">expand_more</span>
+                </button>
+                <div id="saldoEstatusMenu" class="hidden absolute z-20 mt-1 w-full bg-white border border-outline-variant rounded-lg shadow-lg p-1.5">
+                  <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                    <input type="checkbox" data-saldo-estatus-opt="OK" class="saldo-estatus-check rounded border-outline-variant"> Conforme
+                  </label>
+                  <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                    <input type="checkbox" data-saldo-estatus-opt="SOBRANTE" class="saldo-estatus-check rounded border-outline-variant"> Sobrante
+                  </label>
+                  <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                    <input type="checkbox" data-saldo-estatus-opt="FALTANTE" class="saldo-estatus-check rounded border-outline-variant"> Faltante
+                  </label>
+                  <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                    <input type="checkbox" data-saldo-estatus-opt="PENDIENTE" class="saldo-estatus-check rounded border-outline-variant"> Pendiente
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="overflow-x-auto max-h-[55vh] overflow-y-auto">
+            <table class="w-full text-sm">
+              <thead class="sticky top-0 bg-surface-container-low z-10"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
+                <th data-saldo-sort="codBpcs" class="saldo-sort-th py-3 px-4 font-semibold cursor-pointer select-none hover:text-on-surface">Código BPCS <span class="sort-icon text-[10px] opacity-40">↕</span></th>
+                <th data-saldo-sort="codCliente" class="saldo-sort-th py-3 px-4 font-semibold cursor-pointer select-none hover:text-on-surface">Código Cliente <span class="sort-icon text-[10px] opacity-40">↕</span></th>
+                <th class="py-3 px-4 font-semibold text-right">Cant. Inicial</th>
+                <th class="py-3 px-4 font-semibold text-right">Inventariado</th>
+                <th class="py-3 px-4 font-semibold text-right">Vendido</th>
+                <th class="py-3 px-4 font-semibold text-right">Diferencia</th>
+                <th class="py-3 px-4 font-semibold">Estatus</th>
+                <th class="py-3 px-4 font-semibold text-center">Acción</th>
+              </tr></thead>
+              <tbody id="saldoDetailTableBody"></tbody>
+            </table>
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-2 p-4 border-t border-outline-variant">
+            <p id="saldoDetailRowCount" class="text-xs text-on-surface-variant"></p>
+            <button id="btnExportSaldo" class="flex items-center gap-1.5 text-xs border border-outline-variant rounded-lg px-3 py-1.5 hover:bg-surface-container-low">
+              <span class="material-symbols-outlined text-[16px]">download</span> Exportar a Excel
+            </button>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ===== PANEL: TOMA DE INVENTARIO ===== -->
@@ -632,13 +736,15 @@ const SHEET_URLS = {
   data: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6knd52iLgvI9mITzf58-ny_gJoTWecCkWxGHd9Am7oKzbvzA-Z9ACZ-xY49qfr1uINSV8-_PKE3Up/pub?gid=431089307&single=true&output=csv",
   manual: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6knd52iLgvI9mITzf58-ny_gJoTWecCkWxGHd9Am7oKzbvzA-Z9ACZ-xY49qfr1uINSV8-_PKE3Up/pub?gid=896875505&single=true&output=csv",
   maestra: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6knd52iLgvI9mITzf58-ny_gJoTWecCkWxGHd9Am7oKzbvzA-Z9ACZ-xY49qfr1uINSV8-_PKE3Up/pub?gid=1288666899&single=true&output=csv",
+  saldo: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6knd52iLgvI9mITzf58-ny_gJoTWecCkWxGHd9Am7oKzbvzA-Z9ACZ-xY49qfr1uINSV8-_PKE3Up/pub?gid=945923461&single=true&output=csv",
+  venta: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6knd52iLgvI9mITzf58-ny_gJoTWecCkWxGHd9Am7oKzbvzA-Z9ACZ-xY49qfr1uINSV8-_PKE3Up/pub?gid=647651347&single=true&output=csv",
 };
 
 // Pega aquí la URL de tu Apps Script Web App (termina en /exec) una vez que lo implementes.
 // Mientras esté vacío, el botón "Guardar en Google Sheet" quedará deshabilitado y solo podrás exportar a Excel.
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwmZzME570enDyAkPV6smo4zIBGhaKzGrO58jJ-Ob43A_3Tb6yxuhGQwq29hZkglLQ/exec";
 
-let DB = { usuario: [], ubicaciones: [], data: [], manual: [], maestra: [] };
+let DB = { usuario: [], ubicaciones: [], data: [], manual: [], maestra: [], saldo: [], venta: [] };
 let sessionCounts = []; // conteo de esta sesión (coincide con DATA)
 let sessionManual = []; // ítems contados que no existen en DATA (van a HOJA MANUAL)
 let currentUser = null;
@@ -662,11 +768,12 @@ async function loadAllData() {
   document.getElementById('globalStatus').classList.add('flex');
   if (btn) btn.disabled = true;
   if (icon) icon.classList.add('spin');
-  const [usuario, ubicaciones, data, manual, maestra] = await Promise.all([
+  const [usuario, ubicaciones, data, manual, maestra, saldo, venta] = await Promise.all([
     fetchCsv(SHEET_URLS.usuario), fetchCsv(SHEET_URLS.ubicaciones),
-    fetchCsv(SHEET_URLS.data), fetchCsv(SHEET_URLS.manual), fetchCsv(SHEET_URLS.maestra)
+    fetchCsv(SHEET_URLS.data), fetchCsv(SHEET_URLS.manual), fetchCsv(SHEET_URLS.maestra),
+    fetchCsv(SHEET_URLS.saldo), fetchCsv(SHEET_URLS.venta)
   ]);
-  DB = { usuario, ubicaciones, data, manual, maestra };
+  DB = { usuario, ubicaciones, data, manual, maestra, saldo, venta };
   document.getElementById('globalStatus').classList.add('hidden');
   document.getElementById('globalStatus').classList.remove('flex');
   if (btn) btn.disabled = false;
@@ -675,6 +782,7 @@ async function loadAllData() {
   if (syncEl) syncEl.textContent = 'Última actualización: ' + new Date().toLocaleTimeString('es-PE');
   dashSelected.clear();
   renderDashboard();
+  renderSaldoDashboard();
   renderDataTable();
   renderUbiTable();
   renderMaestraTable();
@@ -1064,6 +1172,173 @@ function exportarDashboardExcel(soloSeleccionados) {
 
 document.getElementById('btnExportDashAll').addEventListener('click', () => exportarDashboardExcel(false));
 document.getElementById('btnExportDashSel').addEventListener('click', () => exportarDashboardExcel(true));
+
+/* ==================== SALDO INICIAL (BPCS vs Cliente) ==================== */
+let saldoRowsCache = [];
+let saldoEstatusSeleccionados = new Set();
+let saldoSortField = null;
+let saldoSortDir = 'asc';
+
+// Cruza el SALDO (COD.PROD.BPCS / COD.PROD.CLIENTE / SALDO INICIAL) con lo contado en DATA (CODIGO / CANTIDAD)
+function computeSaldoRows() {
+  return DB.saldo.map(r => {
+    const codBpcs = (r['COD.PROD.BPCS'] || '').toString().trim();
+    const codCliente = (r['COD.PROD.CLIENTE'] || '').toString().trim();
+    const saldoNum = parseFloat(r['SALDO INICIAL']) || 0;
+    const matches = DB.data.filter(d => (d.CODIGO || '').toString().trim().toUpperCase() === codBpcs.toUpperCase());
+    const contados = matches.filter(d => normalizarEstatus(d.ESTATUS) !== 'PENDIENTE');
+    const yaContado = contados.length > 0;
+    const inventariado = contados.reduce((s, d) => s + (parseFloat(d.CANTIDAD) || 0), 0);
+    const vendido = DB.venta
+      .filter(v => (v['COD.PROD.BPCS'] || '').toString().trim().toUpperCase() === codBpcs.toUpperCase())
+      .reduce((s, v) => s + (parseFloat(v['CANNTIDAD']) || 0), 0);
+    let estatus, diferencia;
+    if (!yaContado) { estatus = 'PENDIENTE'; diferencia = null; }
+    else {
+      diferencia = (inventariado + vendido) - saldoNum;
+      estatus = diferencia === 0 ? 'OK' : (diferencia > 0 ? 'SOBRANTE' : 'FALTANTE');
+    }
+    return { codBpcs, codCliente, saldoInicial: saldoNum, inventariado, vendido, diferencia, estatus, yaContado };
+  });
+}
+
+function renderSaldoDashboard() {
+  saldoRowsCache = computeSaldoRows();
+  renderSaldoResumen();
+  renderSaldoDetailTable();
+}
+
+function renderSaldoResumen() {
+  const rows = saldoRowsCache;
+  const total = rows.length;
+  const contadosArr = rows.filter(r => r.yaContado);
+  const contados = contadosArr.length;
+  const pct = total > 0 ? (contados / total * 100) : 0;
+  const diffNeto = contadosArr.reduce((s, r) => s + (r.diferencia || 0), 0);
+
+  document.getElementById('kpiSaldoTotalCodigos').textContent = total.toLocaleString('es-PE');
+  document.getElementById('kpiSaldoContados').textContent = contados.toLocaleString('es-PE');
+  document.getElementById('kpiSaldoPorcentaje').textContent = total > 0 ? pct.toFixed(1) + '%' : '—';
+  document.getElementById('saldoProgresoBar').style.width = pct.toFixed(1) + '%';
+  const diffEl = document.getElementById('kpiSaldoDiferencia');
+  diffEl.textContent = total > 0 ? ((diffNeto > 0 ? '+' : '') + Math.round(diffNeto).toLocaleString('es-PE')) : '—';
+  diffEl.className = 'text-3xl font-bold font-data ' + (diffNeto === 0 ? '' : diffNeto > 0 ? 'text-[#b06000]' : 'text-error');
+
+  const conteo = { OK: 0, SOBRANTE: 0, FALTANTE: 0, PENDIENTE: 0 };
+  rows.forEach(r => conteo[r.estatus]++);
+  const colores = { OK: 'bg-success', SOBRANTE: 'bg-[#b06000]', FALTANTE: 'bg-error', PENDIENTE: 'bg-outline-variant' };
+  const labels = { OK: 'Conforme', SOBRANTE: 'Sobrante', FALTANTE: 'Faltante', PENDIENTE: 'Pendiente' };
+  document.getElementById('chartSaldoEstatus').innerHTML = Object.keys(conteo).map(k => {
+    const v = conteo[k];
+    const pctK = total > 0 ? (v / total * 100) : 0;
+    return `<div class="flex flex-col items-center gap-1 h-full justify-end">
+      <div class="flex flex-col items-center justify-end h-full">
+        <span class="text-[10px] font-data mb-0.5">${v.toLocaleString('es-PE')}</span>
+        <div class="${colores[k]} w-9 rounded-t transition-all" style="height:${Math.max(3, Math.min(100, pctK))}%" title="${labels[k]}: ${v} (${pctK.toFixed(1)}%)"></div>
+      </div>
+      <span class="text-[11px] text-on-surface-variant font-semibold mt-1">${labels[k]}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderSaldoDetailTable() {
+  const q = (document.getElementById('saldoFiltroCodigo').value || '').toUpperCase().trim();
+  let rows = saldoRowsCache.filter(r => {
+    if (q && !(r.codBpcs.toUpperCase().includes(q) || r.codCliente.toUpperCase().includes(q))) return false;
+    if (saldoEstatusSeleccionados.size > 0 && !saldoEstatusSeleccionados.has(r.estatus)) return false;
+    return true;
+  });
+  if (saldoSortField) {
+    const dir = saldoSortDir === 'asc' ? 1 : -1;
+    rows = rows.slice().sort((a, b) => (a[saldoSortField] || '').toString().localeCompare((b[saldoSortField] || '').toString(), 'es', { numeric: true, sensitivity: 'base' }) * dir);
+  }
+
+  document.querySelectorAll('.saldo-sort-th').forEach(th => {
+    const icon = th.querySelector('.sort-icon');
+    if (th.dataset.saldoSort === saldoSortField) {
+      icon.textContent = saldoSortDir === 'asc' ? '↑' : '↓';
+      icon.classList.remove('opacity-40'); icon.classList.add('text-primary', 'opacity-100');
+    } else {
+      icon.textContent = '↕'; icon.classList.add('opacity-40'); icon.classList.remove('text-primary', 'opacity-100');
+    }
+  });
+
+  document.getElementById('saldoDetailRowCount').textContent = `Mostrando ${Math.min(rows.length, 500)} de ${rows.length} código(s) (de ${saldoRowsCache.length} totales).`;
+  document.getElementById('saldoDetailTableBody').innerHTML = rows.slice(0, 500).map(r => {
+    const diffTxt = r.diferencia === null ? '-' : (r.diferencia > 0 ? '+' + r.diferencia.toLocaleString('es-PE') : r.diferencia.toLocaleString('es-PE'));
+    const diffCls = r.diferencia === null ? 'text-on-surface-variant' : r.diferencia === 0 ? '' : (r.diferencia > 0 ? 'text-[#b06000]' : 'text-error');
+    const validarBtn = (r.estatus === 'FALTANTE' || r.estatus === 'SOBRANTE')
+      ? `<button data-validar-cod="${r.codBpcs}" class="btn-validar-saldo text-[11px] font-semibold text-primary border border-primary/30 rounded-lg px-2 py-1 hover:bg-primary/5">Validar</button>`
+      : `<span class="text-on-surface-variant text-[11px]">-</span>`;
+    return `<tr class="border-b border-surface-variant hover:bg-surface-container-low">
+      <td class="py-2 px-3 font-data font-semibold text-primary">${r.codBpcs}</td>
+      <td class="py-2 px-3 font-data">${r.codCliente}</td>
+      <td class="py-2 px-3 font-data text-right">${r.saldoInicial.toLocaleString('es-PE')}</td>
+      <td class="py-2 px-3 font-data text-right">${r.yaContado ? r.inventariado.toLocaleString('es-PE') : '-'}</td>
+      <td class="py-2 px-3 font-data text-right">${r.vendido.toLocaleString('es-PE')}</td>
+      <td class="py-2 px-3 font-data text-right ${diffCls}">${diffTxt}</td>
+      <td class="py-2 px-3">${estatusBadgeHtmlV2(r.estatus)}</td>
+      <td class="py-2 px-3 text-center">${validarBtn}</td>
+    </tr>`;
+  }).join('');
+
+  document.querySelectorAll('.btn-validar-saldo').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cod = btn.dataset.validarCod;
+      document.getElementById('dashFiltroCodigo').value = cod;
+      renderDashDetailTable();
+      document.getElementById('dashFiltroCodigo').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
+}
+
+document.getElementById('saldoFiltroCodigo').addEventListener('input', renderSaldoDetailTable);
+
+document.querySelectorAll('.saldo-sort-th').forEach(th => {
+  th.addEventListener('click', () => {
+    const field = th.dataset.saldoSort;
+    if (saldoSortField === field) { saldoSortDir = saldoSortDir === 'asc' ? 'desc' : 'asc'; }
+    else { saldoSortField = field; saldoSortDir = 'asc'; }
+    renderSaldoDetailTable();
+  });
+});
+
+const saldoEstatusBtn = document.getElementById('saldoEstatusBtn');
+const saldoEstatusMenu = document.getElementById('saldoEstatusMenu');
+saldoEstatusBtn.addEventListener('click', () => saldoEstatusMenu.classList.toggle('hidden'));
+document.addEventListener('click', (e) => {
+  if (!document.getElementById('saldoEstatusWrap').contains(e.target)) saldoEstatusMenu.classList.add('hidden');
+});
+document.querySelectorAll('.saldo-estatus-check').forEach(chk => {
+  chk.addEventListener('change', () => {
+    saldoEstatusSeleccionados.clear();
+    document.querySelectorAll('.saldo-estatus-check:checked').forEach(c => saldoEstatusSeleccionados.add(c.dataset.saldoEstatusOpt));
+    const labels = { OK: 'Conforme', SOBRANTE: 'Sobrante', FALTANTE: 'Faltante', PENDIENTE: 'Pendiente' };
+    document.getElementById('saldoEstatusLabel').textContent = saldoEstatusSeleccionados.size === 0
+      ? 'Todos los Estatus' : Array.from(saldoEstatusSeleccionados).map(k => labels[k]).join(', ');
+    renderSaldoDetailTable();
+  });
+});
+
+document.getElementById('btnExportSaldo').addEventListener('click', () => {
+  const q = (document.getElementById('saldoFiltroCodigo').value || '').toUpperCase().trim();
+  let rows = saldoRowsCache.filter(r => {
+    if (q && !(r.codBpcs.toUpperCase().includes(q) || r.codCliente.toUpperCase().includes(q))) return false;
+    if (saldoEstatusSeleccionados.size > 0 && !saldoEstatusSeleccionados.has(r.estatus)) return false;
+    return true;
+  });
+  if (rows.length === 0) { alert('No hay filas para exportar.'); return; }
+  const data = rows.map(r => ({
+    'COD.PROD.BPCS': r.codBpcs, 'COD.PROD.CLIENTE': r.codCliente,
+    'CANTIDAD INICIAL': r.saldoInicial, 'INVENTARIADO': r.yaContado ? r.inventariado : '',
+    'VENDIDO': r.vendido,
+    'DIFERENCIA': r.diferencia === null ? '' : r.diferencia, 'ESTATUS': r.estatus
+  }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'Saldo Inicial');
+  const fecha = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `Control_Saldo_${fecha}.xlsx`);
+});
 
 ['dashKpiDesde', 'dashKpiHasta'].forEach(id => {
   document.getElementById(id).addEventListener('change', renderDashKpisYCharts);
