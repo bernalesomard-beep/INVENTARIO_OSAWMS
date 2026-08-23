@@ -43,6 +43,9 @@
   ::-webkit-scrollbar-thumb { background: #c6c6cd; border-radius: 4px; }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
+  .dash-subview { display: none; }
+  .dash-subview.active { display: block; }
+  .dash-sub-btn.active { background-color: #000000; color: #ffffff; }
   .spin { animation: spin 1s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   [data-nav-item].active { background-color: rgba(255,255,255,0.12); color: #ffffff; opacity: 1 !important; }
@@ -153,8 +156,21 @@
         </div>
       </div>
 
+      <!-- Toggle de sub-vistas del Dashboard -->
+      <div class="flex items-center gap-2 mb-6 bg-white border border-outline-variant rounded-lg p-1 w-fit">
+        <button id="dashSubBtnMonitoreo" data-dash-sub="monitoreo" class="dash-sub-btn active flex items-center gap-1.5 text-sm font-semibold rounded-md px-3 py-1.5 transition-colors">
+          <span class="material-symbols-outlined text-[18px]">monitoring</span> Monitoreo
+        </button>
+        <button id="dashSubBtnSaldo" data-dash-sub="saldo" class="dash-sub-btn flex items-center gap-1.5 text-sm font-semibold rounded-md px-3 py-1.5 text-on-surface-variant transition-colors">
+          <span class="material-symbols-outlined text-[18px]">account_balance_wallet</span> Control de Saldo
+        </button>
+      </div>
+
+      <!-- ===== SUBVISTA: MONITOREO ===== -->
+      <div id="dashSubMonitoreo" class="dash-subview active">
+
       <!-- KPIs (2x2) + Progreso por Rango de Fechas agrupados a la izquierda; Progreso por Rack más alto a la derecha -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 mb-6 items-stretch">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6 items-stretch">
         <div class="flex flex-col gap-5">
           <div class="grid grid-cols-2 gap-5">
             <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
@@ -243,96 +259,8 @@
           <h3 class="font-semibold mb-3 text-sm">Progreso por Rack</h3>
           <div id="chartPorRack" class="flex-1 flex flex-col justify-start gap-2.5 overflow-y-auto pr-1"></div>
         </div>
-
-        <!-- ===== SALDO INICIAL (BPCS vs Cliente) — columna derecha ===== -->
-        <div class="flex flex-col gap-5 h-full">
-          <div>
-            <h3 class="font-semibold mb-3 text-sm">Control de Saldo Inicial</h3>
-            <div class="grid grid-cols-2 gap-3 mb-3">
-              <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
-                <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">Códigos con Saldo</span>
-                <p id="kpiSaldoTotalCodigos" class="text-xl font-bold font-data">-</p>
-              </div>
-              <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
-                <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">Inventariados</span>
-                <p id="kpiSaldoContados" class="text-xl font-bold font-data text-success">-</p>
-              </div>
-              <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
-                <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">% Avance</span>
-                <div>
-                  <p id="kpiSaldoPorcentaje" class="text-xl font-bold font-data">-</p>
-                  <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-1 overflow-hidden">
-                    <div id="saldoProgresoBar" class="bg-primary h-full rounded-full transition-all" style="width:0%"></div>
-                  </div>
-                </div>
-              </div>
-              <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
-                <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">Diferencia Neta</span>
-                <p id="kpiSaldoDiferencia" class="text-xl font-bold font-data">-</p>
-              </div>
-            </div>
-            <div class="bg-white border border-outline-variant rounded-xl p-4">
-              <h4 class="font-semibold mb-2 text-xs">Distribución por Estatus</h4>
-              <div id="chartSaldoEstatus" class="flex items-end justify-around gap-3 border-l border-b border-outline-variant px-3 pb-1 min-h-[110px]"></div>
-            </div>
-          </div>
-
-          <!-- Detalle -->
-          <div class="bg-white border border-outline-variant rounded-xl flex-1 flex flex-col overflow-hidden">
-            <div class="p-4 border-b border-outline-variant bg-surface-container-low flex flex-col gap-2.5 rounded-t-xl">
-              <h4 class="font-semibold text-sm">Detalle de Saldo por Código</h4>
-              <div class="flex flex-col gap-2.5">
-                <div class="relative">
-                  <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
-                  <input id="saldoFiltroCodigo" type="text" autocomplete="off" placeholder="Filtrar por código BPCS o Cliente" class="w-full pl-9 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
-                </div>
-                <div class="relative" id="saldoEstatusWrap">
-                  <button id="saldoEstatusBtn" type="button" class="w-full flex items-center pl-9 pr-2 py-2 rounded-lg border border-outline-variant focus:border-primary focus:ring-primary text-sm bg-white text-left relative">
-                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">filter_alt</span>
-                    <span id="saldoEstatusLabel" class="truncate">Todos los Estatus</span>
-                    <span class="material-symbols-outlined ml-auto text-on-surface-variant text-[18px]">expand_more</span>
-                  </button>
-                  <div id="saldoEstatusMenu" class="hidden absolute z-20 mt-1 w-full bg-white border border-outline-variant rounded-lg shadow-lg p-1.5">
-                    <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
-                      <input type="checkbox" data-saldo-estatus-opt="OK" class="saldo-estatus-check rounded border-outline-variant"> Conforme
-                    </label>
-                    <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
-                      <input type="checkbox" data-saldo-estatus-opt="SOBRANTE" class="saldo-estatus-check rounded border-outline-variant"> Sobrante
-                    </label>
-                    <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
-                      <input type="checkbox" data-saldo-estatus-opt="FALTANTE" class="saldo-estatus-check rounded border-outline-variant"> Faltante
-                    </label>
-                    <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
-                      <input type="checkbox" data-saldo-estatus-opt="PENDIENTE" class="saldo-estatus-check rounded border-outline-variant"> Pendiente
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="overflow-x-auto overflow-y-auto flex-1 max-h-[420px]">
-              <table class="w-full text-xs">
-                <thead class="sticky top-0 bg-surface-container-low z-10"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
-                  <th data-saldo-sort="codBpcs" class="saldo-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Cód. BPCS <span class="sort-icon text-[10px] opacity-40">↕</span></th>
-                  <th data-saldo-sort="codCliente" class="saldo-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Cód. Cliente <span class="sort-icon text-[10px] opacity-40">↕</span></th>
-                  <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Cant. Inicial</th>
-                  <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Inventariado</th>
-                  <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Vendido</th>
-                  <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Diferencia</th>
-                  <th class="py-2 px-3 font-semibold whitespace-nowrap">Estatus</th>
-                  <th class="py-2 px-3 font-semibold text-center whitespace-nowrap">Acción</th>
-                </tr></thead>
-                <tbody id="saldoDetailTableBody"></tbody>
-              </table>
-            </div>
-            <div class="flex flex-wrap items-center justify-between gap-2 p-3 border-t border-outline-variant">
-              <p id="saldoDetailRowCount" class="text-[11px] text-on-surface-variant"></p>
-              <button id="btnExportSaldo" class="flex items-center gap-1.5 text-xs border border-outline-variant rounded-lg px-3 py-1.5 hover:bg-surface-container-low">
-                <span class="material-symbols-outlined text-[16px]">download</span> Exportar a Excel
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
+      <!-- fin grid Monitoreo -->
 
       <!-- Detailed table (independent date range + filters) -->
       <div class="bg-white border border-outline-variant rounded-xl">
@@ -414,6 +342,100 @@
           </div>
         </div>
       </div>
+      </div>
+      <!-- ===== fin SUBVISTA: MONITOREO ===== -->
+
+      <!-- ===== SUBVISTA: CONTROL DE SALDO ===== -->
+      <div id="dashSubSaldo" class="dash-subview">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6 items-stretch">
+          <div class="bg-white border border-outline-variant rounded-xl p-5">
+            <h3 class="font-semibold mb-3 text-sm">Control de Saldo Inicial</h3>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
+                <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">Códigos con Saldo</span>
+                <p id="kpiSaldoTotalCodigos" class="text-xl font-bold font-data">-</p>
+              </div>
+              <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
+                <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">Inventariados</span>
+                <p id="kpiSaldoContados" class="text-xl font-bold font-data text-success">-</p>
+              </div>
+              <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
+                <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">% Avance</span>
+                <div>
+                  <p id="kpiSaldoPorcentaje" class="text-xl font-bold font-data">-</p>
+                  <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-1 overflow-hidden">
+                    <div id="saldoProgresoBar" class="bg-primary h-full rounded-full transition-all" style="width:0%"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
+                <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">Diferencia Neta</span>
+                <p id="kpiSaldoDiferencia" class="text-xl font-bold font-data">-</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white border border-outline-variant rounded-xl p-5">
+            <h4 class="font-semibold mb-2 text-xs">Distribución por Estatus</h4>
+            <div id="chartSaldoEstatus" class="flex items-end justify-around gap-3 border-l border-b border-outline-variant px-3 pb-1 min-h-[110px]"></div>
+          </div>
+        </div>
+
+        <!-- Detalle de Saldo por Código — ahora a ancho completo -->
+        <div class="bg-white border border-outline-variant rounded-xl flex flex-col overflow-hidden">
+          <div class="p-4 border-b border-outline-variant bg-surface-container-low flex flex-col gap-2.5 rounded-t-xl">
+            <h4 class="font-semibold text-sm">Detalle de Saldo por Código</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+                <input id="saldoFiltroCodigo" type="text" autocomplete="off" placeholder="Filtrar por código BPCS o Cliente" class="w-full pl-9 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+              </div>
+              <div class="relative" id="saldoEstatusWrap">
+                <button id="saldoEstatusBtn" type="button" class="w-full flex items-center pl-9 pr-2 py-2 rounded-lg border border-outline-variant focus:border-primary focus:ring-primary text-sm bg-white text-left relative">
+                  <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">filter_alt</span>
+                  <span id="saldoEstatusLabel" class="truncate">Todos los Estatus</span>
+                  <span class="material-symbols-outlined ml-auto text-on-surface-variant text-[18px]">expand_more</span>
+                </button>
+                <div id="saldoEstatusMenu" class="hidden absolute z-20 mt-1 w-full bg-white border border-outline-variant rounded-lg shadow-lg p-1.5">
+                  <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                    <input type="checkbox" data-saldo-estatus-opt="OK" class="saldo-estatus-check rounded border-outline-variant"> Conforme
+                  </label>
+                  <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                    <input type="checkbox" data-saldo-estatus-opt="SOBRANTE" class="saldo-estatus-check rounded border-outline-variant"> Sobrante
+                  </label>
+                  <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                    <input type="checkbox" data-saldo-estatus-opt="FALTANTE" class="saldo-estatus-check rounded border-outline-variant"> Faltante
+                  </label>
+                  <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                    <input type="checkbox" data-saldo-estatus-opt="PENDIENTE" class="saldo-estatus-check rounded border-outline-variant"> Pendiente
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="overflow-x-auto overflow-y-auto flex-1 max-h-[55vh]">
+            <table class="w-full text-xs">
+              <thead class="sticky top-0 bg-surface-container-low z-10"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
+                <th data-saldo-sort="codBpcs" class="saldo-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Cód. BPCS <span class="sort-icon text-[10px] opacity-40">↕</span></th>
+                <th data-saldo-sort="codCliente" class="saldo-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Cód. Cliente <span class="sort-icon text-[10px] opacity-40">↕</span></th>
+                <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Cant. Inicial</th>
+                <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Inventariado</th>
+                <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Vendido</th>
+                <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Diferencia</th>
+                <th class="py-2 px-3 font-semibold whitespace-nowrap">Estatus</th>
+                <th class="py-2 px-3 font-semibold text-center whitespace-nowrap">Acción</th>
+              </tr></thead>
+              <tbody id="saldoDetailTableBody"></tbody>
+            </table>
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-2 p-3 border-t border-outline-variant">
+            <p id="saldoDetailRowCount" class="text-[11px] text-on-surface-variant"></p>
+            <button id="btnExportSaldo" class="flex items-center gap-1.5 text-xs border border-outline-variant rounded-lg px-3 py-1.5 hover:bg-surface-container-low">
+              <span class="material-symbols-outlined text-[16px]">download</span> Exportar a Excel
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- ===== fin SUBVISTA: CONTROL DE SALDO ===== -->
     </section>
 
     <!-- ===== PANEL: TOMA DE INVENTARIO ===== -->
@@ -842,6 +864,21 @@ document.querySelectorAll('[data-nav-item]').forEach(btn => {
   });
 });
 document.querySelector('[data-nav-item]').classList.add('active');
+
+/* ==================== SUBVISTAS DEL DASHBOARD (Monitoreo / Control de Saldo) ==================== */
+document.querySelectorAll('.dash-sub-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.dash-sub-btn').forEach(b => {
+      b.classList.remove('active');
+      b.classList.add('text-on-surface-variant');
+    });
+    btn.classList.add('active');
+    btn.classList.remove('text-on-surface-variant');
+    document.querySelectorAll('.dash-subview').forEach(v => v.classList.remove('active'));
+    const target = btn.dataset.dashSub === 'saldo' ? 'dashSubSaldo' : 'dashSubMonitoreo';
+    document.getElementById(target).classList.add('active');
+  });
+});
 
 /* ==================== DASHBOARD EJECUTIVO ==================== */
 
