@@ -1600,7 +1600,16 @@ function renderSaldoResumen() {
 
   const conteo = { OK: 0, SOBRANTE: 0, FALTANTE: 0, PENDIENTE: 0 };
   const conteoUnid = { OK: 0, SOBRANTE: 0, FALTANTE: 0, PENDIENTE: 0 };
-  rows.forEach(r => { conteo[r.estatus]++; conteoUnid[r.estatus] += (r.saldoInicial || 0); });
+  rows.forEach(r => {
+    conteo[r.estatus]++;
+    if (r.estatus === 'PENDIENTE') {
+      conteoUnid[r.estatus] += (r.saldoInicial || 0);      // aún no contado: se usa el saldo esperado
+    } else if (r.estatus === 'OK') {
+      conteoUnid[r.estatus] += (r.inventariado || 0);      // conforme: lo que se contó
+    } else {
+      conteoUnid[r.estatus] += Math.abs(r.diferencia || 0); // sobrante/faltante: la diferencia real (en positivo)
+    }
+  });
   const colores = { OK: 'bg-success', SOBRANTE: 'bg-[#b06000]', FALTANTE: 'bg-error', PENDIENTE: 'bg-outline-variant' };
   const coloresUnid = { OK: 'bg-success/40', SOBRANTE: 'bg-[#b06000]/40', FALTANTE: 'bg-error/40', PENDIENTE: 'bg-outline-variant/60' };
   const labels = { OK: 'Conforme', SOBRANTE: 'Sobrante', FALTANTE: 'Faltante', PENDIENTE: 'Pendiente' };
