@@ -349,22 +349,66 @@
         </button>
       </div>
 
-      <!-- Sesión de conteo (coincide con DATA) — solo contador, sin mostrar el detalle -->
-      <div class="bg-white border border-outline-variant rounded-xl p-4 mb-4 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary">inventory_2</span>
-          <span class="font-semibold">Conteo de esta sesión (DATA)</span>
+      <!-- Sesión de conteo (coincide con DATA) — colapsable, con filtro del detalle -->
+      <div class="bg-white border border-outline-variant rounded-xl mb-4 overflow-hidden">
+        <button id="toggleConteoBox" type="button" class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low text-left">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">inventory_2</span>
+            <span class="font-semibold">Conteo de esta sesión (DATA)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="conteoCount" class="text-2xl font-bold font-data">0</span>
+            <span id="conteoChevron" class="material-symbols-outlined text-on-surface-variant transition-transform">expand_more</span>
+          </div>
+        </button>
+        <div id="conteoDetailBox" class="hidden border-t border-outline-variant p-4">
+          <input id="conteoFiltro" type="text" placeholder="Filtrar por código, ubicación, usuario, estatus..." class="w-full mb-3 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+          <div class="overflow-x-auto max-h-72 overflow-y-auto border border-outline-variant rounded-lg">
+            <table class="w-full text-xs">
+              <thead class="sticky top-0 bg-white"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
+                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">ID Detalle</th>
+                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Registro</th>
+                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Usuario</th>
+                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Tipo</th>
+                <th class="py-2 px-3 font-semibold">Código</th><th class="py-2 px-3 font-semibold">Ubicación</th>
+                <th class="py-2 px-3 font-semibold text-right">Saldo</th><th class="py-2 px-3 font-semibold text-right">Cant. Física</th>
+                <th class="py-2 px-3 font-semibold">Estatus</th><th class="py-2 px-3 font-semibold"></th>
+              </tr></thead>
+              <tbody id="conteoTableBody"></tbody>
+            </table>
+          </div>
         </div>
-        <span id="conteoCount" class="text-2xl font-bold font-data">0</span>
       </div>
 
-      <!-- Sesión de manuales (no encontrados en DATA) — solo contador, sin mostrar el detalle -->
-      <div class="bg-white border border-outline-variant rounded-xl p-4 mb-6 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary">note_add</span>
-          <span class="font-semibold">No encontrados en DATA (Hoja Manual)</span>
+      <!-- Sesión de manuales (no encontrados en DATA) — colapsable, con filtro del detalle -->
+      <div class="bg-white border border-outline-variant rounded-xl mb-6 overflow-hidden">
+        <button id="toggleManualBox" type="button" class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low text-left">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">note_add</span>
+            <span class="font-semibold">No encontrados en DATA (Hoja Manual)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="manualCount" class="text-2xl font-bold font-data">0</span>
+            <span id="manualChevron" class="material-symbols-outlined text-on-surface-variant transition-transform">expand_more</span>
+          </div>
+        </button>
+        <div id="manualDetailBox" class="hidden border-t border-outline-variant p-4">
+          <input id="manualFiltro" type="text" placeholder="Filtrar por código, EAN, ubicación, usuario..." class="w-full mb-3 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+          <div class="overflow-x-auto max-h-72 overflow-y-auto border border-outline-variant rounded-lg">
+            <table class="w-full text-xs">
+              <thead class="sticky top-0 bg-white"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
+                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">ID Detalle</th>
+                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Registro</th>
+                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Usuario</th>
+                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Tipo</th>
+                <th class="py-2 px-3 font-semibold">Código / EAN</th><th class="py-2 px-3 font-semibold">Descripción</th>
+                <th class="py-2 px-3 font-semibold">Ubicación</th><th class="py-2 px-3 font-semibold text-right">Cantidad</th>
+                <th class="py-2 px-3 font-semibold"></th>
+              </tr></thead>
+              <tbody id="manualSessionTableBody"></tbody>
+            </table>
+          </div>
         </div>
-        <span id="manualCount" class="text-2xl font-bold font-data">0</span>
       </div>
 
       <!-- Guardar / Exportar -->
@@ -1105,6 +1149,7 @@ document.getElementById('mfAdd').addEventListener('click', () => {
   const cantidad = document.getElementById('mfCantidad').value.trim();
   if (!codigo || cantidad === '') { alert('Ingresa al menos el código y la cantidad contada.'); return; }
   sessionManual.push({
+    ID_DETALLE: generarIdDetalle(), TIPO_REGISTRO: 'MANUAL',
     TIPO: document.getElementById('mfTipo').value.trim(),
     CODICE: document.getElementById('mfCodice').value.trim(),
     CODIGO: codigo,
@@ -1120,8 +1165,41 @@ document.getElementById('mfAdd').addEventListener('click', () => {
   renderManualSessionTable();
 });
 
+function generarIdDetalle() {
+  return Math.random().toString(16).slice(2, 10);
+}
+
 function renderManualSessionTable() {
   document.getElementById('manualCount').textContent = sessionManual.length;
+  const filtroEl = document.getElementById('manualFiltro');
+  const filtro = filtroEl ? filtroEl.value.toUpperCase().trim() : '';
+  const tbody = document.getElementById('manualSessionTableBody');
+  const rows = sessionManual.filter(m => {
+    if (!filtro) return true;
+    return [m.ID_DETALLE, m.REGISTRO, m.USUARIO, m.CODIGO, m.EAN13, m.UBICACION, m.DESCRIPCION].some(v => (v || '').toString().toUpperCase().includes(filtro));
+  });
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" class="py-6 text-center text-on-surface-variant">${sessionManual.length === 0 ? 'Sin registros todavía.' : 'Sin resultados para ese filtro.'}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(m => {
+    const idxReal = sessionManual.indexOf(m);
+    const codigoMostrar = m.EAN13 ? m.EAN13 : m.CODIGO; // según el EAN o código, el que esté llenado
+    return `<tr class="border-b border-surface-variant last:border-0 hover:bg-surface-container-low">
+      <td class="py-2 px-3 font-data text-[#b06000]">${m.ID_DETALLE || ''}</td>
+      <td class="py-2 px-3 font-data">${m.REGISTRO || ''}</td>
+      <td class="py-2 px-3 font-data">${m.USUARIO || ''}</td>
+      <td class="py-2 px-3 font-data">${m.TIPO_REGISTRO || ''}</td>
+      <td class="py-2 px-3 font-data">${codigoMostrar || ''}</td>
+      <td class="py-2 px-3 truncate max-w-[160px]">${m.DESCRIPCION || ''}</td>
+      <td class="py-2 px-3 font-data">${m.UBICACION || ''}</td>
+      <td class="py-2 px-3 font-data text-right">${m.CANTIDAD || ''}</td>
+      <td class="py-2 px-3"><button data-removemanual="${idxReal}" class="text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">delete</span></button></td>
+    </tr>`;
+  }).join('');
+  tbody.querySelectorAll('[data-removemanual]').forEach(btn => {
+    btn.addEventListener('click', () => { sessionManual.splice(+btn.dataset.removemanual, 1); renderManualSessionTable(); });
+  });
 }
 
 document.getElementById('cfCantidad').addEventListener('input', () => {
@@ -1145,9 +1223,10 @@ document.getElementById('cfAdd').addEventListener('click', () => {
   const saldo = parseFloat(selectedItem.SALDO) || 0;
   const estatus = fisica === saldo ? 'OK' : (fisica > saldo ? 'SOBRANTE' : 'FALTANTE');
   sessionCounts.push({
+    ID_DETALLE: generarIdDetalle(), TIPO_REGISTRO: 'DATA',
     ID_DATA: selectedItem.ID_DATA || '', CODIGO: selectedItem.CODIGO || '', DESCRIPCCION: selectedItem.DESCRIPCCION || '',
     EAN13: selectedItem.EAN13 || '', UBICACION: selectedItem.UBICACION || '', LOTE: selectedItem.LOTE || '',
-    SALDO_SISTEMA: saldo, CANTIDAD_FISICA: fisica, ESTATUS: estatus,
+    SALDO_SISTEMA: saldo, CANTIDAD_FISICA: fisica, DIFERENCIA: fisica - saldo, ESTATUS: estatus,
     REGISTRO: new Date().toLocaleString('es-PE'), USUARIO: currentUser ? currentUser.ID_USUARIO : ''
   });
   document.getElementById('conteoForm').classList.add('hidden');
@@ -1158,7 +1237,56 @@ document.getElementById('cfAdd').addEventListener('click', () => {
 
 function renderConteoTable() {
   document.getElementById('conteoCount').textContent = sessionCounts.length;
+  const filtroEl = document.getElementById('conteoFiltro');
+  const filtro = filtroEl ? filtroEl.value.toUpperCase().trim() : '';
+  const tbody = document.getElementById('conteoTableBody');
+  const rows = sessionCounts.filter(c => {
+    if (!filtro) return true;
+    return [c.ID_DETALLE, c.REGISTRO, c.USUARIO, c.CODIGO, c.UBICACION, c.ESTATUS].some(v => (v || '').toString().toUpperCase().includes(filtro));
+  });
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" class="py-6 text-center text-on-surface-variant">${sessionCounts.length === 0 ? 'Sin registros todavía.' : 'Sin resultados para ese filtro.'}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(c => {
+    const idxReal = sessionCounts.indexOf(c);
+    return `<tr class="border-b border-surface-variant last:border-0 hover:bg-surface-container-low">
+      <td class="py-2 px-3 font-data text-[#b06000]">${c.ID_DETALLE || ''}</td>
+      <td class="py-2 px-3 font-data">${c.REGISTRO || ''}</td>
+      <td class="py-2 px-3 font-data">${c.USUARIO || ''}</td>
+      <td class="py-2 px-3 font-data">${c.TIPO_REGISTRO || ''}</td>
+      <td class="py-2 px-3 font-data">${c.CODIGO || ''}</td>
+      <td class="py-2 px-3 font-data">${c.UBICACION || ''}</td>
+      <td class="py-2 px-3 font-data text-right">${c.SALDO_SISTEMA}</td>
+      <td class="py-2 px-3 font-data text-right">${c.CANTIDAD_FISICA}</td>
+      <td class="py-2 px-3">${estatusBadgeHtml(c.ESTATUS)}</td>
+      <td class="py-2 px-3"><button data-remove="${idxReal}" class="text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">delete</span></button></td>
+    </tr>`;
+  }).join('');
+  tbody.querySelectorAll('[data-remove]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      sessionCounts.splice(+btn.dataset.remove, 1);
+      renderConteoTable();
+      renderSessionKpi();
+    });
+  });
 }
+
+// Expandir/colapsar cajas de detalle + filtro en vivo
+document.getElementById('toggleConteoBox').addEventListener('click', () => {
+  const box = document.getElementById('conteoDetailBox');
+  const chev = document.getElementById('conteoChevron');
+  box.classList.toggle('hidden');
+  chev.style.transform = box.classList.contains('hidden') ? '' : 'rotate(180deg)';
+});
+document.getElementById('toggleManualBox').addEventListener('click', () => {
+  const box = document.getElementById('manualDetailBox');
+  const chev = document.getElementById('manualChevron');
+  box.classList.toggle('hidden');
+  chev.style.transform = box.classList.contains('hidden') ? '' : 'rotate(180deg)';
+});
+document.getElementById('conteoFiltro').addEventListener('input', debounce(renderConteoTable, 150));
+document.getElementById('manualFiltro').addEventListener('input', debounce(renderManualSessionTable, 150));
 
 document.getElementById('btnClearSession').addEventListener('click', () => {
   if (sessionCounts.length === 0 && sessionManual.length === 0) return;
@@ -1198,6 +1326,26 @@ if (!GAS_URL) {
   saveStatus.textContent = 'Configura GAS_URL en el código para activar el guardado directo.';
 }
 
+// Une DATA + Manual en el formato de la hoja DETALLE (log unificado de todo lo inventariado)
+function construirDetalleParaGuardar() {
+  const detalle = [];
+  sessionCounts.forEach(c => {
+    detalle.push({
+      ID_DETALLE: c.ID_DETALLE, REGISTRO: c.REGISTRO, USUARIO: c.USUARIO, TIPO: c.TIPO_REGISTRO,
+      UBICACION: c.UBICACION, CODIGO: c.CODIGO, DESCRIPCION: c.DESCRIPCCION, EAN13: c.EAN13,
+      CANTIDAD_INICIAL: c.SALDO_SISTEMA, CONTEO: c.CANTIDAD_FISICA, DIFERENCIA: c.DIFERENCIA, ESTATUS: c.ESTATUS
+    });
+  });
+  sessionManual.forEach(m => {
+    detalle.push({
+      ID_DETALLE: m.ID_DETALLE, REGISTRO: m.REGISTRO, USUARIO: m.USUARIO, TIPO: m.TIPO_REGISTRO,
+      UBICACION: m.UBICACION, CODIGO: m.EAN13 ? m.EAN13 : m.CODIGO, DESCRIPCION: m.DESCRIPCION, EAN13: m.EAN13,
+      CANTIDAD_INICIAL: '', CONTEO: m.CANTIDAD, DIFERENCIA: '', ESTATUS: 'MANUAL'
+    });
+  });
+  return detalle;
+}
+
 btnSaveToSheet.addEventListener('click', async () => {
   if (!GAS_URL) return;
   if (sessionCounts.length === 0 && sessionManual.length === 0) { alert('No hay conteos que guardar todavía.'); return; }
@@ -1208,11 +1356,11 @@ btnSaveToSheet.addEventListener('click', async () => {
     const res = await fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita preflight CORS con Apps Script
-      body: JSON.stringify({ conteo: sessionCounts, manual: sessionManual })
+      body: JSON.stringify({ conteo: sessionCounts, manual: sessionManual, detalle: construirDetalleParaGuardar() })
     });
     const json = await res.json();
     if (json.ok) {
-      saveStatus.textContent = `Guardado: ${json.conteoActualizados || 0} filas actualizadas en DATA, ${json.manualAgregados || 0} agregadas a Hoja Manual.`;
+      saveStatus.textContent = `Guardado: ${json.conteoActualizados || 0} filas actualizadas en DATA, ${json.manualAgregados || 0} agregadas a Hoja Manual, ${json.detalleAgregados || 0} agregadas al Detalle.`;
       saveStatus.className = 'text-sm text-success';
     } else {
       saveStatus.textContent = 'Error al guardar: ' + json.error;
