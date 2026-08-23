@@ -164,6 +164,9 @@
         <button id="dashSubBtnSaldo" data-dash-sub="saldo" class="dash-sub-btn flex items-center gap-1.5 text-sm font-semibold rounded-md px-3 py-1.5 text-on-surface-variant transition-colors">
           <span class="material-symbols-outlined text-[18px]">account_balance_wallet</span> Control de Saldo
         </button>
+        <button id="dashSubBtnDuplicados" data-dash-sub="duplicados" class="dash-sub-btn flex items-center gap-1.5 text-sm font-semibold rounded-md px-3 py-1.5 text-on-surface-variant transition-colors">
+          <span class="material-symbols-outlined text-[18px]">content_copy</span> Duplicados
+        </button>
       </div>
 
       <!-- ===== SUBVISTA: MONITOREO ===== -->
@@ -452,6 +455,51 @@
         </div>
       </div>
       <!-- ===== fin SUBVISTA: CONTROL DE SALDO ===== -->
+
+      <!-- ===== SUBVISTA: DUPLICADOS ===== -->
+      <div id="dashSubDuplicados" class="dash-subview">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-6">
+          <div class="bg-white border border-outline-variant rounded-xl p-5">
+            <span class="text-[11px] uppercase tracking-wide text-on-surface-variant font-semibold">Combinaciones Duplicadas</span>
+            <p id="kpiDupCombos" class="text-3xl font-bold font-data mt-1">-</p>
+            <p class="text-[11px] text-on-surface-variant mt-1">Ubicación + código registrados más veces que lotes existentes en DATA</p>
+          </div>
+          <div class="bg-white border border-outline-variant rounded-xl p-5">
+            <span class="text-[11px] uppercase tracking-wide text-on-surface-variant font-semibold">Líneas de más (exceso)</span>
+            <p id="kpiDupExceso" class="text-3xl font-bold font-data mt-1 text-error">-</p>
+            <p class="text-[11px] text-on-surface-variant mt-1">Registros que sobran respecto a lo esperado</p>
+          </div>
+          <div class="bg-white border border-outline-variant rounded-xl p-5">
+            <span class="text-[11px] uppercase tracking-wide text-on-surface-variant font-semibold">Total Registros Involucrados</span>
+            <p id="kpiDupTotalRegistros" class="text-3xl font-bold font-data mt-1">-</p>
+            <p class="text-[11px] text-on-surface-variant mt-1">Filas de DETALLE que forman parte de algún grupo duplicado</p>
+          </div>
+        </div>
+
+        <div class="bg-white border border-outline-variant rounded-xl flex flex-col overflow-hidden">
+          <div class="p-4 border-b border-outline-variant bg-surface-container-low flex flex-col gap-2.5 rounded-t-xl">
+            <h4 class="font-semibold text-sm">Combinaciones Ubicación + Código registradas de más</h4>
+            <p class="text-xs text-on-surface-variant">En DATA maestro no existen dos líneas con la misma Ubicación + Código + Lote. Si en DETALLE una combinación Ubicación + Código aparece más veces que la cantidad de lotes que tiene en DATA, probablemente el personal registró/escaneó esa ubicación más de una vez.</p>
+            <input id="dupFiltro" type="text" placeholder="Filtrar por código, ubicación o usuario..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+          </div>
+          <div class="overflow-x-auto overflow-y-auto flex-1 max-h-[55vh]">
+            <table class="w-full text-xs">
+              <thead class="sticky top-0 bg-surface-container-low z-10"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
+                <th class="py-2 px-3 font-semibold whitespace-nowrap">Ubicación</th>
+                <th class="py-2 px-3 font-semibold whitespace-nowrap">Código</th>
+                <th class="py-2 px-3 font-semibold whitespace-nowrap">Descripción</th>
+                <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Veces Registrado</th>
+                <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Lotes en DATA</th>
+                <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Exceso</th>
+                <th class="py-2 px-3 font-semibold whitespace-nowrap">Usuarios</th>
+                <th class="py-2 px-3 font-semibold whitespace-nowrap"></th>
+              </tr></thead>
+              <tbody id="dupTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- ===== fin SUBVISTA: DUPLICADOS ===== -->
     </section>
 
     <!-- ===== PANEL: TOMA DE INVENTARIO ===== -->
@@ -524,7 +572,7 @@
         <button id="toggleConteoBox" type="button" class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low text-left">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-primary">inventory_2</span>
-            <span class="font-semibold">Conteo de esta sesión (DATA)</span>
+            <span class="font-semibold">Pendientes por guardar — DATA (esta sesión)</span>
           </div>
           <div class="flex items-center gap-2">
             <span id="conteoCount" class="text-2xl font-bold font-data">0</span>
@@ -555,7 +603,7 @@
         <button id="toggleManualBox" type="button" class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low text-left">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-primary">note_add</span>
-            <span class="font-semibold">No encontrados en DATA (Hoja Manual)</span>
+            <span class="font-semibold">Pendientes por guardar — No encontrados en DATA (Hoja Manual)</span>
           </div>
           <div class="flex items-center gap-2">
             <span id="manualCount" class="text-2xl font-bold font-data">0</span>
@@ -581,7 +629,43 @@
         </div>
       </div>
 
-      <!-- Guardar / Exportar -->
+      <!-- Conteo real registrado (fuente: Sheet DETALLE) — colapsable, con alerta de duplicados -->
+      <div class="bg-white border border-outline-variant rounded-xl mb-6 overflow-hidden">
+        <button id="toggleDetalleRealBox" type="button" class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low text-left">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">fact_check</span>
+            <span class="font-semibold">Conteo real registrado (DETALLE — todos los usuarios)</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span id="detalleRealDupBadge" class="hidden text-xs font-semibold px-2.5 py-1 rounded-full bg-error-container text-on-error-container border border-[#FECACA]"></span>
+            <span id="detalleRealCount" class="text-2xl font-bold font-data">0</span>
+            <span id="detalleRealChevron" class="material-symbols-outlined text-on-surface-variant transition-transform">expand_more</span>
+          </div>
+        </button>
+        <div id="detalleRealDetailBox" class="hidden border-t border-outline-variant p-4">
+          <p class="text-xs text-on-surface-variant mb-3">Esto se lee directamente del Sheet DETALLE (lo que ya está guardado, de todos los que están contando). Las filas marcadas en rojo forman parte de una combinación Ubicación+Código registrada más veces de lo esperado (posible doble conteo).</p>
+          <div class="flex flex-col sm:flex-row gap-2.5 mb-3">
+            <input id="detalleRealFiltro" type="text" placeholder="Filtrar por código, ubicación, usuario, estatus..." class="flex-1 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+            <label class="flex items-center gap-2 text-xs whitespace-nowrap px-3 border border-outline-variant rounded-lg cursor-pointer select-none">
+              <input id="detalleRealSoloDup" type="checkbox" class="rounded border-outline-variant"> Solo duplicados
+            </label>
+          </div>
+          <div class="overflow-x-auto max-h-96 overflow-y-auto border border-outline-variant rounded-lg">
+            <table class="w-full text-xs">
+              <thead class="sticky top-0 bg-white"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
+                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">ID Detalle</th>
+                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Registro</th>
+                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Usuario</th>
+                <th class="py-2 px-3 font-semibold">Ubicación</th><th class="py-2 px-3 font-semibold">Código</th>
+                <th class="py-2 px-3 font-semibold text-right">Cant. Inicial</th><th class="py-2 px-3 font-semibold text-right">Conteo</th>
+                <th class="py-2 px-3 font-semibold">Estatus</th><th class="py-2 px-3 font-semibold"></th>
+              </tr></thead>
+              <tbody id="detalleRealTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-wrap items-center gap-3">
         <button id="btnSaveToSheet" class="flex items-center gap-2 bg-primary text-white rounded-lg px-4 py-2.5 font-semibold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed">
           <span class="material-symbols-outlined text-[18px]">cloud_upload</span> <span id="btnSaveText">Guardar en Google Sheet</span>
@@ -772,13 +856,14 @@ const SHEET_URLS = {
   maestra: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6knd52iLgvI9mITzf58-ny_gJoTWecCkWxGHd9Am7oKzbvzA-Z9ACZ-xY49qfr1uINSV8-_PKE3Up/pub?gid=1288666899&single=true&output=csv",
   saldo: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6knd52iLgvI9mITzf58-ny_gJoTWecCkWxGHd9Am7oKzbvzA-Z9ACZ-xY49qfr1uINSV8-_PKE3Up/pub?gid=945923461&single=true&output=csv",
   venta: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6knd52iLgvI9mITzf58-ny_gJoTWecCkWxGHd9Am7oKzbvzA-Z9ACZ-xY49qfr1uINSV8-_PKE3Up/pub?gid=647651347&single=true&output=csv",
+  detalle: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6knd52iLgvI9mITzf58-ny_gJoTWecCkWxGHd9Am7oKzbvzA-Z9ACZ-xY49qfr1uINSV8-_PKE3Up/pub?gid=326530096&single=true&output=csv",
 };
 
 // Pega aquí la URL de tu Apps Script Web App (termina en /exec) una vez que lo implementes.
 // Mientras esté vacío, el botón "Guardar en Google Sheet" quedará deshabilitado y solo podrás exportar a Excel.
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwmZzME570enDyAkPV6smo4zIBGhaKzGrO58jJ-Ob43A_3Tb6yxuhGQwq29hZkglLQ/exec";
 
-let DB = { usuario: [], ubicaciones: [], data: [], manual: [], maestra: [], saldo: [], venta: [] };
+let DB = { usuario: [], ubicaciones: [], data: [], manual: [], maestra: [], saldo: [], venta: [], detalle: [] };
 let sessionCounts = []; // conteo de esta sesión (coincide con DATA)
 let sessionManual = []; // ítems contados que no existen en DATA (van a HOJA MANUAL)
 let currentUser = null;
@@ -802,12 +887,12 @@ async function loadAllData() {
   document.getElementById('globalStatus').classList.add('flex');
   if (btn) btn.disabled = true;
   if (icon) icon.classList.add('spin');
-  const [usuario, ubicaciones, data, manual, maestra, saldo, venta] = await Promise.all([
+  const [usuario, ubicaciones, data, manual, maestra, saldo, venta, detalle] = await Promise.all([
     fetchCsv(SHEET_URLS.usuario), fetchCsv(SHEET_URLS.ubicaciones),
     fetchCsv(SHEET_URLS.data), fetchCsv(SHEET_URLS.manual), fetchCsv(SHEET_URLS.maestra),
-    fetchCsv(SHEET_URLS.saldo), fetchCsv(SHEET_URLS.venta)
+    fetchCsv(SHEET_URLS.saldo), fetchCsv(SHEET_URLS.venta), fetchCsv(SHEET_URLS.detalle)
   ]);
-  DB = { usuario, ubicaciones, data, manual, maestra, saldo, venta };
+  DB = { usuario, ubicaciones, data, manual, maestra, saldo, venta, detalle };
   document.getElementById('globalStatus').classList.add('hidden');
   document.getElementById('globalStatus').classList.remove('flex');
   if (btn) btn.disabled = false;
@@ -817,6 +902,8 @@ async function loadAllData() {
   dashSelected.clear();
   renderDashboard();
   renderSaldoDashboard();
+  renderDuplicados();
+  renderDetalleRealTable();
   renderDataTable();
   renderUbiTable();
   renderMaestraTable();
@@ -891,10 +978,53 @@ document.querySelectorAll('.dash-sub-btn').forEach(btn => {
     btn.classList.add('active');
     btn.classList.remove('text-on-surface-variant');
     document.querySelectorAll('.dash-subview').forEach(v => v.classList.remove('active'));
-    const target = btn.dataset.dashSub === 'saldo' ? 'dashSubSaldo' : 'dashSubMonitoreo';
+    const map = { saldo: 'dashSubSaldo', duplicados: 'dashSubDuplicados' };
+    const target = map[btn.dataset.dashSub] || 'dashSubMonitoreo';
     document.getElementById(target).classList.add('active');
+    if (btn.dataset.dashSub === 'duplicados') renderDuplicados();
   });
 });
+
+function renderDuplicados() {
+  const dups = computeDuplicados();
+  const totalRegistros = dups.reduce((s, d) => s + d.vecesRegistrado, 0);
+  const totalExceso = dups.reduce((s, d) => s + d.exceso, 0);
+  document.getElementById('kpiDupCombos').textContent = dups.length.toLocaleString('es-PE');
+  document.getElementById('kpiDupExceso').textContent = totalExceso.toLocaleString('es-PE');
+  document.getElementById('kpiDupTotalRegistros').textContent = totalRegistros.toLocaleString('es-PE');
+
+  const filtroEl = document.getElementById('dupFiltro');
+  const filtro = filtroEl ? filtroEl.value.toUpperCase().trim() : '';
+  const tbody = document.getElementById('dupTableBody');
+  const rows = dups.filter(d => {
+    if (!filtro) return true;
+    return [d.UBICACION, d.CODIGO, d.DESCRIPCION, d.usuarios].some(v => (v || '').toString().toUpperCase().includes(filtro));
+  });
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-on-surface-variant">${dups.length === 0 ? 'No se detectaron duplicados. ✅' : 'Sin resultados para ese filtro.'}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map((d, i) => `
+    <tr class="border-b border-surface-variant last:border-0 hover:bg-surface-container-low">
+      <td class="py-2 px-3 font-data">${d.UBICACION}</td>
+      <td class="py-2 px-3 font-data">${d.CODIGO}</td>
+      <td class="py-2 px-3 truncate max-w-[220px]">${d.DESCRIPCION}</td>
+      <td class="py-2 px-3 font-data text-right">${d.vecesRegistrado}</td>
+      <td class="py-2 px-3 font-data text-right">${d.lotesEnData}</td>
+      <td class="py-2 px-3 font-data text-right font-semibold text-error">+${d.exceso}</td>
+      <td class="py-2 px-3 truncate max-w-[160px]">${d.usuarios}</td>
+      <td class="py-2 px-3"><button data-dupidx="${i}" class="text-primary text-[11px] font-semibold whitespace-nowrap">Ver registros</button></td>
+    </tr>`).join('');
+  tbody.querySelectorAll('[data-dupidx]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const d = rows[+btn.dataset.dupidx];
+      const detalle = d.registros.map(r => `• ${r.REGISTRO} — ${r.USUARIO} — Cant.Inicial ${r['CANTIDAD INICIAL']} — Conteo ${r.CONTEO} — ${r.ESTATUS}`).join('\n');
+      alert(`${d.UBICACION} · ${d.CODIGO}\n${d.DESCRIPCION}\n\nRegistros:\n${detalle}`);
+    });
+  });
+}
+document.getElementById('dupFiltro') && document.getElementById('dupFiltro').addEventListener('input', debounce(renderDuplicados, 200));
+
 
 /* ==================== DASHBOARD EJECUTIVO ==================== */
 
@@ -1255,6 +1385,54 @@ function renderSaldoDashboard() {
   saldoRowsCache = computeSaldoRows();
   renderSaldoResumen();
   renderSaldoDetailTable();
+}
+
+/* ==================== DUPLICADOS EN DETALLE (misma UBICACIÓN+CÓDIGO registrada más veces que lotes existentes en DATA) ==================== */
+function computeDuplicados() {
+  const filas = DB.detalle.filter(d => (d.TIPO || '').toString().trim().toUpperCase() === 'DATA');
+  if (filas.length === 0) return [];
+
+  // Mapa UBICACION|CODIGO -> Set de LOTE distintos en DATA (maestro)
+  const lotesPorCombo = new Map();
+  DB.data.forEach(d => {
+    const ubic = (d.UBICACION || '').toString().trim().toUpperCase();
+    const cod = (d.CODIGO || '').toString().trim().toUpperCase();
+    if (!ubic || !cod) return;
+    const key = ubic + '|' + cod;
+    if (!lotesPorCombo.has(key)) lotesPorCombo.set(key, new Set());
+    lotesPorCombo.get(key).add((d.LOTE || '').toString().trim().toUpperCase());
+  });
+
+  // Agrupa las filas de DETALLE por UBICACION|CODIGO
+  const gruposPorCombo = new Map();
+  filas.forEach(f => {
+    const ubic = (f['UBICACIÓN'] || '').toString().trim().toUpperCase();
+    const cod = (f.CODIGO || '').toString().trim().toUpperCase();
+    if (!ubic || !cod) return;
+    const key = ubic + '|' + cod;
+    if (!gruposPorCombo.has(key)) gruposPorCombo.set(key, []);
+    gruposPorCombo.get(key).push(f);
+  });
+
+  const duplicados = [];
+  gruposPorCombo.forEach((registros, key) => {
+    const [ubic, cod] = key.split('|');
+    const lotesSet = lotesPorCombo.get(key);
+    const lotesCount = lotesSet ? lotesSet.size : 0;
+    if (registros.length > Math.max(lotesCount, 1)) {
+      duplicados.push({
+        UBICACION: ubic, CODIGO: cod,
+        DESCRIPCION: registros[0].DESCRIPCION || '',
+        vecesRegistrado: registros.length,
+        lotesEnData: lotesCount,
+        exceso: registros.length - Math.max(lotesCount, 1),
+        usuarios: [...new Set(registros.map(r => r.USUARIO))].join(', '),
+        registros
+      });
+    }
+  });
+  duplicados.sort((a, b) => b.exceso - a.exceso);
+  return duplicados;
 }
 
 function renderSaldoResumen() {
@@ -1680,6 +1858,64 @@ document.getElementById('toggleManualBox').addEventListener('click', () => {
 });
 document.getElementById('conteoFiltro').addEventListener('input', debounce(renderConteoTable, 150));
 document.getElementById('manualFiltro').addEventListener('input', debounce(renderManualSessionTable, 150));
+
+/* ---- Conteo real registrado (DETALLE, leído del Sheet) ---- */
+document.getElementById('toggleDetalleRealBox').addEventListener('click', () => {
+  const box = document.getElementById('detalleRealDetailBox');
+  const chev = document.getElementById('detalleRealChevron');
+  box.classList.toggle('hidden');
+  chev.style.transform = box.classList.contains('hidden') ? '' : 'rotate(180deg)';
+  if (!box.classList.contains('hidden')) renderDetalleRealTable();
+});
+document.getElementById('detalleRealFiltro').addEventListener('input', debounce(renderDetalleRealTable, 150));
+document.getElementById('detalleRealSoloDup').addEventListener('change', renderDetalleRealTable);
+
+function renderDetalleRealTable() {
+  const filas = DB.detalle.filter(d => (d.TIPO || '').toString().trim().toUpperCase() === 'DATA');
+  document.getElementById('detalleRealCount').textContent = filas.length;
+
+  const dups = computeDuplicados();
+  const dupKeys = new Set(dups.map(d => d.UBICACION + '|' + d.CODIGO));
+  const dupBadge = document.getElementById('detalleRealDupBadge');
+  if (dups.length > 0) {
+    dupBadge.textContent = `${dups.length} combinación(es) duplicada(s)`;
+    dupBadge.classList.remove('hidden');
+  } else {
+    dupBadge.classList.add('hidden');
+  }
+
+  const filtroEl = document.getElementById('detalleRealFiltro');
+  const filtro = filtroEl ? filtroEl.value.toUpperCase().trim() : '';
+  const soloDup = document.getElementById('detalleRealSoloDup').checked;
+  const tbody = document.getElementById('detalleRealTableBody');
+
+  let rows = filas.map(f => ({
+    ...f,
+    _esDup: dupKeys.has((f['UBICACIÓN'] || '').toString().trim().toUpperCase() + '|' + (f.CODIGO || '').toString().trim().toUpperCase())
+  }));
+  if (soloDup) rows = rows.filter(r => r._esDup);
+  if (filtro) {
+    rows = rows.filter(r => [r.ID_DETALLE, r.REGISTRO, r.USUARIO, r['UBICACIÓN'], r.CODIGO, r.ESTATUS].some(v => (v || '').toString().toUpperCase().includes(filtro)));
+  }
+
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" class="py-6 text-center text-on-surface-variant">${filas.length === 0 ? 'Aún no hay registros guardados en DETALLE.' : 'Sin resultados para ese filtro.'}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(r => `
+    <tr class="border-b border-surface-variant last:border-0 hover:bg-surface-container-low ${r._esDup ? 'bg-error-container/40' : ''}">
+      <td class="py-2 px-3 font-data text-[#b06000]">${r.ID_DETALLE || ''} ${r._esDup ? '<span class="ml-1 text-error" title="Posible duplicado">⚠</span>' : ''}</td>
+      <td class="py-2 px-3 font-data">${r.REGISTRO || ''}</td>
+      <td class="py-2 px-3 font-data">${r.USUARIO || ''}</td>
+      <td class="py-2 px-3 font-data">${r['UBICACIÓN'] || ''}</td>
+      <td class="py-2 px-3 font-data">${r.CODIGO || ''}</td>
+      <td class="py-2 px-3 font-data text-right">${r['CANTIDAD INICIAL'] || ''}</td>
+      <td class="py-2 px-3 font-data text-right">${r.CONTEO || ''}</td>
+      <td class="py-2 px-3">${estatusBadgeHtmlV2(normalizarEstatus(r.ESTATUS))}</td>
+      <td class="py-2 px-3"></td>
+    </tr>`).join('');
+}
+
 
 document.getElementById('btnClearSession').addEventListener('click', () => {
   if (sessionCounts.length === 0 && sessionManual.length === 0) return;
