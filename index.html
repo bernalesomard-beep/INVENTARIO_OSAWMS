@@ -161,83 +161,107 @@
         </div>
       </div>
 
-      <!-- KPI Row -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-6">
-        <div class="bg-white border border-outline-variant rounded-xl p-5 flex flex-col justify-between h-32">
-          <div class="flex justify-between items-start">
-            <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Líneas Totales</span>
-            <span class="material-symbols-outlined text-on-surface-variant opacity-50 text-[20px]">list_alt</span>
-          </div>
-          <p id="kpiLineasTotales" class="text-4xl font-bold font-data">-</p>
-        </div>
-        <div class="bg-white border border-outline-variant rounded-xl p-5 flex flex-col justify-between h-32">
-          <div class="flex justify-between items-start">
-            <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Líneas Correctas</span>
-            <span class="material-symbols-outlined text-success opacity-70 text-[20px]">check_circle</span>
-          </div>
-          <p id="kpiLineasCorrectas" class="text-4xl font-bold font-data text-success">-</p>
-        </div>
-        <div class="bg-white border border-outline-variant rounded-xl p-5 flex flex-col justify-between h-32">
-          <div class="flex justify-between items-start">
-            <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Diferencias</span>
-            <span class="material-symbols-outlined text-error opacity-70 text-[20px]">warning</span>
-          </div>
-          <p id="kpiDiferencias" class="text-4xl font-bold font-data text-error">-</p>
-        </div>
-        <div class="bg-white border border-outline-variant rounded-xl p-5 flex flex-col justify-between h-32">
-          <div class="flex justify-between items-start">
-            <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Progreso Global</span>
-            <span class="material-symbols-outlined text-primary-fixed-dim opacity-70 text-[20px]">donut_large</span>
-          </div>
-          <div>
-            <p id="kpiProgresoGlobal" class="text-4xl font-bold font-data">-</p>
-            <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
-              <div id="kpiProgresoBar" class="bg-primary h-full rounded-full transition-all" style="width:0%"></div>
+      <!-- KPIs (2x2) + Progreso por Rango de Fechas agrupados a la izquierda; Progreso por Rack más alto a la derecha -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6 items-stretch">
+        <div class="flex flex-col gap-5">
+          <div class="grid grid-cols-2 gap-5">
+            <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+              <div class="flex justify-between items-start">
+                <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Líneas Totales</span>
+                <span class="material-symbols-outlined text-on-surface-variant opacity-50 text-[18px]">list_alt</span>
+              </div>
+              <p id="kpiLineasTotales" class="text-3xl font-bold font-data">-</p>
+            </div>
+            <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+              <div class="flex justify-between items-start">
+                <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Líneas Correctas</span>
+                <span class="material-symbols-outlined text-success opacity-70 text-[18px]">check_circle</span>
+              </div>
+              <p id="kpiLineasCorrectas" class="text-3xl font-bold font-data text-success">-</p>
+            </div>
+            <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+              <div class="flex justify-between items-start">
+                <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Diferencias</span>
+                <span class="material-symbols-outlined text-error opacity-70 text-[18px]">warning</span>
+              </div>
+              <p id="kpiDiferencias" class="text-3xl font-bold font-data text-error">-</p>
+            </div>
+            <div class="bg-white border border-outline-variant rounded-xl p-4 flex flex-col justify-between h-28">
+              <div class="flex justify-between items-start">
+                <span class="text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Progreso Global</span>
+                <span class="material-symbols-outlined text-primary-fixed-dim opacity-70 text-[18px]">donut_large</span>
+              </div>
+              <div>
+                <p id="kpiProgresoGlobal" class="text-3xl font-bold font-data">-</p>
+                <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-1.5 overflow-hidden">
+                  <div id="kpiProgresoBar" class="bg-primary h-full rounded-full transition-all" style="width:0%"></div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Charts Row -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
-        <div class="bg-white border border-outline-variant rounded-xl p-5 h-80 flex flex-col">
-          <h3 class="font-semibold mb-1 text-sm">Progreso por Rango de Fechas</h3>
-          <div class="grid grid-cols-3 gap-3 mb-3">
-            <div class="bg-surface-container-low rounded-lg px-3 py-2">
-              <p class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold">Unid. trabajadas</p>
-              <p id="statUnidadesTrabajadas" class="text-lg font-bold font-data">-</p>
+          <div class="bg-white border border-outline-variant rounded-xl p-5 flex-1 flex flex-col">
+            <h3 class="font-semibold mb-3 text-sm">Progreso por Rango de Fechas</h3>
+            <div class="overflow-x-auto mb-3">
+              <table class="w-full text-xs">
+                <thead>
+                  <tr class="text-on-surface-variant border-b border-outline-variant">
+                    <th class="text-left font-semibold py-1.5 pr-2"></th>
+                    <th class="text-right font-semibold py-1.5 px-2">Totales</th>
+                    <th class="text-right font-semibold py-1.5 px-2">Contadas</th>
+                    <th class="text-right font-semibold py-1.5 px-2 text-error">Faltantes</th>
+                    <th class="text-right font-semibold py-1.5 px-2 text-[#b06000]">Sobrantes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-surface-variant">
+                    <td class="py-1.5 pr-2 font-semibold whitespace-nowrap">Unidades</td>
+                    <td id="statUnidTotales" class="text-right font-data py-1.5 px-2">-</td>
+                    <td id="statUnidContadas" class="text-right font-data py-1.5 px-2">-</td>
+                    <td id="statUnidFaltantes" class="text-right font-data py-1.5 px-2 text-error">-</td>
+                    <td id="statUnidSobrantes" class="text-right font-data py-1.5 px-2 text-[#b06000]">-</td>
+                  </tr>
+                  <tr class="border-b border-surface-variant">
+                    <td class="py-1.5 pr-2 font-semibold whitespace-nowrap">Ubicaciones</td>
+                    <td id="statUbiTotales" class="text-right font-data py-1.5 px-2">-</td>
+                    <td id="statUbiContadas" class="text-right font-data py-1.5 px-2">-</td>
+                    <td id="statUbiFaltantes" class="text-right font-data py-1.5 px-2 text-error">-</td>
+                    <td id="statUbiSobrantes" class="text-right font-data py-1.5 px-2 text-[#b06000]">-</td>
+                  </tr>
+                  <tr>
+                    <td class="py-1.5 pr-2 font-semibold whitespace-nowrap">Códigos</td>
+                    <td id="statCodTotales" class="text-right font-data py-1.5 px-2">-</td>
+                    <td id="statCodContadas" class="text-right font-data py-1.5 px-2">-</td>
+                    <td id="statCodFaltantes" class="text-right font-data py-1.5 px-2 text-error">-</td>
+                    <td id="statCodSobrantes" class="text-right font-data py-1.5 px-2 text-[#b06000]">-</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div class="bg-surface-container-low rounded-lg px-3 py-2">
-              <p class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold">Ubicaciones</p>
-              <p id="statUbicaciones" class="text-lg font-bold font-data">-</p>
-            </div>
-            <div class="bg-surface-container-low rounded-lg px-3 py-2">
-              <p class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold">Códigos</p>
-              <p id="statCodigos" class="text-lg font-bold font-data">-</p>
-            </div>
+            <div id="chartRangoFechas" class="flex-1 flex items-end gap-2 border-l border-b border-outline-variant px-2 pb-1 min-h-[140px]"></div>
           </div>
-          <div id="chartRangoFechas" class="flex-1 flex items-end gap-2 border-l border-b border-outline-variant px-2 pb-1"></div>
         </div>
-        <div class="bg-white border border-outline-variant rounded-xl p-5 h-80 flex flex-col overflow-y-auto">
+
+        <div class="bg-white border border-outline-variant rounded-xl p-5 flex flex-col h-full">
           <h3 class="font-semibold mb-3 text-sm">Progreso por Rack</h3>
-          <div id="chartPorRack" class="flex-1 flex flex-col justify-center gap-3"></div>
+          <div id="chartPorRack" class="flex-1 flex flex-col justify-start gap-2.5 overflow-y-auto pr-1"></div>
         </div>
       </div>
 
       <!-- Detailed table (independent date range + filters) -->
-      <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
-        <div class="p-5 border-b border-outline-variant bg-surface-container-low flex flex-col gap-3">
+      <div class="bg-white border border-outline-variant rounded-xl">
+        <div class="p-5 border-b border-outline-variant bg-surface-container-low flex flex-col gap-3 rounded-t-xl">
           <h3 class="font-semibold">Resumen de Precisión de Líneas</h3>
-          <div class="flex flex-wrap gap-3">
-            <div class="relative flex-1 min-w-[160px]">
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+            <div class="relative">
               <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
               <input id="dashFiltroCodigo" type="text" autocomplete="off" placeholder="Filtrar por código" class="w-full pl-9 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
             </div>
-            <div class="relative flex-1 min-w-[160px]">
+            <div class="relative">
               <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">location_on</span>
               <input id="dashFiltroUbicacion" type="text" autocomplete="off" placeholder="Filtrar por ubicación" class="w-full pl-9 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
             </div>
-            <div class="relative flex-1 min-w-[160px]">
+            <div class="relative">
               <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">filter_alt</span>
               <select id="dashFiltroEstatus" class="w-full pl-9 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm appearance-none bg-white">
                 <option value="">Todos los Estatus</option>
@@ -247,11 +271,11 @@
                 <option value="PENDIENTE">Pendiente</option>
               </select>
             </div>
-            <div class="flex items-center gap-2 flex-1 min-w-[240px]">
+            <div class="flex items-center gap-1.5">
               <label class="text-xs text-on-surface-variant shrink-0">Desde</label>
-              <input id="dashFiltroDesde" type="date" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+              <input id="dashFiltroDesde" type="date" class="w-full min-w-0 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
               <label class="text-xs text-on-surface-variant shrink-0">Hasta</label>
-              <input id="dashFiltroHasta" type="date" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+              <input id="dashFiltroHasta" type="date" class="w-full min-w-0 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
               <button id="dashFiltroLimpiar" title="Quitar filtro de fecha" class="text-on-surface-variant hover:text-error shrink-0"><span class="material-symbols-outlined text-[18px]">close</span></button>
             </div>
           </div>
@@ -792,16 +816,42 @@ function renderDashKpisYCharts() {
   document.getElementById('kpiProgresoGlobal').textContent = totales > 0 ? progreso.toFixed(1) + '%' : '—';
   document.getElementById('kpiProgresoBar').style.width = progreso.toFixed(1) + '%';
 
-  // Unidades trabajadas (suma de CANTIDAD contada), ubicaciones y códigos únicos dentro del rango
-  const unidades = enRango.reduce((sum, r) => {
-    const c = parseFloat(r.CANTIDAD);
-    return sum + (isNaN(c) ? 0 : c);
+  // Totales = universo completo (todo DB.data); Contadas/Faltantes/Sobrantes = dentro del rango seleccionado
+  const faltantesRango = enRango.filter(r => normalizarEstatus(r.ESTATUS) === 'FALTANTE');
+  const sobrantesRango = enRango.filter(r => normalizarEstatus(r.ESTATUS) === 'SOBRANTE');
+
+  // Unidades (suma de SALDO / CANTIDAD)
+  const sumaSaldo = arr => arr.reduce((s, r) => { const v = parseFloat(r.SALDO); return s + (isNaN(v) ? 0 : v); }, 0);
+  const sumaCantidad = arr => arr.reduce((s, r) => { const v = parseFloat(r.CANTIDAD); return s + (isNaN(v) ? 0 : v); }, 0);
+  const unidTotales = sumaSaldo(DB.data);
+  const unidContadas = sumaCantidad(enRango);
+  const unidFaltantes = faltantesRango.reduce((s, r) => {
+    const saldo = parseFloat(r.SALDO) || 0, cant = parseFloat(r.CANTIDAD) || 0;
+    return s + Math.max(0, saldo - cant);
   }, 0);
-  const ubicacionesUnicas = new Set(enRango.map(r => (r.UBICACION || '').toString().trim()).filter(Boolean)).size;
-  const codigosUnicos = new Set(enRango.map(r => (r.CODIGO || '').toString().trim()).filter(Boolean)).size;
-  document.getElementById('statUnidadesTrabajadas').textContent = unidades.toLocaleString('es-PE');
-  document.getElementById('statUbicaciones').textContent = ubicacionesUnicas.toLocaleString('es-PE');
-  document.getElementById('statCodigos').textContent = codigosUnicos.toLocaleString('es-PE');
+  const unidSobrantes = sobrantesRango.reduce((s, r) => {
+    const saldo = parseFloat(r.SALDO) || 0, cant = parseFloat(r.CANTIDAD) || 0;
+    return s + Math.max(0, cant - saldo);
+  }, 0);
+
+  // Ubicaciones únicas
+  const setUbi = arr => new Set(arr.map(r => (r.UBICACION || '').toString().trim()).filter(Boolean)).size;
+  document.getElementById('statUbiTotales').textContent = setUbi(DB.data).toLocaleString('es-PE');
+  document.getElementById('statUbiContadas').textContent = setUbi(enRango).toLocaleString('es-PE');
+  document.getElementById('statUbiFaltantes').textContent = setUbi(faltantesRango).toLocaleString('es-PE');
+  document.getElementById('statUbiSobrantes').textContent = setUbi(sobrantesRango).toLocaleString('es-PE');
+
+  // Códigos únicos
+  const setCod = arr => new Set(arr.map(r => (r.CODIGO || '').toString().trim()).filter(Boolean)).size;
+  document.getElementById('statCodTotales').textContent = setCod(DB.data).toLocaleString('es-PE');
+  document.getElementById('statCodContadas').textContent = setCod(enRango).toLocaleString('es-PE');
+  document.getElementById('statCodFaltantes').textContent = setCod(faltantesRango).toLocaleString('es-PE');
+  document.getElementById('statCodSobrantes').textContent = setCod(sobrantesRango).toLocaleString('es-PE');
+
+  document.getElementById('statUnidTotales').textContent = Math.round(unidTotales).toLocaleString('es-PE');
+  document.getElementById('statUnidContadas').textContent = Math.round(unidContadas).toLocaleString('es-PE');
+  document.getElementById('statUnidFaltantes').textContent = Math.round(unidFaltantes).toLocaleString('es-PE');
+  document.getElementById('statUnidSobrantes').textContent = Math.round(unidSobrantes).toLocaleString('es-PE');
 
   renderChartRangoFechas(desde, hasta);
   renderChartPorRack(desde, hasta);
@@ -849,10 +899,11 @@ function renderChartPorRack(desde, hasta) {
   });
   const arr = Object.entries(racks)
     .map(([rack, v]) => ({ rack, pct: v.total > 0 ? (v.contados / v.total * 100) : 0 }))
-    .sort((a, b) => b.pct - a.pct).slice(0, 6);
+    .sort((a, b) => a.rack.localeCompare(b.rack, 'es', { numeric: true, sensitivity: 'base' }))
+    .slice(0, 30);
   if (arr.length === 0) { cont.innerHTML = '<p class="text-sm text-on-surface-variant">Sin datos de racks.</p>'; return; }
   cont.innerHTML = arr.map(r => `
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-3 shrink-0">
       <span class="font-data text-xs text-on-surface-variant w-16 shrink-0 truncate">${r.rack}</span>
       <div class="flex-1 bg-surface-container-high h-2.5 rounded-full overflow-hidden">
         <div class="${r.pct >= 100 ? 'bg-primary' : r.pct >= 50 ? 'bg-primary-fixed-dim' : 'bg-error-container'} h-full rounded-full" style="width:${Math.min(100, r.pct)}%"></div>
