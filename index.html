@@ -144,20 +144,12 @@
           <h2 class="text-2xl font-bold font-headline mb-1">Resumen Ejecutivo</h2>
           <p class="text-on-surface-variant text-sm">Monitoreo de inventario en tiempo real y precisión de líneas.</p>
         </div>
-        <div class="flex flex-wrap items-center gap-3">
-          <div class="flex bg-surface-container-high p-1 rounded-lg">
-            <button data-rango="hoy" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded bg-white shadow-sm text-primary transition-colors">Hoy</button>
-            <button data-rango="semana" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded text-on-surface-variant hover:bg-white/60 transition-colors">Semana</button>
-            <button data-rango="mes" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded text-on-surface-variant hover:bg-white/60 transition-colors">Mes</button>
-            <button data-rango="trimestre" class="dash-rango-btn px-3 py-1.5 text-xs font-data font-semibold rounded text-on-surface-variant hover:bg-white/60 transition-colors">Trimestre</button>
-          </div>
-          <div class="flex items-center gap-1.5 bg-white border border-outline-variant rounded-lg px-2 py-1">
-            <span class="text-xs text-on-surface-variant pl-1">Desde</span>
-            <input id="dashKpiDesde" type="date" class="rounded-md border-0 focus:ring-primary text-xs font-data py-1 px-1.5">
-            <span class="text-xs text-on-surface-variant">Hasta</span>
-            <input id="dashKpiHasta" type="date" class="rounded-md border-0 focus:ring-primary text-xs font-data py-1 px-1.5">
-            <button id="dashKpiLimpiar" title="Quitar rango personalizado" class="text-on-surface-variant hover:text-error shrink-0"><span class="material-symbols-outlined text-[16px]">close</span></button>
-          </div>
+        <div class="flex items-center gap-1.5 bg-white border border-outline-variant rounded-lg px-2 py-1.5">
+          <span class="text-xs text-on-surface-variant pl-1">Desde</span>
+          <input id="dashKpiDesde" type="date" class="rounded-md border-0 focus:ring-primary text-xs font-data py-1 px-1.5">
+          <span class="text-xs text-on-surface-variant">Hasta</span>
+          <input id="dashKpiHasta" type="date" class="rounded-md border-0 focus:ring-primary text-xs font-data py-1 px-1.5">
+          <button id="dashKpiLimpiar" title="Quitar rango de fecha" class="text-on-surface-variant hover:text-error shrink-0"><span class="material-symbols-outlined text-[16px]">close</span></button>
         </div>
       </div>
 
@@ -238,7 +230,12 @@
                 </tbody>
               </table>
             </div>
-            <div id="chartRangoFechas" class="flex-1 flex items-end gap-2 border-l border-b border-outline-variant px-2 pb-1 min-h-[140px]"></div>
+            <div class="flex items-center gap-4 mb-2">
+              <span class="flex items-center gap-1.5 text-[11px] text-on-surface-variant"><span class="w-2.5 h-2.5 rounded-sm bg-error inline-block"></span>Faltante</span>
+              <span class="flex items-center gap-1.5 text-[11px] text-on-surface-variant"><span class="w-2.5 h-2.5 rounded-sm bg-[#b06000] inline-block"></span>Sobrante</span>
+              <span class="text-[11px] text-on-surface-variant ml-auto">% sobre el total de cada categoría</span>
+            </div>
+            <div id="chartRangoFechas" class="flex-1 flex items-end justify-around gap-6 border-l border-b border-outline-variant px-4 pb-1 min-h-[140px]"></div>
           </div>
         </div>
 
@@ -261,15 +258,26 @@
               <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">location_on</span>
               <input id="dashFiltroUbicacion" type="text" autocomplete="off" placeholder="Filtrar por ubicación" class="w-full pl-9 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
             </div>
-            <div class="relative">
-              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">filter_alt</span>
-              <select id="dashFiltroEstatus" class="w-full pl-9 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm appearance-none bg-white">
-                <option value="">Todos los Estatus</option>
-                <option value="OK">Conforme</option>
-                <option value="SOBRANTE">Sobrante</option>
-                <option value="FALTANTE">Faltante</option>
-                <option value="PENDIENTE">Pendiente</option>
-              </select>
+            <div class="relative" id="dashEstatusWrap">
+              <button id="dashEstatusBtn" type="button" class="w-full flex items-center pl-9 pr-2 py-2 rounded-lg border border-outline-variant focus:border-primary focus:ring-primary text-sm bg-white text-left relative">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">filter_alt</span>
+                <span id="dashEstatusLabel" class="truncate">Todos los Estatus</span>
+                <span class="material-symbols-outlined ml-auto text-on-surface-variant text-[18px]">expand_more</span>
+              </button>
+              <div id="dashEstatusMenu" class="hidden absolute z-20 mt-1 w-full bg-white border border-outline-variant rounded-lg shadow-lg p-1.5">
+                <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                  <input type="checkbox" data-estatus-opt="OK" class="dash-estatus-check rounded border-outline-variant"> Conforme
+                </label>
+                <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                  <input type="checkbox" data-estatus-opt="SOBRANTE" class="dash-estatus-check rounded border-outline-variant"> Sobrante
+                </label>
+                <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                  <input type="checkbox" data-estatus-opt="FALTANTE" class="dash-estatus-check rounded border-outline-variant"> Faltante
+                </label>
+                <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                  <input type="checkbox" data-estatus-opt="PENDIENTE" class="dash-estatus-check rounded border-outline-variant"> Pendiente
+                </label>
+              </div>
             </div>
             <div class="flex items-center gap-1.5">
               <label class="text-xs text-on-surface-variant shrink-0">Desde</label>
@@ -732,7 +740,6 @@ document.querySelectorAll('[data-nav-item]').forEach(btn => {
 document.querySelector('[data-nav-item]').classList.add('active');
 
 /* ==================== DASHBOARD EJECUTIVO ==================== */
-let dashRango = 'hoy'; // controla KPIs + gráficos (independiente de la tabla de detalle)
 
 // Acepta ISO, "dd/mm/aaaa[, hh:mm:ss]" (formato de toLocaleString('es-PE')), etc.
 function parseFechaRegistro(v) {
@@ -751,20 +758,13 @@ function parseFechaRegistro(v) {
   return null;
 }
 
-function getRangoFechas(tipo) {
+// Solo trabaja con el rango de fecha Desde/Hasta. Sin fechas -> abarca todo el histórico.
+function getRangoFechas() {
   const desdeVal = document.getElementById('dashKpiDesde') ? document.getElementById('dashKpiDesde').value : '';
   const hastaVal = document.getElementById('dashKpiHasta') ? document.getElementById('dashKpiHasta').value : '';
-  if (desdeVal && hastaVal) {
-    return { desde: new Date(desdeVal + 'T00:00:00'), hasta: new Date(hastaVal + 'T23:59:59'), personalizado: true };
-  }
-  const ahora = new Date();
-  const hasta = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 23, 59, 59);
-  let desde;
-  if (tipo === 'hoy') { desde = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 0, 0, 0); }
-  else if (tipo === 'semana') { desde = new Date(ahora); desde.setDate(desde.getDate() - 6); desde.setHours(0, 0, 0, 0); }
-  else if (tipo === 'mes') { desde = new Date(ahora); desde.setDate(desde.getDate() - 29); desde.setHours(0, 0, 0, 0); }
-  else { desde = new Date(ahora); desde.setMonth(desde.getMonth() - 3); desde.setHours(0, 0, 0, 0); }
-  return { desde, hasta, personalizado: false };
+  const desde = desdeVal ? new Date(desdeVal + 'T00:00:00') : new Date(2000, 0, 1);
+  const hasta = hastaVal ? new Date(hastaVal + 'T23:59:59') : new Date(2100, 0, 1);
+  return { desde, hasta, personalizado: !!(desdeVal || hastaVal) };
 }
 
 function normalizarEstatus(e) {
@@ -798,9 +798,9 @@ function renderDashboard() {
   renderDashDetailTable();
 }
 
-// KPIs + gráficos: se filtran por dashRango (Hoy / Semana / Mes / Trimestre) o por rango personalizado
+// KPIs + gráficos: se filtran únicamente por el rango de fecha Desde/Hasta
 function renderDashKpisYCharts() {
-  const { desde, hasta } = getRangoFechas(dashRango);
+  const { desde, hasta } = getRangoFechas();
   const enRango = DB.data.filter(r => {
     const f = parseFechaRegistro(r.REGISTRO || r.FECHA);
     return f && f >= desde && f <= hasta;
@@ -859,32 +859,46 @@ function renderDashKpisYCharts() {
 
 function renderChartRangoFechas(desde, hasta) {
   const cont = document.getElementById('chartRangoFechas');
-  const totalMs = hasta - desde;
-  const numBins = dashRango === 'hoy' ? 6 : (dashRango === 'semana' ? 7 : 6);
-  const binMs = totalMs / numBins;
-  const bins = Array.from({ length: numBins }, (_, i) => ({
-    desde: new Date(desde.getTime() + i * binMs), count: 0
-  }));
-  DB.data.forEach(r => {
+  const enRango = DB.data.filter(r => {
     const f = parseFechaRegistro(r.REGISTRO || r.FECHA);
-    if (!f || f < desde || f > hasta) return;
-    const idx = Math.min(numBins - 1, Math.floor((f - desde) / binMs));
-    bins[idx].count++;
+    return f && f >= desde && f <= hasta;
   });
-  const max = Math.max(1, ...bins.map(b => b.count));
-  if (bins.every(b => b.count === 0)) {
-    cont.innerHTML = '<p class="text-sm text-on-surface-variant self-center w-full text-center">Sin conteos registrados en este período.</p>';
-    return;
-  }
-  cont.innerHTML = bins.map((b, i) => {
-    const h = Math.max(4, Math.round((b.count / max) * 100));
-    const isLast = i === bins.length - 1;
-    const label = dashRango === 'hoy' ? b.desde.getHours() + 'h' : b.desde.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit' });
-    return `<div class="flex-1 flex flex-col items-center justify-end gap-1 h-full">
-      <div class="${isLast ? 'bg-primary' : 'bg-primary-fixed-dim'} w-full rounded-t transition-all" style="height:${h}%" title="${b.count} líneas"></div>
-      <span class="text-[10px] text-on-surface-variant font-data">${label}</span>
-    </div>`;
-  }).join('');
+  const faltantesRango = enRango.filter(r => normalizarEstatus(r.ESTATUS) === 'FALTANTE');
+  const sobrantesRango = enRango.filter(r => normalizarEstatus(r.ESTATUS) === 'SOBRANTE');
+
+  const sumaSaldo = arr => arr.reduce((s, r) => { const v = parseFloat(r.SALDO); return s + (isNaN(v) ? 0 : v); }, 0);
+  const unidTotales = sumaSaldo(DB.data);
+  const unidFaltantes = faltantesRango.reduce((s, r) => { const saldo = parseFloat(r.SALDO) || 0, cant = parseFloat(r.CANTIDAD) || 0; return s + Math.max(0, saldo - cant); }, 0);
+  const unidSobrantes = sobrantesRango.reduce((s, r) => { const saldo = parseFloat(r.SALDO) || 0, cant = parseFloat(r.CANTIDAD) || 0; return s + Math.max(0, cant - saldo); }, 0);
+
+  const setUnicos = (arr, campo) => new Set(arr.map(r => (r[campo] || '').toString().trim()).filter(Boolean)).size;
+  const ubiTotales = setUnicos(DB.data, 'UBICACION');
+  const ubiFaltantes = setUnicos(faltantesRango, 'UBICACION');
+  const ubiSobrantes = setUnicos(sobrantesRango, 'UBICACION');
+  const codTotales = setUnicos(DB.data, 'CODIGO');
+  const codFaltantes = setUnicos(faltantesRango, 'CODIGO');
+  const codSobrantes = setUnicos(sobrantesRango, 'CODIGO');
+
+  const categorias = [
+    { nombre: 'Unidades', pctFalt: unidTotales > 0 ? unidFaltantes / unidTotales * 100 : 0, pctSobr: unidTotales > 0 ? unidSobrantes / unidTotales * 100 : 0, falt: unidFaltantes, sobr: unidSobrantes },
+    { nombre: 'Ubicaciones', pctFalt: ubiTotales > 0 ? ubiFaltantes / ubiTotales * 100 : 0, pctSobr: ubiTotales > 0 ? ubiSobrantes / ubiTotales * 100 : 0, falt: ubiFaltantes, sobr: ubiSobrantes },
+    { nombre: 'Códigos', pctFalt: codTotales > 0 ? codFaltantes / codTotales * 100 : 0, pctSobr: codTotales > 0 ? codSobrantes / codTotales * 100 : 0, falt: codFaltantes, sobr: codSobrantes },
+  ];
+
+  cont.innerHTML = categorias.map(c => `
+    <div class="flex flex-col items-center gap-1 h-full justify-end">
+      <div class="flex items-end gap-1.5 h-full">
+        <div class="flex flex-col items-center justify-end h-full">
+          <span class="text-[10px] font-data text-error mb-0.5">${Math.round(c.falt).toLocaleString('es-PE')}</span>
+          <div class="bg-error w-7 rounded-t transition-all" style="height:${Math.max(3, Math.min(100, c.pctFalt))}%" title="Faltantes: ${Math.round(c.falt).toLocaleString('es-PE')} (${c.pctFalt.toFixed(1)}%)"></div>
+        </div>
+        <div class="flex flex-col items-center justify-end h-full">
+          <span class="text-[10px] font-data text-[#b06000] mb-0.5">${Math.round(c.sobr).toLocaleString('es-PE')}</span>
+          <div class="bg-[#b06000] w-7 rounded-t transition-all" style="height:${Math.max(3, Math.min(100, c.pctSobr))}%" title="Sobrantes: ${Math.round(c.sobr).toLocaleString('es-PE')} (${c.pctSobr.toFixed(1)}%)"></div>
+        </div>
+      </div>
+      <span class="text-[11px] text-on-surface-variant font-semibold mt-1">${c.nombre}</span>
+    </div>`).join('');
 }
 
 function renderChartPorRack(desde, hasta) {
@@ -914,6 +928,7 @@ function renderChartPorRack(desde, hasta) {
 
 // Tabla de detalle: filtros propios de código, ubicación, estatus y rango de fechas INDEPENDIENTE del de arriba
 let dashFilteredRows = []; // última lista filtrada (para exportar "todo lo filtrado")
+let dashEstatusSeleccionados = new Set(); // vacío = todos los estatus
 let dashSelected = new Set(); // keys de filas marcadas con checkbox
 let dashSortField = null; // 'CODIGO' | 'UBICACION' | null
 let dashSortDir = 'asc';
@@ -925,7 +940,6 @@ function dashRowKey(r, i) {
 function renderDashDetailTable() {
   const codigo = (document.getElementById('dashFiltroCodigo').value || '').toUpperCase().trim();
   const ubicacion = (document.getElementById('dashFiltroUbicacion').value || '').toUpperCase().trim();
-  const estatusSel = document.getElementById('dashFiltroEstatus').value;
   const desdeVal = document.getElementById('dashFiltroDesde').value;
   const hastaVal = document.getElementById('dashFiltroHasta').value;
   const desde = desdeVal ? new Date(desdeVal + 'T00:00:00') : null;
@@ -935,7 +949,7 @@ function renderDashDetailTable() {
     if (codigo && !(r.CODIGO || '').toString().toUpperCase().includes(codigo)) return false;
     if (ubicacion && !(r.UBICACION || '').toString().toUpperCase().includes(ubicacion)) return false;
     const estNorm = normalizarEstatus(r.ESTATUS);
-    if (estatusSel && estNorm !== estatusSel) return false;
+    if (dashEstatusSeleccionados.size > 0 && !dashEstatusSeleccionados.has(estNorm)) return false;
     if (desde || hasta) {
       const f = parseFechaRegistro(r.REGISTRO || r.FECHA);
       if (!f) return false;
@@ -1051,39 +1065,12 @@ function exportarDashboardExcel(soloSeleccionados) {
 document.getElementById('btnExportDashAll').addEventListener('click', () => exportarDashboardExcel(false));
 document.getElementById('btnExportDashSel').addEventListener('click', () => exportarDashboardExcel(true));
 
-document.querySelectorAll('.dash-rango-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    dashRango = btn.dataset.rango;
-    document.getElementById('dashKpiDesde').value = '';
-    document.getElementById('dashKpiHasta').value = '';
-    document.querySelectorAll('.dash-rango-btn').forEach(b => b.classList.remove('bg-white', 'shadow-sm', 'text-primary'));
-    document.querySelectorAll('.dash-rango-btn').forEach(b => b.classList.add('text-on-surface-variant'));
-    btn.classList.remove('text-on-surface-variant');
-    btn.classList.add('bg-white', 'shadow-sm', 'text-primary');
-    renderDashKpisYCharts();
-  });
-});
-
 ['dashKpiDesde', 'dashKpiHasta'].forEach(id => {
-  document.getElementById(id).addEventListener('change', () => {
-    const d = document.getElementById('dashKpiDesde').value;
-    const h = document.getElementById('dashKpiHasta').value;
-    if (d && h) {
-      document.querySelectorAll('.dash-rango-btn').forEach(b => b.classList.remove('bg-white', 'shadow-sm', 'text-primary'));
-      document.querySelectorAll('.dash-rango-btn').forEach(b => b.classList.add('text-on-surface-variant'));
-    }
-    renderDashKpisYCharts();
-  });
+  document.getElementById(id).addEventListener('change', renderDashKpisYCharts);
 });
 document.getElementById('dashKpiLimpiar').addEventListener('click', () => {
   document.getElementById('dashKpiDesde').value = '';
   document.getElementById('dashKpiHasta').value = '';
-  document.querySelectorAll('.dash-rango-btn').forEach(b => b.classList.remove('bg-white', 'shadow-sm', 'text-primary', 'text-on-surface-variant'));
-  document.querySelectorAll('.dash-rango-btn').forEach(b => b.classList.add('text-on-surface-variant'));
-  const hoyBtn = document.querySelector('.dash-rango-btn[data-rango="hoy"]');
-  hoyBtn.classList.remove('text-on-surface-variant');
-  hoyBtn.classList.add('bg-white', 'shadow-sm', 'text-primary');
-  dashRango = 'hoy';
   renderDashKpisYCharts();
 });
 
@@ -1103,7 +1090,7 @@ document.querySelectorAll('.dash-sort-th').forEach(th => {
 ['dashFiltroCodigo', 'dashFiltroUbicacion'].forEach(id => {
   document.getElementById(id).addEventListener('input', debounce(renderDashDetailTable, 200));
 });
-['dashFiltroEstatus', 'dashFiltroDesde', 'dashFiltroHasta'].forEach(id => {
+['dashFiltroDesde', 'dashFiltroHasta'].forEach(id => {
   document.getElementById(id).addEventListener('change', renderDashDetailTable);
 });
 document.getElementById('dashFiltroLimpiar').addEventListener('click', () => {
@@ -1111,6 +1098,30 @@ document.getElementById('dashFiltroLimpiar').addEventListener('click', () => {
   document.getElementById('dashFiltroHasta').value = '';
   renderDashDetailTable();
 });
+
+// Dropdown de selección múltiple de estatus
+const ESTATUS_LABELS = { OK: 'Conforme', SOBRANTE: 'Sobrante', FALTANTE: 'Faltante', PENDIENTE: 'Pendiente' };
+document.getElementById('dashEstatusBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  document.getElementById('dashEstatusMenu').classList.toggle('hidden');
+});
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('dashEstatusWrap');
+  if (wrap && !wrap.contains(e.target)) document.getElementById('dashEstatusMenu').classList.add('hidden');
+});
+document.querySelectorAll('.dash-estatus-check').forEach(cb => {
+  cb.addEventListener('change', () => {
+    if (cb.checked) dashEstatusSeleccionados.add(cb.dataset.estatusOpt);
+    else dashEstatusSeleccionados.delete(cb.dataset.estatusOpt);
+    updateDashEstatusLabel();
+    renderDashDetailTable();
+  });
+});
+function updateDashEstatusLabel() {
+  const label = document.getElementById('dashEstatusLabel');
+  if (dashEstatusSeleccionados.size === 0) { label.textContent = 'Todos los Estatus'; return; }
+  label.textContent = Array.from(dashEstatusSeleccionados).map(v => ESTATUS_LABELS[v] || v).join(', ');
+}
 
 // Ya no depende de la sesión actual: el dashboard ejecutivo se basa en DB.data (hoja DATA en Sheets)
 function renderSessionKpi() { }
