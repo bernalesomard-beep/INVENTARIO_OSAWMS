@@ -107,6 +107,12 @@
       <button data-nav-item data-target="panelMaestra" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container opacity-70 hover:bg-primary-fixed-dim hover:text-on-primary-fixed transition-colors text-left">
         <span class="material-symbols-outlined">inventory</span><span class="text-sm font-semibold">Maestra</span>
       </button>
+      <button data-nav-item data-target="panelSaldoSheet" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container opacity-70 hover:bg-primary-fixed-dim hover:text-on-primary-fixed transition-colors text-left">
+        <span class="material-symbols-outlined">account_balance_wallet</span><span class="text-sm font-semibold">Saldo</span>
+      </button>
+      <button data-nav-item data-target="panelVentaSheet" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container opacity-70 hover:bg-primary-fixed-dim hover:text-on-primary-fixed transition-colors text-left">
+        <span class="material-symbols-outlined">point_of_sale</span><span class="text-sm font-semibold">Ventas</span>
+      </button>
       <button data-nav-item data-target="panelManual" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container opacity-70 hover:bg-primary-fixed-dim hover:text-on-primary-fixed transition-colors text-left">
         <span class="material-symbols-outlined">edit_note</span><span class="text-sm font-semibold">Hoja Manual</span>
       </button>
@@ -307,6 +313,11 @@
               <button id="dashFiltroLimpiar" title="Quitar filtro de fecha" class="text-on-surface-variant hover:text-error shrink-0"><span class="material-symbols-outlined text-[18px]">close</span></button>
             </div>
           </div>
+          <div class="flex justify-end">
+            <button id="dashFiltrosLimpiarTodo" type="button" class="flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-error font-semibold">
+              <span class="material-symbols-outlined text-[16px]">filter_alt_off</span> Limpiar filtros
+            </button>
+          </div>
         </div>
         <div class="overflow-x-auto max-h-[55vh] overflow-y-auto">
           <table class="w-full text-sm table-fixed">
@@ -395,7 +406,11 @@
           </div>
           <div class="bg-white border border-outline-variant rounded-xl p-5">
             <h4 class="font-semibold mb-2 text-xs">Distribución por Estatus</h4>
-            <div id="chartSaldoEstatus" class="flex items-end justify-around gap-3 border-l border-b border-outline-variant px-3 pb-1 min-h-[110px]"></div>
+            <div id="chartSaldoEstatus" class="flex items-end justify-around gap-4 border-l border-b border-outline-variant px-3 pb-1 pt-3"></div>
+            <div class="flex items-center gap-4 mt-2">
+              <span class="flex items-center gap-1.5 text-[10px] text-on-surface-variant"><span class="w-2.5 h-2.5 rounded-sm bg-primary inline-block"></span>Códigos</span>
+              <span class="flex items-center gap-1.5 text-[10px] text-on-surface-variant"><span class="w-2.5 h-2.5 rounded-sm bg-primary/40 inline-block"></span>Unidades</span>
+            </div>
           </div>
         </div>
 
@@ -429,6 +444,11 @@
                   </label>
                 </div>
               </div>
+            </div>
+            <div class="flex justify-end">
+              <button id="saldoFiltrosLimpiarTodo" type="button" class="flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-error font-semibold">
+                <span class="material-symbols-outlined text-[16px]">filter_alt_off</span> Limpiar filtros
+              </button>
             </div>
           </div>
           <div class="overflow-x-auto overflow-y-auto flex-1 max-h-[55vh]">
@@ -480,7 +500,10 @@
           <div class="p-4 border-b border-outline-variant bg-surface-container-low flex flex-col gap-2.5 rounded-t-xl">
             <h4 class="font-semibold text-sm">Combinaciones Ubicación + Código registradas de más</h4>
             <p class="text-xs text-on-surface-variant">En DATA maestro no existen dos líneas con la misma Ubicación + Código + Lote. Si en DETALLE una combinación Ubicación + Código aparece más veces que la cantidad de lotes que tiene en DATA, probablemente el personal registró/escaneó esa ubicación más de una vez.</p>
-            <input id="dupFiltro" type="text" placeholder="Filtrar por código, ubicación o usuario..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+            <div class="relative w-full">
+              <input id="dupFiltro" type="text" placeholder="Filtrar por código, ubicación o usuario..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data pr-8">
+              <button id="dupFiltroClear" title="Limpiar filtro" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">close</span></button>
+            </div>
           </div>
           <div class="overflow-x-auto overflow-y-auto flex-1 max-h-[55vh]">
             <table class="w-full text-xs">
@@ -580,7 +603,10 @@
           </div>
         </button>
         <div id="conteoDetailBox" class="hidden border-t border-outline-variant p-4">
-          <input id="conteoFiltro" type="text" placeholder="Filtrar por código, ubicación, usuario, estatus..." class="w-full mb-3 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+          <div class="relative w-full mb-3">
+            <input id="conteoFiltro" type="text" placeholder="Filtrar por código, ubicación, usuario, estatus..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data pr-8">
+            <button id="conteoFiltroClear" title="Limpiar filtro" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">close</span></button>
+          </div>
           <div class="overflow-x-auto max-h-72 overflow-y-auto border border-outline-variant rounded-lg">
             <table class="w-full text-xs">
               <thead class="sticky top-0 bg-white"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
@@ -611,7 +637,10 @@
           </div>
         </button>
         <div id="manualDetailBox" class="hidden border-t border-outline-variant p-4">
-          <input id="manualFiltro" type="text" placeholder="Filtrar por código, EAN, ubicación, usuario..." class="w-full mb-3 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+          <div class="relative w-full mb-3">
+            <input id="manualFiltro" type="text" placeholder="Filtrar por código, EAN, ubicación, usuario..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data pr-8">
+            <button id="manualFiltroClear" title="Limpiar filtro" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">close</span></button>
+          </div>
           <div class="overflow-x-auto max-h-72 overflow-y-auto border border-outline-variant rounded-lg">
             <table class="w-full text-xs">
               <thead class="sticky top-0 bg-white"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
@@ -645,10 +674,16 @@
         <div id="detalleRealDetailBox" class="hidden border-t border-outline-variant p-4">
           <p class="text-xs text-on-surface-variant mb-3">Esto se lee directamente del Sheet DETALLE (lo que ya está guardado, de todos los que están contando). Las filas marcadas en rojo forman parte de una combinación Ubicación+Código registrada más veces de lo esperado (posible doble conteo).</p>
           <div class="flex flex-col sm:flex-row gap-2.5 mb-3">
-            <input id="detalleRealFiltro" type="text" placeholder="Filtrar por código, ubicación, usuario, estatus..." class="flex-1 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+            <div class="relative flex-1">
+              <input id="detalleRealFiltro" type="text" placeholder="Filtrar por código, ubicación, usuario, estatus..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data pr-8">
+              <button id="detalleRealFiltroClear" title="Limpiar texto" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">close</span></button>
+            </div>
             <label class="flex items-center gap-2 text-xs whitespace-nowrap px-3 border border-outline-variant rounded-lg cursor-pointer select-none">
               <input id="detalleRealSoloDup" type="checkbox" class="rounded border-outline-variant"> Solo duplicados
             </label>
+            <button id="detalleRealFiltrosLimpiarTodo" type="button" class="flex items-center gap-1.5 text-xs whitespace-nowrap px-3 border border-outline-variant rounded-lg hover:bg-surface-container-low text-on-surface-variant hover:text-error">
+              <span class="material-symbols-outlined text-[16px]">filter_alt_off</span> Limpiar filtros
+            </button>
           </div>
           <div class="flex flex-wrap items-center gap-2 mb-3">
             <span id="detalleRealSelCount" class="text-xs text-on-surface-variant hidden"></span>
@@ -668,7 +703,7 @@
               <thead class="sticky top-0 bg-white"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
                 <th class="py-2 px-3 font-semibold w-8"><input id="detalleRealCheckAll" type="checkbox" class="rounded border-outline-variant"></th>
                 <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">ID Detalle</th>
-                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Registro</th>
+                <th data-detalle-sort="REGISTRO" class="detalle-sort-th py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0] cursor-pointer select-none whitespace-nowrap">Registro <span class="sort-icon text-[10px] opacity-40">↕</span></th>
                 <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Usuario</th>
                 <th data-detalle-sort="UBICACIÓN" class="detalle-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Ubicación <span class="sort-icon text-[10px] opacity-40">↕</span></th>
                 <th data-detalle-sort="CODIGO" class="detalle-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Código <span class="sort-icon text-[10px] opacity-40">↕</span></th>
@@ -715,7 +750,10 @@
         </label>
         <p data-status="data" class="text-xs mt-2"></p>
       </div>
-      <input id="dataFilter" type="text" placeholder="Filtrar por código, descripción o ubicación..." class="w-full mb-3 rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm">
+      <div class="relative w-full mb-3">
+        <input id="dataFilter" type="text" placeholder="Filtrar por código, descripción o ubicación..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm pr-8">
+        <button id="dataFilterClear" title="Limpiar filtro" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">close</span></button>
+      </div>
       <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
         <div class="overflow-x-auto max-h-[65vh] overflow-y-auto">
           <table class="w-full text-sm">
@@ -754,7 +792,10 @@
         </label>
         <p data-status="ubicaciones" class="text-xs mt-2"></p>
       </div>
-      <input id="ubiFilter" type="text" placeholder="Filtrar por rack, nivel o ubicación..." class="w-full mb-3 rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm">
+      <div class="relative w-full mb-3">
+        <input id="ubiFilter" type="text" placeholder="Filtrar por rack, nivel o ubicación..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm pr-8">
+        <button id="ubiFilterClear" title="Limpiar filtro" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">close</span></button>
+      </div>
       <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
         <div class="overflow-x-auto max-h-[65vh] overflow-y-auto">
           <table class="w-full text-sm">
@@ -789,7 +830,10 @@
         </label>
         <p data-status="maestra" class="text-xs mt-2"></p>
       </div>
-      <input id="maestraFilter" type="text" placeholder="Filtrar por código o descripción..." class="w-full mb-3 rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm">
+      <div class="relative w-full mb-3">
+        <input id="maestraFilter" type="text" placeholder="Filtrar por código o descripción..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm pr-8">
+        <button id="maestraFilterClear" title="Limpiar filtro" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">close</span></button>
+      </div>
       <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
         <div class="overflow-x-auto max-h-[65vh] overflow-y-auto">
           <table class="w-full text-sm">
@@ -805,11 +849,72 @@
       <p id="maestraRowCount" class="text-xs text-on-surface-variant mt-2"></p>
     </section>
 
+    <!-- ===== PANEL: SALDO (Hoja SALDO) ===== -->
+    <section id="panelSaldoSheet" class="tab-panel">
+      <h2 class="text-2xl font-bold font-headline mb-1">Saldo</h2>
+      <p class="text-on-surface-variant text-sm mb-4">Hoja <span class="font-data">SALDO</span> — saldo inicial por código.</p>
+      <div class="grid grid-cols-2 gap-3 mb-4 max-w-md">
+        <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
+          <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">Total Códigos</span>
+          <p id="kpiSaldoSheetCodigos" class="text-xl font-bold font-data">-</p>
+        </div>
+        <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
+          <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">Total Unidades</span>
+          <p id="kpiSaldoSheetUnidades" class="text-xl font-bold font-data">-</p>
+        </div>
+      </div>
+      <div class="relative w-full mb-3">
+        <input id="saldoSheetFilter" type="text" placeholder="Filtrar por código BPCS o Cliente..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm pr-8">
+        <button id="saldoSheetFilterClear" title="Limpiar filtro" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">close</span></button>
+      </div>
+      <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
+        <div class="overflow-x-auto max-h-[65vh] overflow-y-auto">
+          <table class="w-full text-sm">
+            <thead class="sticky top-0 bg-surface-container-low z-10"><tr id="saldoSheetTableHead" class="text-left text-on-surface-variant border-b border-outline-variant"></tr></thead>
+            <tbody id="saldoSheetTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <p id="saldoSheetRowCount" class="text-xs text-on-surface-variant mt-2"></p>
+    </section>
+
+    <!-- ===== PANEL: VENTAS (Hoja VENTA) ===== -->
+    <section id="panelVentaSheet" class="tab-panel">
+      <h2 class="text-2xl font-bold font-headline mb-1">Ventas</h2>
+      <p class="text-on-surface-variant text-sm mb-4">Hoja <span class="font-data">VENTA</span> — ventas registradas por código.</p>
+      <div class="grid grid-cols-2 gap-3 mb-4 max-w-md">
+        <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
+          <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">Total Códigos</span>
+          <p id="kpiVentaSheetCodigos" class="text-xl font-bold font-data">-</p>
+        </div>
+        <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
+          <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">Total Unidades</span>
+          <p id="kpiVentaSheetUnidades" class="text-xl font-bold font-data">-</p>
+        </div>
+      </div>
+      <div class="relative w-full mb-3">
+        <input id="ventaSheetFilter" type="text" placeholder="Filtrar por código BPCS..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm pr-8">
+        <button id="ventaSheetFilterClear" title="Limpiar filtro" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">close</span></button>
+      </div>
+      <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
+        <div class="overflow-x-auto max-h-[65vh] overflow-y-auto">
+          <table class="w-full text-sm">
+            <thead class="sticky top-0 bg-surface-container-low z-10"><tr id="ventaSheetTableHead" class="text-left text-on-surface-variant border-b border-outline-variant"></tr></thead>
+            <tbody id="ventaSheetTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <p id="ventaSheetRowCount" class="text-xs text-on-surface-variant mt-2"></p>
+    </section>
+
     <!-- ===== PANEL: MANUAL ===== -->
     <section id="panelManual" class="tab-panel">
       <h2 class="text-2xl font-bold font-headline mb-1">Hoja Manual</h2>
       <p class="text-on-surface-variant text-sm mb-4">Hoja <span class="font-data">HOJA MANUAL</span> — registros manuales existentes.</p>
-      <input id="manualFilter" type="text" placeholder="Filtrar..." class="w-full mb-3 rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm">
+      <div class="relative w-full mb-3">
+        <input id="manualFilter" type="text" placeholder="Filtrar..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-sm pr-8">
+        <button id="manualFilterClear" title="Limpiar filtro" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">close</span></button>
+      </div>
       <div class="bg-white border border-outline-variant rounded-xl overflow-hidden">
         <div class="overflow-x-auto max-h-[65vh] overflow-y-auto">
           <table class="w-full text-sm">
@@ -922,6 +1027,8 @@ async function loadAllData() {
   renderDataTable();
   renderUbiTable();
   renderMaestraTable();
+  renderSaldoSheetTable();
+  renderVentaSheetTable();
   renderManualTable();
   renderUsuariosTable();
 }
@@ -1144,7 +1251,7 @@ function renderDashKpisYCharts() {
   document.getElementById('statUbiSobrantes').textContent = setUbi(sobrantesRango).toLocaleString('es-PE');
 
   // Códigos únicos
-  const setCod = arr => new Set(arr.map(r => (r.CODIGO || '').toString().trim()).filter(Boolean)).size;
+  const setCod = arr => new Set(arr.map(r => (r.CODIGO || '').toString().trim().toUpperCase()).filter(Boolean)).size;
   document.getElementById('statCodTotales').textContent = setCod(DB.data).toLocaleString('es-PE');
   document.getElementById('statCodContadas').textContent = setCod(enRango).toLocaleString('es-PE');
   document.getElementById('statCodFaltantes').textContent = setCod(faltantesRango).toLocaleString('es-PE');
@@ -1208,23 +1315,38 @@ function renderChartPorRack(desde, hasta) {
   const racks = {};
   DB.data.forEach(r => {
     const rack = (r.RACK || r['RACK '] || '—').toString().trim() || '—';
-    if (!racks[rack]) racks[rack] = { total: 0, contados: 0 };
+    if (!racks[rack]) racks[rack] = { total: 0, contados: 0, ubicaciones: new Set(), codigos: new Set(), unidades: 0 };
     racks[rack].total++;
     const f = parseFechaRegistro(r.REGISTRO || r.FECHA);
     if (f && f >= desde && f <= hasta && normalizarEstatus(r.ESTATUS) !== 'PENDIENTE') racks[rack].contados++;
+    const ubic = (r.UBICACION || '').toString().trim();
+    if (ubic) racks[rack].ubicaciones.add(ubic);
+    const cod = (r.CODIGO || '').toString().trim().toUpperCase();
+    if (cod) racks[rack].codigos.add(cod);
+    const saldoNum = parseFloat(r.SALDO);
+    if (!isNaN(saldoNum)) racks[rack].unidades += saldoNum;
   });
   const arr = Object.entries(racks)
-    .map(([rack, v]) => ({ rack, pct: v.total > 0 ? (v.contados / v.total * 100) : 0 }))
+    .map(([rack, v]) => ({
+      rack,
+      pct: v.total > 0 ? (v.contados / v.total * 100) : 0,
+      ubicaciones: v.ubicaciones.size,
+      codigos: v.codigos.size,
+      unidades: v.unidades
+    }))
     .sort((a, b) => a.rack.localeCompare(b.rack, 'es', { numeric: true, sensitivity: 'base' }))
     .slice(0, 30);
   if (arr.length === 0) { cont.innerHTML = '<p class="text-sm text-on-surface-variant">Sin datos de racks.</p>'; return; }
   cont.innerHTML = arr.map(r => `
-    <div class="flex items-center gap-3 shrink-0">
-      <span class="font-data text-xs text-on-surface-variant w-16 shrink-0 truncate">${r.rack}</span>
-      <div class="flex-1 bg-surface-container-high h-2.5 rounded-full overflow-hidden">
-        <div class="${r.pct >= 100 ? 'bg-primary' : r.pct >= 50 ? 'bg-primary-fixed-dim' : 'bg-error-container'} h-full rounded-full" style="width:${Math.min(100, r.pct)}%"></div>
+    <div class="flex flex-col gap-0.5 shrink-0 pb-1.5 border-b border-surface-variant last:border-0 last:pb-0">
+      <div class="flex items-center gap-3">
+        <span class="font-data text-xs text-on-surface-variant w-16 shrink-0 truncate">${r.rack}</span>
+        <div class="flex-1 bg-surface-container-high h-2.5 rounded-full overflow-hidden">
+          <div class="${r.pct >= 100 ? 'bg-primary' : r.pct >= 50 ? 'bg-primary-fixed-dim' : 'bg-error-container'} h-full rounded-full" style="width:${Math.min(100, r.pct)}%"></div>
+        </div>
+        <span class="font-data text-xs w-16 text-right ${r.pct >= 50 ? 'text-primary' : 'text-error'}">${r.pct.toFixed(2)}%</span>
       </div>
-      <span class="font-data text-xs w-10 text-right ${r.pct >= 50 ? 'text-primary' : 'text-error'}">${r.pct.toFixed(0)}%</span>
+      <div class="pl-[76px] text-[10px] text-on-surface-variant font-data">${r.ubicaciones.toLocaleString('es-PE')} ubic. · ${r.codigos.toLocaleString('es-PE')} cód. · ${Math.round(r.unidades).toLocaleString('es-PE')} unid.</div>
     </div>`).join('');
 }
 
@@ -1477,16 +1599,30 @@ function renderSaldoResumen() {
   diffEl.className = 'text-3xl font-bold font-data ' + (diffNeto === 0 ? '' : diffNeto > 0 ? 'text-[#b06000]' : 'text-error');
 
   const conteo = { OK: 0, SOBRANTE: 0, FALTANTE: 0, PENDIENTE: 0 };
-  rows.forEach(r => conteo[r.estatus]++);
+  const conteoUnid = { OK: 0, SOBRANTE: 0, FALTANTE: 0, PENDIENTE: 0 };
+  rows.forEach(r => { conteo[r.estatus]++; conteoUnid[r.estatus] += (r.saldoInicial || 0); });
   const colores = { OK: 'bg-success', SOBRANTE: 'bg-[#b06000]', FALTANTE: 'bg-error', PENDIENTE: 'bg-outline-variant' };
+  const coloresUnid = { OK: 'bg-success/40', SOBRANTE: 'bg-[#b06000]/40', FALTANTE: 'bg-error/40', PENDIENTE: 'bg-outline-variant/60' };
   const labels = { OK: 'Conforme', SOBRANTE: 'Sobrante', FALTANTE: 'Faltante', PENDIENTE: 'Pendiente' };
+  const totalUnidEstatus = Object.values(conteoUnid).reduce((s, v) => s + v, 0);
+  const MAX_BAR_PX = 100;
   document.getElementById('chartSaldoEstatus').innerHTML = Object.keys(conteo).map(k => {
     const v = conteo[k];
+    const vu = conteoUnid[k];
     const pctK = total > 0 ? (v / total * 100) : 0;
-    return `<div class="flex flex-col items-center gap-1 h-full justify-end">
-      <div class="flex flex-col items-center justify-end h-full">
-        <span class="text-[10px] font-data mb-0.5">${v.toLocaleString('es-PE')}</span>
-        <div class="${colores[k]} w-9 rounded-t transition-all" style="height:${Math.max(3, Math.min(100, pctK))}%" title="${labels[k]}: ${v} (${pctK.toFixed(1)}%)"></div>
+    const pctU = totalUnidEstatus > 0 ? (vu / totalUnidEstatus * 100) : 0;
+    const hK = Math.max(3, Math.round(Math.min(100, pctK) * MAX_BAR_PX / 100));
+    const hU = Math.max(3, Math.round(Math.min(100, pctU) * MAX_BAR_PX / 100));
+    return `<div class="flex flex-col items-center gap-1">
+      <div class="flex items-end gap-1.5" style="height:${MAX_BAR_PX}px">
+        <div class="flex flex-col items-center justify-end h-full">
+          <span class="text-[9px] font-data mb-0.5">${v.toLocaleString('es-PE')}</span>
+          <div class="${colores[k]} w-5 rounded-t transition-all" style="height:${hK}px" title="Códigos ${labels[k]}: ${v.toLocaleString('es-PE')} (${pctK.toFixed(1)}%)"></div>
+        </div>
+        <div class="flex flex-col items-center justify-end h-full">
+          <span class="text-[9px] font-data mb-0.5">${Math.round(vu).toLocaleString('es-PE')}</span>
+          <div class="${coloresUnid[k]} w-5 rounded-t transition-all" style="height:${hU}px" title="Unidades ${labels[k]}: ${Math.round(vu).toLocaleString('es-PE')} (${pctU.toFixed(1)}%)"></div>
+        </div>
       </div>
       <span class="text-[11px] text-on-surface-variant font-semibold mt-1">${labels[k]}</span>
     </div>`;
@@ -1572,6 +1708,14 @@ document.querySelectorAll('.saldo-estatus-check').forEach(chk => {
   });
 });
 
+document.getElementById('saldoFiltrosLimpiarTodo').addEventListener('click', () => {
+  document.getElementById('saldoFiltroCodigo').value = '';
+  saldoEstatusSeleccionados.clear();
+  document.querySelectorAll('.saldo-estatus-check').forEach(c => c.checked = false);
+  document.getElementById('saldoEstatusLabel').textContent = 'Todos los Estatus';
+  renderSaldoDetailTable();
+});
+
 document.getElementById('btnExportSaldo').addEventListener('click', () => {
   const q = (document.getElementById('saldoFiltroCodigo').value || '').toUpperCase().trim();
   let rows = saldoRowsCache.filter(r => {
@@ -1623,6 +1767,16 @@ document.querySelectorAll('.dash-sort-th').forEach(th => {
 document.getElementById('dashFiltroLimpiar').addEventListener('click', () => {
   document.getElementById('dashFiltroDesde').value = '';
   document.getElementById('dashFiltroHasta').value = '';
+  renderDashDetailTable();
+});
+document.getElementById('dashFiltrosLimpiarTodo').addEventListener('click', () => {
+  document.getElementById('dashFiltroCodigo').value = '';
+  document.getElementById('dashFiltroUbicacion').value = '';
+  document.getElementById('dashFiltroDesde').value = '';
+  document.getElementById('dashFiltroHasta').value = '';
+  dashEstatusSeleccionados.clear();
+  document.querySelectorAll('.dash-estatus-check').forEach(cb => cb.checked = false);
+  updateDashEstatusLabel();
   renderDashDetailTable();
 });
 
@@ -1886,7 +2040,22 @@ document.getElementById('toggleDetalleRealBox').addEventListener('click', () => 
   if (!box.classList.contains('hidden')) renderDetalleRealTable();
 });
 document.getElementById('detalleRealFiltro').addEventListener('input', debounce(renderDetalleRealTable, 150));
+document.getElementById('detalleRealFiltro').addEventListener('input', (e) => {
+  document.getElementById('detalleRealFiltroClear').classList.toggle('hidden', !e.target.value);
+});
+document.getElementById('detalleRealFiltroClear').addEventListener('click', () => {
+  const el = document.getElementById('detalleRealFiltro');
+  el.value = '';
+  document.getElementById('detalleRealFiltroClear').classList.add('hidden');
+  renderDetalleRealTable();
+});
 document.getElementById('detalleRealSoloDup').addEventListener('change', renderDetalleRealTable);
+document.getElementById('detalleRealFiltrosLimpiarTodo').addEventListener('click', () => {
+  document.getElementById('detalleRealFiltro').value = '';
+  document.getElementById('detalleRealFiltroClear').classList.add('hidden');
+  document.getElementById('detalleRealSoloDup').checked = false;
+  renderDetalleRealTable();
+});
 
 function renderDetalleRealTable() {
   const filas = DB.detalle.filter(d => (d.TIPO || '').toString().trim().toUpperCase() === 'DATA');
@@ -1917,7 +2086,17 @@ function renderDetalleRealTable() {
   }
   if (detalleSortField) {
     const dir = detalleSortDir === 'asc' ? 1 : -1;
-    rows = rows.slice().sort((a, b) => (a[detalleSortField] || '').toString().localeCompare((b[detalleSortField] || '').toString(), 'es', { numeric: true, sensitivity: 'base' }) * dir);
+    if (detalleSortField === 'REGISTRO') {
+      rows = rows.slice().sort((a, b) => {
+        const fa = parseFechaRegistro(a.REGISTRO || a.FECHA);
+        const fb = parseFechaRegistro(b.REGISTRO || b.FECHA);
+        const ta = fa ? fa.getTime() : -Infinity;
+        const tb = fb ? fb.getTime() : -Infinity;
+        return (ta - tb) * dir;
+      });
+    } else {
+      rows = rows.slice().sort((a, b) => (a[detalleSortField] || '').toString().localeCompare((b[detalleSortField] || '').toString(), 'es', { numeric: true, sensitivity: 'base' }) * dir);
+    }
   }
 
   document.querySelectorAll('.detalle-sort-th').forEach(th => {
@@ -2015,7 +2194,17 @@ document.getElementById('btnExportDetalleReal').addEventListener('click', () => 
   }
   if (detalleSortField) {
     const dir = detalleSortDir === 'asc' ? 1 : -1;
-    rows = rows.slice().sort((a, b) => (a[detalleSortField] || '').toString().localeCompare((b[detalleSortField] || '').toString(), 'es', { numeric: true, sensitivity: 'base' }) * dir);
+    if (detalleSortField === 'REGISTRO') {
+      rows = rows.slice().sort((a, b) => {
+        const fa = parseFechaRegistro(a.REGISTRO || a.FECHA);
+        const fb = parseFechaRegistro(b.REGISTRO || b.FECHA);
+        const ta = fa ? fa.getTime() : -Infinity;
+        const tb = fb ? fb.getTime() : -Infinity;
+        return (ta - tb) * dir;
+      });
+    } else {
+      rows = rows.slice().sort((a, b) => (a[detalleSortField] || '').toString().localeCompare((b[detalleSortField] || '').toString(), 'es', { numeric: true, sensitivity: 'base' }) * dir);
+    }
   }
 
   if (rows.length === 0) { alert('No hay filas para exportar.'); return; }
@@ -2209,6 +2398,57 @@ function renderMaestraTable(filter = '') {
 }
 document.getElementById('maestraFilter').addEventListener('input', debounce(e => renderMaestraTable(e.target.value), 200));
 
+/* ==================== SALDO (panel: hoja SALDO completa) ==================== */
+function renderSaldoSheetTable(filter = '') {
+  const f = (filter || '').toUpperCase().trim();
+  const rows = DB.saldo.filter(r => !f || JSON.stringify(r).toUpperCase().includes(f));
+  const cols = DB.saldo.length ? Object.keys(DB.saldo[0]) : [];
+
+  document.getElementById('saldoSheetTableHead').innerHTML = cols.map(c =>
+    `<th class="py-2 px-3 font-semibold whitespace-nowrap">${c}</th>`).join('');
+
+  document.getElementById('saldoSheetTableBody').innerHTML = rows.slice(0, 500).map(r => `
+    <tr class="border-b border-surface-variant hover:bg-surface-container-low">
+      ${cols.map(c => `<td class="py-1.5 px-3 font-data whitespace-nowrap">${r[c] != null ? r[c] : ''}</td>`).join('')}
+    </tr>`).join('');
+
+  document.getElementById('saldoSheetRowCount').textContent =
+    `Mostrando ${Math.min(rows.length, 500)} de ${rows.length} filas (de ${DB.saldo.length} totales).`;
+
+  const codigosSet = new Set(rows.map(r => (r['COD.PROD.BPCS'] || '').toString().trim().toUpperCase()).filter(Boolean));
+  const unidades = rows.reduce((s, r) => { const v = parseFloat(r['SALDO INICIAL']); return s + (isNaN(v) ? 0 : v); }, 0);
+  document.getElementById('kpiSaldoSheetCodigos').textContent = codigosSet.size.toLocaleString('es-PE');
+  document.getElementById('kpiSaldoSheetUnidades').textContent = Math.round(unidades).toLocaleString('es-PE');
+}
+document.getElementById('saldoSheetFilter').addEventListener('input', debounce(e => renderSaldoSheetTable(e.target.value), 200));
+
+/* ==================== VENTAS (panel: hoja VENTA completa) ==================== */
+function renderVentaSheetTable(filter = '') {
+  const f = (filter || '').toUpperCase().trim();
+  const rows = DB.venta.filter(r => !f || JSON.stringify(r).toUpperCase().includes(f));
+  const cols = DB.venta.length ? Object.keys(DB.venta[0]) : [];
+
+  document.getElementById('ventaSheetTableHead').innerHTML = cols.map(c =>
+    `<th class="py-2 px-3 font-semibold whitespace-nowrap">${c}</th>`).join('');
+
+  document.getElementById('ventaSheetTableBody').innerHTML = rows.slice(0, 500).map(r => `
+    <tr class="border-b border-surface-variant hover:bg-surface-container-low">
+      ${cols.map(c => `<td class="py-1.5 px-3 font-data whitespace-nowrap">${r[c] != null ? r[c] : ''}</td>`).join('')}
+    </tr>`).join('');
+
+  document.getElementById('ventaSheetRowCount').textContent =
+    `Mostrando ${Math.min(rows.length, 500)} de ${rows.length} filas (de ${DB.venta.length} totales).`;
+
+  const codigosSet = new Set(rows.map(r => (r['COD.PROD.BPCS'] || '').toString().trim().toUpperCase()).filter(Boolean));
+  const unidades = rows.reduce((s, r) => { const v = parseFloat(r['CANNTIDAD']); return s + (isNaN(v) ? 0 : v); }, 0);
+  document.getElementById('kpiVentaSheetCodigos').textContent = codigosSet.size.toLocaleString('es-PE');
+  document.getElementById('kpiVentaSheetUnidades').textContent = Math.round(unidades).toLocaleString('es-PE');
+}
+document.getElementById('ventaSheetFilter').addEventListener('input', debounce(e => renderVentaSheetTable(e.target.value), 200));
+
+wireClearableFilter('saldoSheetFilter', 'saldoSheetFilterClear', () => renderSaldoSheetTable(''));
+wireClearableFilter('ventaSheetFilter', 'ventaSheetFilterClear', () => renderVentaSheetTable(''));
+
 function renderManualTable(filter = '') {
   const f = filter.toUpperCase();
   const rows = DB.manual.filter(r => !f || JSON.stringify(r).toUpperCase().includes(f));
@@ -2223,6 +2463,29 @@ function renderManualTable(filter = '') {
   document.getElementById('manualRowCount').textContent = `Mostrando ${Math.min(rows.length,500)} de ${rows.length} filas (de ${DB.manual.length} totales).`;
 }
 document.getElementById('manualFilter').addEventListener('input', debounce(e => renderManualTable(e.target.value), 200));
+
+/* ---- Botones "X" para limpiar filtros de texto simples ---- */
+function wireClearableFilter(inputId, clearId, onClear) {
+  const input = document.getElementById(inputId);
+  const clearBtn = document.getElementById(clearId);
+  if (!input || !clearBtn) return;
+  const toggle = () => clearBtn.classList.toggle('hidden', !input.value);
+  input.addEventListener('input', toggle);
+  toggle();
+  clearBtn.addEventListener('click', () => {
+    input.value = '';
+    clearBtn.classList.add('hidden');
+    onClear();
+    input.focus();
+  });
+}
+wireClearableFilter('dupFiltro', 'dupFiltroClear', renderDuplicados);
+wireClearableFilter('conteoFiltro', 'conteoFiltroClear', renderConteoTable);
+wireClearableFilter('manualFiltro', 'manualFiltroClear', renderManualSessionTable);
+wireClearableFilter('dataFilter', 'dataFilterClear', () => renderDataTable(''));
+wireClearableFilter('ubiFilter', 'ubiFilterClear', () => renderUbiTable(''));
+wireClearableFilter('maestraFilter', 'maestraFilterClear', () => renderMaestraTable(''));
+wireClearableFilter('manualFilter', 'manualFilterClear', () => renderManualTable(''));
 
 function renderUsuariosTable() {
   document.getElementById('usuariosTableBody').innerHTML = DB.usuario.map(u => `
