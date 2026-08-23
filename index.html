@@ -1598,18 +1598,29 @@ function renderSaldoResumen() {
   diffEl.textContent = total > 0 ? ((diffNeto > 0 ? '+' : '') + Math.round(diffNeto).toLocaleString('es-PE')) : '—';
   diffEl.className = 'text-3xl font-bold font-data ' + (diffNeto === 0 ? '' : diffNeto > 0 ? 'text-[#b06000]' : 'text-error');
 
-  const conteo = { OK: 0, SOBRANTE: 0, FALTANTE: 0, PENDIENTE: 0 };
+  // Distribución por Estatus: se calcula directamente desde el sheet DETALLE (log real de conteos),
+  // no desde el cruce SALDO vs DATA, para que coincida con lo que se ve en el Sheet.
+  const filasDetalleData = DB.detalle.filter(d => (d.TIPO || '').toString().trim().toUpperCase() === 'DATA');
+  const codigosSets = { OK: new Set(), SOBRANTE: new Set(), FALTANTE: new Set(), PENDIENTE: new Set() };
   const conteoUnid = { OK: 0, SOBRANTE: 0, FALTANTE: 0, PENDIENTE: 0 };
-  rows.forEach(r => {
-    conteo[r.estatus]++;
-    if (r.estatus === 'PENDIENTE') {
-      conteoUnid[r.estatus] += (r.saldoInicial || 0);      // aún no contado: se usa el saldo esperado
-    } else if (r.estatus === 'OK') {
-      conteoUnid[r.estatus] += (r.inventariado || 0);      // conforme: lo que se contó
+  filasDetalleData.forEach(d => {
+    const est = normalizarEstatus(d.ESTATUS);
+    if (!codigosSets[est]) return; // ignora estatus no contemplados (p.ej. MANUAL)
+    const cod = (d.CODIGO || '').toString().trim().toUpperCase();
+    if (cod) codigosSets[est].add(cod);
+    if (est === 'PENDIENTE') {
+      const ci = parseFloat(d['CANTIDAD INICIAL']);
+      conteoUnid[est] += isNaN(ci) ? 0 : ci;                 // aún no contado: cantidad inicial esperada
+    } else if (est === 'OK') {
+      const ct = parseFloat(d.CONTEO);
+      conteoUnid[est] += isNaN(ct) ? 0 : ct;                 // conforme: lo que se contó (columna CONTEO)
     } else {
-      conteoUnid[r.estatus] += Math.abs(r.diferencia || 0); // sobrante/faltante: la diferencia real (en positivo)
+      const diff = parseFloat(d.DIFERENCIA);
+      conteoUnid[est] += isNaN(diff) ? 0 : Math.abs(diff);   // sobrante/faltante: columna DIFERENCIA (en positivo)
     }
   });
+  const conteo = { OK: codigosSets.OK.size, SOBRANTE: codigosSets.SOBRANTE.size, FALTANTE: codigosSets.FALTANTE.size, PENDIENTE: codigosSets.PENDIENTE.size };
+  const totalEstatusCodigos = conteo.OK + conteo.SOBRANTE + conteo.FALTANTE + conteo.PENDIENTE;
   const colores = { OK: 'bg-success', SOBRANTE: 'bg-[#b06000]', FALTANTE: 'bg-error', PENDIENTE: 'bg-outline-variant' };
   const coloresUnid = { OK: 'bg-success/40', SOBRANTE: 'bg-[#b06000]/40', FALTANTE: 'bg-error/40', PENDIENTE: 'bg-outline-variant/60' };
   const labels = { OK: 'Conforme', SOBRANTE: 'Sobrante', FALTANTE: 'Faltante', PENDIENTE: 'Pendiente' };
@@ -1618,7 +1629,7 @@ function renderSaldoResumen() {
   document.getElementById('chartSaldoEstatus').innerHTML = Object.keys(conteo).map(k => {
     const v = conteo[k];
     const vu = conteoUnid[k];
-    const pctK = total > 0 ? (v / total * 100) : 0;
+    const pctK = totalEstatusCodigos > 0 ? (v / totalEstatusCodigos * 100) : 0;
     const pctU = totalUnidEstatus > 0 ? (vu / totalUnidEstatus * 100) : 0;
     const hK = Math.max(3, Math.round(Math.min(100, pctK) * MAX_BAR_PX / 100));
     const hU = Math.max(3, Math.round(Math.min(100, pctU) * MAX_BAR_PX / 100));
