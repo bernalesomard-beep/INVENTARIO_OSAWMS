@@ -378,14 +378,25 @@
           </div>
         </div>
         <div class="overflow-x-auto max-h-[55vh] overflow-y-auto">
-          <table class="w-full text-sm">
+          <table class="w-full text-sm table-fixed">
+            <colgroup>
+              <col style="width:2rem">
+              <col style="width:3.5rem">
+              <col style="width:3.5rem">
+              <col style="width:7rem">
+              <col style="width:10rem">
+              <col style="width:5rem">
+              <col style="width:5rem">
+              <col style="width:6rem">
+              <col style="width:8.5rem">
+            </colgroup>
             <thead class="sticky top-0 bg-surface-container-low z-10"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
-              <th class="py-3 pl-4 pr-1 w-8"><input id="dashSelAll" type="checkbox" class="rounded border-outline-variant"></th>
-              <th class="py-3 px-4 font-semibold">Rack</th><th class="py-3 px-4 font-semibold">Nivel</th>
-              <th data-sort="UBICACION" class="dash-sort-th py-3 px-4 font-semibold cursor-pointer select-none hover:text-on-surface">Ubicación <span class="sort-icon text-[10px] opacity-40">↕</span></th>
-              <th data-sort="CODIGO" class="dash-sort-th py-3 px-4 font-semibold cursor-pointer select-none hover:text-on-surface">Código <span class="sort-icon text-[10px] opacity-40">↕</span></th>
-              <th class="py-3 px-4 font-semibold text-right">Saldo</th><th class="py-3 px-4 font-semibold text-right">Cantidad</th>
-              <th class="py-3 px-4 font-semibold text-right">Diferencia</th><th class="py-3 px-4 font-semibold">Estatus</th>
+              <th class="py-3 pl-4 pr-1"><input id="dashSelAll" type="checkbox" class="rounded border-outline-variant"></th>
+              <th class="py-3 px-2 font-semibold">Rack</th><th class="py-3 px-2 font-semibold">Nivel</th>
+              <th data-sort="UBICACION" class="dash-sort-th py-3 px-2 font-semibold cursor-pointer select-none hover:text-on-surface truncate">Ubicación <span class="sort-icon text-[10px] opacity-40">↕</span></th>
+              <th data-sort="CODIGO" class="dash-sort-th py-3 px-2 font-semibold cursor-pointer select-none hover:text-on-surface truncate">Código <span class="sort-icon text-[10px] opacity-40">↕</span></th>
+              <th class="py-3 px-2 font-semibold text-right">Saldo</th><th class="py-3 px-2 font-semibold text-right">Cantidad</th>
+              <th class="py-3 px-2 font-semibold text-right">Diferencia</th><th class="py-3 px-2 font-semibold">Estatus</th>
             </tr></thead>
             <tbody id="dashDetailTableBody"></tbody>
           </table>
@@ -1085,14 +1096,14 @@ function renderDashDetailTable() {
     const checked = dashSelected.has(key) ? 'checked' : '';
     return `<tr class="border-b border-surface-variant hover:bg-surface-container-low">
       <td class="py-2 pl-3 pr-1"><input type="checkbox" data-dashrow="${key}" class="dash-row-check rounded border-outline-variant" ${checked}></td>
-      <td class="py-2 px-3 font-data font-semibold text-primary">${r.RACK || ''}</td>
-      <td class="py-2 px-3 font-data">${r.NIVEL || ''}</td>
-      <td class="py-2 px-3 font-data">${r.UBICACION || ''}</td>
-      <td class="py-2 px-3 font-data">${r.CODIGO || ''}</td>
-      <td class="py-2 px-3 font-data text-right">${r.SALDO || ''}</td>
-      <td class="py-2 px-3 font-data text-right">${r.CANTIDAD || '-'}</td>
-      <td class="py-2 px-3 font-data text-right ${diffCls}">${diffTxt}</td>
-      <td class="py-2 px-3">${estatusBadgeHtmlV2(normalizarEstatus(r.ESTATUS))}</td>
+      <td class="py-2 px-2 font-data font-semibold text-primary truncate">${r.RACK || ''}</td>
+      <td class="py-2 px-2 font-data truncate">${r.NIVEL || ''}</td>
+      <td class="py-2 px-2 font-data truncate" title="${r.UBICACION || ''}">${r.UBICACION || ''}</td>
+      <td class="py-2 px-2 font-data truncate" title="${r.CODIGO || ''}">${r.CODIGO || ''}</td>
+      <td class="py-2 px-2 font-data text-right">${r.SALDO || ''}</td>
+      <td class="py-2 px-2 font-data text-right">${r.CANTIDAD || '-'}</td>
+      <td class="py-2 px-2 font-data text-right ${diffCls}">${diffTxt}</td>
+      <td class="py-2 px-2">${estatusBadgeHtmlV2(normalizarEstatus(r.ESTATUS))}</td>
     </tr>`;
   }).join('');
   document.getElementById('dashDetailRowCount').textContent = `Mostrando ${Math.min(rows.length, 500)} de ${rows.length} filas (de ${DB.data.length} totales).`;
@@ -1897,4 +1908,3 @@ function debounce(fn, ms) {
 </script>
 </body>
 </html>
-
