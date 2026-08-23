@@ -356,11 +356,11 @@
                 <p id="kpiSaldoTotalCodigos" class="text-xl font-bold font-data">-</p>
               </div>
               <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
-                <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">Inventariados</span>
+                <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">Códigos Inventariados</span>
                 <p id="kpiSaldoContados" class="text-xl font-bold font-data text-success">-</p>
               </div>
               <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
-                <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">% Avance</span>
+                <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">% Avance (Códigos)</span>
                 <div>
                   <p id="kpiSaldoPorcentaje" class="text-xl font-bold font-data">-</p>
                   <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-1 overflow-hidden">
@@ -369,8 +369,24 @@
                 </div>
               </div>
               <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
+                <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">Unidades Inventariadas</span>
+                <p id="kpiSaldoUnidInventariadas" class="text-xl font-bold font-data text-success">-</p>
+              </div>
+              <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
+                <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">% Avance (Unidades)</span>
+                <div>
+                  <p id="kpiSaldoUnidPorcentaje" class="text-xl font-bold font-data">-</p>
+                  <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-1 overflow-hidden">
+                    <div id="saldoUnidProgresoBar" class="bg-primary h-full rounded-full transition-all" style="width:0%"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-white border border-outline-variant rounded-xl p-3 flex flex-col justify-between h-20">
                 <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">Diferencia Neta</span>
-                <p id="kpiSaldoDiferencia" class="text-xl font-bold font-data">-</p>
+                <div>
+                  <p id="kpiSaldoDiferencia" class="text-xl font-bold font-data">-</p>
+                  <p class="text-[9px] text-on-surface-variant leading-tight mt-0.5">Considerar al término del inventario</p>
+                </div>
               </div>
             </div>
           </div>
@@ -1249,10 +1265,17 @@ function renderSaldoResumen() {
   const pct = total > 0 ? (contados / total * 100) : 0;
   const diffNeto = contadosArr.reduce((s, r) => s + (r.diferencia || 0), 0);
 
+  const unidSaldoInicial = rows.reduce((s, r) => s + (r.saldoInicial || 0), 0);
+  const unidInventariadas = rows.reduce((s, r) => s + (r.inventariado || 0), 0);
+  const pctUnid = unidSaldoInicial > 0 ? (unidInventariadas / unidSaldoInicial * 100) : 0;
+
   document.getElementById('kpiSaldoTotalCodigos').textContent = total.toLocaleString('es-PE');
   document.getElementById('kpiSaldoContados').textContent = contados.toLocaleString('es-PE');
   document.getElementById('kpiSaldoPorcentaje').textContent = total > 0 ? pct.toFixed(1) + '%' : '—';
   document.getElementById('saldoProgresoBar').style.width = pct.toFixed(1) + '%';
+  document.getElementById('kpiSaldoUnidInventariadas').textContent = Math.round(unidInventariadas).toLocaleString('es-PE');
+  document.getElementById('kpiSaldoUnidPorcentaje').textContent = unidSaldoInicial > 0 ? pctUnid.toFixed(1) + '%' : '—';
+  document.getElementById('saldoUnidProgresoBar').style.width = Math.min(pctUnid, 100).toFixed(1) + '%';
   const diffEl = document.getElementById('kpiSaldoDiferencia');
   diffEl.textContent = total > 0 ? ((diffNeto > 0 ? '+' : '') + Math.round(diffNeto).toLocaleString('es-PE')) : '—';
   diffEl.className = 'text-3xl font-bold font-data ' + (diffNeto === 0 ? '' : diffNeto > 0 ? 'text-[#b06000]' : 'text-error');
