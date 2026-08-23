@@ -650,13 +650,25 @@
               <input id="detalleRealSoloDup" type="checkbox" class="rounded border-outline-variant"> Solo duplicados
             </label>
           </div>
+          <div class="flex flex-wrap items-center gap-2 mb-3">
+            <span id="detalleRealSelCount" class="text-xs text-on-surface-variant hidden"></span>
+            <button id="btnSeleccionarDuplicados" class="flex items-center gap-1.5 text-xs border border-outline-variant rounded-lg px-3 py-1.5 hover:bg-surface-container-low">
+              <span class="material-symbols-outlined text-[15px]">content_copy</span> Seleccionar todos los duplicados
+            </button>
+            <button id="btnEliminarDetalleSel" class="hidden items-center gap-1.5 text-xs border border-error/30 text-error rounded-lg px-3 py-1.5 hover:bg-error-container">
+              <span class="material-symbols-outlined text-[15px]">delete</span> Eliminar seleccionados
+            </button>
+            <span id="detalleRealDelStatus" class="text-xs"></span>
+          </div>
           <div class="overflow-x-auto max-h-96 overflow-y-auto border border-outline-variant rounded-lg">
             <table class="w-full text-xs">
               <thead class="sticky top-0 bg-white"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
+                <th class="py-2 px-3 font-semibold w-8"><input id="detalleRealCheckAll" type="checkbox" class="rounded border-outline-variant"></th>
                 <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">ID Detalle</th>
                 <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Registro</th>
                 <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Usuario</th>
-                <th class="py-2 px-3 font-semibold">Ubicación</th><th class="py-2 px-3 font-semibold">Código</th>
+                <th data-detalle-sort="UBICACIÓN" class="detalle-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Ubicación <span class="sort-icon text-[10px] opacity-40">↕</span></th>
+                <th data-detalle-sort="CODIGO" class="detalle-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Código <span class="sort-icon text-[10px] opacity-40">↕</span></th>
                 <th class="py-2 px-3 font-semibold text-right">Cant. Inicial</th><th class="py-2 px-3 font-semibold text-right">Conteo</th>
                 <th class="py-2 px-3 font-semibold">Estatus</th><th class="py-2 px-3 font-semibold"></th>
               </tr></thead>
@@ -1357,6 +1369,9 @@ let saldoRowsCache = [];
 let saldoEstatusSeleccionados = new Set();
 let saldoSortField = null;
 let saldoSortDir = 'asc';
+let detalleSortField = null;
+let detalleSortDir = 'asc';
+let detalleRealSeleccionados = new Set();
 
 // Cruza el SALDO (COD.PROD.BPCS / COD.PROD.CLIENTE / SALDO INICIAL) con lo contado en DATA (CODIGO / CANTIDAD)
 function computeSaldoRows() {
@@ -1897,13 +1912,29 @@ function renderDetalleRealTable() {
   if (filtro) {
     rows = rows.filter(r => [r.ID_DETALLE, r.REGISTRO, r.USUARIO, r['UBICACIÓN'], r.CODIGO, r.ESTATUS].some(v => (v || '').toString().toUpperCase().includes(filtro)));
   }
+  if (detalleSortField) {
+    const dir = detalleSortDir === 'asc' ? 1 : -1;
+    rows = rows.slice().sort((a, b) => (a[detalleSortField] || '').toString().localeCompare((b[detalleSortField] || '').toString(), 'es', { numeric: true, sensitivity: 'base' }) * dir);
+  }
+
+  document.querySelectorAll('.detalle-sort-th').forEach(th => {
+    const icon = th.querySelector('.sort-icon');
+    if (th.dataset.detalleSort === detalleSortField) {
+      icon.textContent = detalleSortDir === 'asc' ? '↑' : '↓';
+      icon.classList.remove('opacity-40'); icon.classList.add('text-primary', 'opacity-100');
+    } else {
+      icon.textContent = '↕'; icon.classList.add('opacity-40'); icon.classList.remove('text-primary', 'opacity-100');
+    }
+  });
 
   if (rows.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" class="py-6 text-center text-on-surface-variant">${filas.length === 0 ? 'Aún no hay registros guardados en DETALLE.' : 'Sin resultados para ese filtro.'}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" class="py-6 text-center text-on-surface-variant">${filas.length === 0 ? 'Aún no hay registros guardados en DETALLE.' : 'Sin resultados para ese filtro.'}</td></tr>`;
+    updateDetalleRealSelUi();
     return;
   }
   tbody.innerHTML = rows.map(r => `
     <tr class="border-b border-surface-variant last:border-0 hover:bg-surface-container-low ${r._esDup ? 'bg-error-container/40' : ''}">
+      <td class="py-2 px-3"><input type="checkbox" class="detalle-real-check rounded border-outline-variant" data-id="${r.ID_DETALLE}" ${detalleRealSeleccionados.has(r.ID_DETALLE) ? 'checked' : ''}></td>
       <td class="py-2 px-3 font-data text-[#b06000]">${r.ID_DETALLE || ''} ${r._esDup ? '<span class="ml-1 text-error" title="Posible duplicado">⚠</span>' : ''}</td>
       <td class="py-2 px-3 font-data">${r.REGISTRO || ''}</td>
       <td class="py-2 px-3 font-data">${r.USUARIO || ''}</td>
@@ -1914,7 +1945,100 @@ function renderDetalleRealTable() {
       <td class="py-2 px-3">${estatusBadgeHtmlV2(normalizarEstatus(r.ESTATUS))}</td>
       <td class="py-2 px-3"></td>
     </tr>`).join('');
+
+  tbody.querySelectorAll('.detalle-real-check').forEach(chk => {
+    chk.addEventListener('change', () => {
+      if (chk.checked) detalleRealSeleccionados.add(chk.dataset.id);
+      else detalleRealSeleccionados.delete(chk.dataset.id);
+      updateDetalleRealSelUi();
+    });
+  });
+  updateDetalleRealSelUi();
 }
+
+function updateDetalleRealSelUi() {
+  const n = detalleRealSeleccionados.size;
+  const selCount = document.getElementById('detalleRealSelCount');
+  const btnDel = document.getElementById('btnEliminarDetalleSel');
+  if (n > 0) {
+    selCount.textContent = `${n} seleccionado(s)`;
+    selCount.classList.remove('hidden');
+    btnDel.classList.remove('hidden');
+    btnDel.classList.add('flex');
+  } else {
+    selCount.classList.add('hidden');
+    btnDel.classList.add('hidden');
+    btnDel.classList.remove('flex');
+  }
+  const visibles = document.querySelectorAll('.detalle-real-check');
+  const checkAll = document.getElementById('detalleRealCheckAll');
+  checkAll.checked = visibles.length > 0 && [...visibles].every(c => c.checked);
+}
+
+document.querySelectorAll('.detalle-sort-th').forEach(th => {
+  th.addEventListener('click', () => {
+    const field = th.dataset.detalleSort;
+    if (detalleSortField === field) { detalleSortDir = detalleSortDir === 'asc' ? 'desc' : 'asc'; }
+    else { detalleSortField = field; detalleSortDir = 'asc'; }
+    renderDetalleRealTable();
+  });
+});
+
+document.getElementById('detalleRealCheckAll').addEventListener('change', (e) => {
+  document.querySelectorAll('.detalle-real-check').forEach(chk => {
+    chk.checked = e.target.checked;
+    if (e.target.checked) detalleRealSeleccionados.add(chk.dataset.id);
+    else detalleRealSeleccionados.delete(chk.dataset.id);
+  });
+  updateDetalleRealSelUi();
+});
+
+document.getElementById('btnSeleccionarDuplicados').addEventListener('click', () => {
+  const dups = computeDuplicados();
+  const dupKeys = new Set(dups.map(d => d.UBICACION + '|' + d.CODIGO));
+  DB.detalle.filter(d => (d.TIPO || '').toString().trim().toUpperCase() === 'DATA').forEach(f => {
+    const key = (f['UBICACIÓN'] || '').toString().trim().toUpperCase() + '|' + (f.CODIGO || '').toString().trim().toUpperCase();
+    if (dupKeys.has(key)) detalleRealSeleccionados.add(f.ID_DETALLE);
+  });
+  document.getElementById('detalleRealSoloDup').checked = true;
+  renderDetalleRealTable();
+});
+
+document.getElementById('btnEliminarDetalleSel').addEventListener('click', async () => {
+  const ids = [...detalleRealSeleccionados];
+  if (ids.length === 0) return;
+  if (!confirm(`¿Eliminar ${ids.length} registro(s) del Sheet DETALLE? Esta acción no se puede deshacer.`)) return;
+  if (!GAS_URL) { alert('GAS_URL no está configurado.'); return; }
+  const statusEl = document.getElementById('detalleRealDelStatus');
+  const btn = document.getElementById('btnEliminarDetalleSel');
+  btn.disabled = true;
+  statusEl.textContent = 'Eliminando...';
+  statusEl.className = 'text-xs text-on-surface-variant';
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ eliminarDetalle: ids })
+    });
+    const json = await res.json();
+    if (json.ok) {
+      DB.detalle = DB.detalle.filter(d => !ids.includes(d.ID_DETALLE));
+      detalleRealSeleccionados.clear();
+      renderDetalleRealTable();
+      renderDuplicados();
+      statusEl.textContent = `${json.detalleEliminados || ids.length} registro(s) eliminado(s).`;
+      statusEl.className = 'text-xs text-success';
+    } else {
+      statusEl.textContent = 'Error al eliminar: ' + json.error;
+      statusEl.className = 'text-xs text-error';
+    }
+  } catch (err) {
+    statusEl.textContent = 'No se pudo conectar con Google Sheets: ' + err.message;
+    statusEl.className = 'text-xs text-error';
+  }
+  btn.disabled = false;
+});
+
 
 
 document.getElementById('btnClearSession').addEventListener('click', () => {
