@@ -2275,8 +2275,13 @@ document.getElementById('btnEliminarDetalleSel').addEventListener('click', async
       detalleRealSeleccionados.clear();
       renderDetalleRealTable();
       renderDuplicados();
-      statusEl.textContent = `${json.detalleEliminados || ids.length} registro(s) eliminado(s).`;
-      statusEl.className = 'text-xs text-success';
+      if (typeof json.detalleEliminados === 'number') {
+        statusEl.textContent = `${json.detalleEliminados} registro(s) eliminado(s) del Sheet.`;
+        statusEl.className = 'text-xs text-success';
+      } else {
+        statusEl.textContent = 'El servidor respondió OK pero no confirmó cuántas filas borró. Verifica que el Apps Script tenga desplegada la ÚLTIMA versión (Implementar > Gestionar implementaciones > Nueva versión) y revisa el Sheet DETALLE manualmente.';
+        statusEl.className = 'text-xs text-[#b06000]';
+      }
     } else {
       statusEl.textContent = 'Error al eliminar: ' + json.error;
       statusEl.className = 'text-xs text-error';
