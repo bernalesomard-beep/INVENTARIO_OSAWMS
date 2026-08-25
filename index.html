@@ -1429,8 +1429,10 @@ function renderDashDetailTable() {
     const dir = dashSortDir === 'asc' ? 1 : -1;
     rows = rows.slice().sort((a, b) => {
       if (dashSortField === 'DIFERENCIA') {
-        const na = parseFloat(a.DIFERENCIA);
-        const nb = parseFloat(b.DIFERENCIA);
+        const saldoA = parseFloat(a.SALDO), cantA = parseFloat(a.CANTIDAD);
+        const saldoB = parseFloat(b.SALDO), cantB = parseFloat(b.CANTIDAD);
+        const na = (!isNaN(saldoA) && !isNaN(cantA)) ? (cantA - saldoA) : NaN;
+        const nb = (!isNaN(saldoB) && !isNaN(cantB)) ? (cantB - saldoB) : NaN;
         const va = isNaN(na) ? -Infinity : na;
         const vb = isNaN(nb) ? -Infinity : nb;
         return (va - vb) * dir;
