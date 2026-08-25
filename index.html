@@ -15,18 +15,19 @@
     theme: {
       extend: {
         colors: {
-          primary: "#000000", "on-primary": "#ffffff",
-          "primary-container": "#131b2e", "on-primary-container": "#7c839b",
-          "primary-fixed": "#dae2fd", "on-primary-fixed": "#131b2e", "primary-fixed-dim": "#bec6e0",
-          secondary: "#515f74", "secondary-container": "#d5e3fd", "on-secondary-container": "#57657b",
-          background: "#f7f9fb", "on-background": "#191c1e",
-          surface: "#f7f9fb", "on-surface": "#191c1e", "on-surface-variant": "#45464d",
-          "surface-container-low": "#f2f4f6", "surface-container": "#eceef0",
-          "surface-container-high": "#e6e8ea", "surface-container-highest": "#e0e3e5",
-          "surface-variant": "#e0e3e5",
-          outline: "#76777d", "outline-variant": "#c6c6cd",
-          error: "#ba1a1a", "error-container": "#ffdad6", "on-error-container": "#93000a",
-          success: "#0f7a4d", "success-container": "#ECFDF5", "on-success-container": "#065F46",
+          primary: "#167C70", "on-primary": "#ffffff",
+          "primary-container": "#24333B", "on-primary-container": "#AEC0BC",
+          "primary-fixed": "#DCEEEA", "on-primary-fixed": "#1B2B31", "primary-fixed-dim": "#6F8C87",
+          secondary: "#68747A", "secondary-container": "#ECEAE4", "on-secondary-container": "#263238",
+          background: "#F6F4EF", "on-background": "#263238",
+          surface: "#FFFFFF", "on-surface": "#263238", "on-surface-variant": "#68747A",
+          "surface-container-low": "#F1EFE9", "surface-container": "#ECEAE4",
+          "surface-container-high": "#E4E1D8", "surface-container-highest": "#DDDAD2",
+          "surface-variant": "#ECEAE4",
+          outline: "#B7B2A6", "outline-variant": "#DDDAD2",
+          error: "#C94F4F", "error-container": "#F8E3E3", "on-error-container": "#A93F3F",
+          success: "#3F8F72", "success-container": "#E5F1EC", "on-success-container": "#28745B",
+          warning: "#D9912E", "warning-container": "#FBEED8", "on-warning-container": "#A86612",
         },
         borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
         fontFamily: {
@@ -38,17 +39,32 @@
   }
 </script>
 <style>
+  :root {
+    --background: #F6F4EF;
+    --surface: #FFFFFF;
+    --surface-secondary: #ECEAE4;
+    --sidebar: #24333B;
+    --sidebar-hover: #6F8C87;
+    --primary: #167C70;
+    --primary-light: #DCEEEA;
+    --success: #3F8F72;
+    --warning: #D9912E;
+    --danger: #C94F4F;
+    --text-primary: #263238;
+    --text-secondary: #68747A;
+    --border: #DDDAD2;
+  }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; font-size: 20px; }
   ::-webkit-scrollbar { width: 8px; height: 8px; }
-  ::-webkit-scrollbar-thumb { background: #c6c6cd; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb { background: #DDDAD2; border-radius: 4px; }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
   .dash-subview { display: none; }
   .dash-subview.active { display: block; }
-  .dash-sub-btn.active { background-color: #000000; color: #ffffff; }
+  .dash-sub-btn.active { background-color: #167C70; color: #ffffff; }
   .spin { animation: spin 1s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  [data-nav-item].active { background-color: rgba(255,255,255,0.12); color: #ffffff; opacity: 1 !important; }
+  [data-nav-item].active { background-color: #ffffff; color: #167C70; box-shadow: inset 3px 0 0 #167C70; opacity: 1 !important; }
 </style>
 </head>
 <body class="bg-background text-on-background font-body min-h-screen">
@@ -227,7 +243,7 @@
                     <th class="text-right font-semibold py-1.5 px-2">Totales</th>
                     <th class="text-right font-semibold py-1.5 px-2">Contadas</th>
                     <th class="text-right font-semibold py-1.5 px-2 text-error">Faltantes</th>
-                    <th class="text-right font-semibold py-1.5 px-2 text-[#b06000]">Sobrantes</th>
+                    <th class="text-right font-semibold py-1.5 px-2 text-[#A86612]">Sobrantes</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -236,28 +252,28 @@
                     <td id="statUnidTotales" class="text-right font-data py-1.5 px-2">-</td>
                     <td id="statUnidContadas" class="text-right font-data py-1.5 px-2">-</td>
                     <td id="statUnidFaltantes" class="text-right font-data py-1.5 px-2 text-error">-</td>
-                    <td id="statUnidSobrantes" class="text-right font-data py-1.5 px-2 text-[#b06000]">-</td>
+                    <td id="statUnidSobrantes" class="text-right font-data py-1.5 px-2 text-[#A86612]">-</td>
                   </tr>
                   <tr class="border-b border-surface-variant">
                     <td class="py-1.5 pr-2 font-semibold whitespace-nowrap">Ubicaciones</td>
                     <td id="statUbiTotales" class="text-right font-data py-1.5 px-2">-</td>
                     <td id="statUbiContadas" class="text-right font-data py-1.5 px-2">-</td>
                     <td id="statUbiFaltantes" class="text-right font-data py-1.5 px-2 text-error">-</td>
-                    <td id="statUbiSobrantes" class="text-right font-data py-1.5 px-2 text-[#b06000]">-</td>
+                    <td id="statUbiSobrantes" class="text-right font-data py-1.5 px-2 text-[#A86612]">-</td>
                   </tr>
                   <tr>
                     <td class="py-1.5 pr-2 font-semibold whitespace-nowrap">Códigos</td>
                     <td id="statCodTotales" class="text-right font-data py-1.5 px-2">-</td>
                     <td id="statCodContadas" class="text-right font-data py-1.5 px-2">-</td>
                     <td id="statCodFaltantes" class="text-right font-data py-1.5 px-2 text-error">-</td>
-                    <td id="statCodSobrantes" class="text-right font-data py-1.5 px-2 text-[#b06000]">-</td>
+                    <td id="statCodSobrantes" class="text-right font-data py-1.5 px-2 text-[#A86612]">-</td>
                   </tr>
                 </tbody>
               </table>
             </div>
             <div class="flex items-center gap-4 mb-2">
               <span class="flex items-center gap-1.5 text-[11px] text-on-surface-variant"><span class="w-2.5 h-2.5 rounded-sm bg-error inline-block"></span>Faltante</span>
-              <span class="flex items-center gap-1.5 text-[11px] text-on-surface-variant"><span class="w-2.5 h-2.5 rounded-sm bg-[#b06000] inline-block"></span>Sobrante</span>
+              <span class="flex items-center gap-1.5 text-[11px] text-on-surface-variant"><span class="w-2.5 h-2.5 rounded-sm bg-[#A86612] inline-block"></span>Sobrante</span>
               <span class="text-[11px] text-on-surface-variant ml-auto">% sobre el total de cada categoría</span>
             </div>
             <div id="chartRangoFechas" class="flex-1 flex items-end justify-around gap-6 border-l border-b border-outline-variant px-4 pb-1 min-h-[140px]"></div>
@@ -628,10 +644,10 @@
           <div class="overflow-x-auto max-h-72 overflow-y-auto border border-outline-variant rounded-lg">
             <table class="w-full text-xs">
               <thead class="sticky top-0 bg-white"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
-                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">ID Detalle</th>
-                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Registro</th>
-                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Usuario</th>
-                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Tipo</th>
+                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">ID Detalle</th>
+                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">Registro</th>
+                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">Usuario</th>
+                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">Tipo</th>
                 <th class="py-2 px-3 font-semibold">Código</th><th class="py-2 px-3 font-semibold">Ubicación</th>
                 <th class="py-2 px-3 font-semibold text-right">Saldo</th><th class="py-2 px-3 font-semibold text-right">Cant. Física</th>
                 <th class="py-2 px-3 font-semibold">Estatus</th><th class="py-2 px-3 font-semibold"></th>
@@ -662,10 +678,10 @@
           <div class="overflow-x-auto max-h-72 overflow-y-auto border border-outline-variant rounded-lg">
             <table class="w-full text-xs">
               <thead class="sticky top-0 bg-white"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
-                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">ID Detalle</th>
-                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Registro</th>
-                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Usuario</th>
-                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Tipo</th>
+                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">ID Detalle</th>
+                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">Registro</th>
+                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">Usuario</th>
+                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">Tipo</th>
                 <th class="py-2 px-3 font-semibold">Código / EAN</th><th class="py-2 px-3 font-semibold">Descripción</th>
                 <th class="py-2 px-3 font-semibold">Ubicación</th><th class="py-2 px-3 font-semibold text-right">Cantidad</th>
                 <th class="py-2 px-3 font-semibold"></th>
@@ -684,7 +700,7 @@
             <span class="font-semibold">Conteo real registrado (DETALLE — todos los usuarios)</span>
           </div>
           <div class="flex items-center gap-3">
-            <span id="detalleRealDupBadge" class="hidden text-xs font-semibold px-2.5 py-1 rounded-full bg-error-container text-on-error-container border border-[#FECACA]"></span>
+            <span id="detalleRealDupBadge" class="hidden text-xs font-semibold px-2.5 py-1 rounded-full bg-error-container text-on-error-container border border-[#F0C4C4]"></span>
             <span id="detalleRealCount" class="text-2xl font-bold font-data">0</span>
             <span id="detalleRealChevron" class="material-symbols-outlined text-on-surface-variant transition-transform">expand_more</span>
           </div>
@@ -720,9 +736,9 @@
             <table class="w-full text-xs">
               <thead class="sticky top-0 bg-white"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
                 <th class="py-2 px-3 font-semibold w-8"><input id="detalleRealCheckAll" type="checkbox" class="rounded border-outline-variant"></th>
-                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">ID Detalle</th>
-                <th data-detalle-sort="REGISTRO" class="detalle-sort-th py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0] cursor-pointer select-none whitespace-nowrap">Registro <span class="sort-icon text-[10px] opacity-40">↕</span></th>
-                <th class="py-2 px-3 font-semibold text-[#b06000] bg-[#fef7e0]">Usuario</th>
+                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">ID Detalle</th>
+                <th data-detalle-sort="REGISTRO" class="detalle-sort-th py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8] cursor-pointer select-none whitespace-nowrap">Registro <span class="sort-icon text-[10px] opacity-40">↕</span></th>
+                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">Usuario</th>
                 <th data-detalle-sort="UBICACIÓN" class="detalle-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Ubicación <span class="sort-icon text-[10px] opacity-40">↕</span></th>
                 <th data-detalle-sort="CODIGO" class="detalle-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Código <span class="sort-icon text-[10px] opacity-40">↕</span></th>
                 <th class="py-2 px-3 font-semibold text-right">Cant. Inicial</th><th class="py-2 px-3 font-semibold text-right">Conteo</th>
@@ -1205,10 +1221,10 @@ function normalizarEstatus(e) {
 
 function estatusBadgeHtmlV2(estNorm) {
   const map = {
-    OK: { cls: 'bg-success-container text-on-success-container border-[#A7F3D0]', icon: 'check', label: 'Conforme' },
-    SOBRANTE: { cls: 'bg-[#fef7e0] text-[#b06000] border-[#fce8b2]', icon: 'add_circle', label: 'Sobrante' },
-    FALTANTE: { cls: 'bg-error-container text-on-error-container border-[#FECACA]', icon: 'warning', label: 'Faltante' },
-    PENDIENTE: { cls: 'bg-[#fff4e5] text-[#c2540d] border-[#ffddb3]', icon: 'schedule', label: 'Pendiente' },
+    OK: { cls: 'bg-success-container text-on-success-container border-[#BFE3D2]', icon: 'check', label: 'Conforme' },
+    SOBRANTE: { cls: 'bg-[#FBEED8] text-[#A86612] border-[#F0DCB8]', icon: 'add_circle', label: 'Sobrante' },
+    FALTANTE: { cls: 'bg-error-container text-on-error-container border-[#F0C4C4]', icon: 'warning', label: 'Faltante' },
+    PENDIENTE: { cls: 'bg-[#E9EBEA] text-[#68747A] border-[#DDDAD2]', icon: 'schedule', label: 'Pendiente' },
   };
   const s = map[estNorm] || map.PENDIENTE;
   return `<span class="inline-flex items-center gap-1 ${s.cls} px-2 py-1 rounded-full text-[11px] font-semibold border"><span class="material-symbols-outlined text-[12px]">${s.icon}</span>${s.label}</span>`;
@@ -1216,8 +1232,8 @@ function estatusBadgeHtmlV2(estNorm) {
 
 // Estatus, mantenido por compatibilidad con badges de sesión (Toma de Inventario)
 function estatusBadgeHtml(estatus) {
-  if (estatus === 'OK') return `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-success-container text-on-success-container text-[11px] font-semibold border border-[#A7F3D0]"><span class="w-1.5 h-1.5 rounded-full bg-success"></span>OK</span>`;
-  return `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-error-container text-on-error-container text-[11px] font-semibold border border-[#FECACA]"><span class="w-1.5 h-1.5 rounded-full bg-error"></span>${estatus}</span>`;
+  if (estatus === 'OK') return `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-success-container text-on-success-container text-[11px] font-semibold border border-[#BFE3D2]"><span class="w-1.5 h-1.5 rounded-full bg-success"></span>OK</span>`;
+  return `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-error-container text-on-error-container text-[11px] font-semibold border border-[#F0C4C4]"><span class="w-1.5 h-1.5 rounded-full bg-error"></span>${estatus}</span>`;
 }
 
 function renderDashboard() {
@@ -1328,8 +1344,8 @@ function renderChartRangoFechas(desde, hasta) {
           <div class="bg-error w-7 rounded-t transition-all" style="height:${Math.max(3, Math.min(100, c.pctFalt))}%" title="Faltantes: ${Math.round(c.falt).toLocaleString('es-PE')} (${c.pctFalt.toFixed(1)}%)"></div>
         </div>
         <div class="flex flex-col items-center justify-end h-full">
-          <span class="text-[10px] font-data text-[#b06000] mb-0.5">${Math.round(c.sobr).toLocaleString('es-PE')}</span>
-          <div class="bg-[#b06000] w-7 rounded-t transition-all" style="height:${Math.max(3, Math.min(100, c.pctSobr))}%" title="Sobrantes: ${Math.round(c.sobr).toLocaleString('es-PE')} (${c.pctSobr.toFixed(1)}%)"></div>
+          <span class="text-[10px] font-data text-[#A86612] mb-0.5">${Math.round(c.sobr).toLocaleString('es-PE')}</span>
+          <div class="bg-[#A86612] w-7 rounded-t transition-all" style="height:${Math.max(3, Math.min(100, c.pctSobr))}%" title="Sobrantes: ${Math.round(c.sobr).toLocaleString('es-PE')} (${c.pctSobr.toFixed(1)}%)"></div>
         </div>
       </div>
       <span class="text-[11px] text-on-surface-variant font-semibold mt-1">${c.nombre}</span>
@@ -1368,9 +1384,9 @@ function renderChartPorRack(desde, hasta) {
       <div class="flex items-center gap-3">
         <span class="font-data text-xs text-on-surface-variant w-16 shrink-0 truncate">${r.rack}</span>
         <div class="flex-1 bg-surface-container-high h-2.5 rounded-full overflow-hidden">
-          <div class="${r.pct >= 100 ? 'bg-success' : r.pct >= 50 ? 'bg-[#c2540d]' : 'bg-error'} h-full rounded-full" style="width:${Math.min(100, r.pct)}%"></div>
+          <div class="${r.pct >= 100 ? 'bg-primary' : r.pct >= 50 ? 'bg-warning' : 'bg-error'} h-full rounded-full" style="width:${Math.min(100, r.pct)}%"></div>
         </div>
-        <span class="font-data text-xs w-16 text-right ${r.pct >= 100 ? 'text-success' : r.pct >= 50 ? 'text-[#c2540d]' : 'text-error'}">${r.pct.toFixed(2)}%</span>
+        <span class="font-data text-xs w-16 text-right ${r.pct >= 100 ? 'text-primary' : r.pct >= 50 ? 'text-[#A86612]' : 'text-error'}">${r.pct.toFixed(2)}%</span>
       </div>
       <div class="pl-[76px] text-[10px] text-on-surface-variant font-data">${r.ubicaciones.toLocaleString('es-PE')} ubic. · ${r.codigos.toLocaleString('es-PE')} cód. · ${Math.round(r.unidades).toLocaleString('es-PE')} unid.</div>
     </div>`).join('');
@@ -1437,7 +1453,7 @@ function renderDashDetailTable() {
     const cant = parseFloat(r.CANTIDAD);
     const diff = (!isNaN(saldo) && !isNaN(cant)) ? (cant - saldo) : null;
     const diffTxt = diff === null ? '-' : (diff > 0 ? '+' + diff : String(diff));
-    const diffCls = diff === null ? 'text-on-surface-variant' : diff === 0 ? '' : (diff > 0 ? 'text-[#b06000]' : 'text-error');
+    const diffCls = diff === null ? 'text-on-surface-variant' : diff === 0 ? '' : (diff > 0 ? 'text-[#A86612]' : 'text-error');
     const key = dashRowKey(r, i);
     const checked = dashSelected.has(key) ? 'checked' : '';
     return `<tr class="border-b border-surface-variant hover:bg-surface-container-low">
@@ -1622,7 +1638,7 @@ function renderSaldoResumen() {
   document.getElementById('saldoUnidProgresoBar').style.width = Math.min(pctUnid, 100).toFixed(1) + '%';
   const diffEl = document.getElementById('kpiSaldoDiferencia');
   diffEl.textContent = total > 0 ? ((diffNeto > 0 ? '+' : '') + Math.round(diffNeto).toLocaleString('es-PE')) : '—';
-  diffEl.className = 'text-3xl font-bold font-data ' + (diffNeto === 0 ? '' : diffNeto > 0 ? 'text-[#b06000]' : 'text-error');
+  diffEl.className = 'text-3xl font-bold font-data ' + (diffNeto === 0 ? '' : diffNeto > 0 ? 'text-[#A86612]' : 'text-error');
 
   // Distribución por Estatus: se calcula directamente desde el sheet DETALLE (log real de conteos),
   // no desde el cruce SALDO vs DATA, para que coincida con lo que se ve en el Sheet.
@@ -1659,8 +1675,8 @@ function renderSaldoResumen() {
   const codigosRealSet = new Set([...codigosSets.OK, ...codigosSets.SOBRANTE, ...codigosSets.FALTANTE]);
   const codigosTodosSet = new Set([...codigosSets.OK, ...codigosSets.SOBRANTE, ...codigosSets.FALTANTE, ...codigosSets.PENDIENTE]);
 
-  const colores = { OK: 'bg-success', SOBRANTE: 'bg-[#b06000]', FALTANTE: 'bg-error', PENDIENTE: 'bg-[#c2540d]', REAL: 'bg-[#7c2d12]' };
-  const coloresUnid = { OK: 'bg-success/40', SOBRANTE: 'bg-[#b06000]/40', FALTANTE: 'bg-error/40', PENDIENTE: 'bg-[#c2540d]/40', REAL: 'bg-[#7c2d12]/40' };
+  const colores = { OK: 'bg-success', SOBRANTE: 'bg-[#A86612]', FALTANTE: 'bg-error', PENDIENTE: 'bg-[#68747A]', REAL: 'bg-[#24333B]' };
+  const coloresUnid = { OK: 'bg-success/40', SOBRANTE: 'bg-[#A86612]/40', FALTANTE: 'bg-error/40', PENDIENTE: 'bg-[#68747A]/40', REAL: 'bg-[#24333B]/40' };
   const labels = { OK: 'Conforme', SOBRANTE: 'Sobrante', FALTANTE: 'Faltante', PENDIENTE: 'Pendiente', REAL: 'Total Real' };
   const totalUnidEstatus = Object.values(conteoUnid).reduce((s, v) => s + v, 0);
   const MAX_BAR_PX = 100;
@@ -1736,7 +1752,7 @@ function renderSaldoDetailTable() {
   document.getElementById('saldoDetailRowCount').textContent = `Mostrando ${Math.min(rows.length, 500)} de ${rows.length} código(s) (de ${saldoRowsCache.length} totales).`;
   document.getElementById('saldoDetailTableBody').innerHTML = rows.slice(0, 500).map(r => {
     const diffTxt = r.diferencia === null ? '-' : (r.diferencia > 0 ? '+' + r.diferencia.toLocaleString('es-PE') : r.diferencia.toLocaleString('es-PE'));
-    const diffCls = r.diferencia === null ? 'text-on-surface-variant' : r.diferencia === 0 ? '' : (r.diferencia > 0 ? 'text-[#b06000]' : 'text-error');
+    const diffCls = r.diferencia === null ? 'text-on-surface-variant' : r.diferencia === 0 ? '' : (r.diferencia > 0 ? 'text-[#A86612]' : 'text-error');
     const validarBtn = (r.estatus === 'FALTANTE' || r.estatus === 'SOBRANTE')
       ? `<button data-validar-cod="${r.codBpcs}" class="btn-validar-saldo text-[11px] font-semibold text-primary border border-primary/30 rounded-lg px-2 py-1 hover:bg-primary/5">Validar</button>`
       : `<span class="text-on-surface-variant text-[11px]">-</span>`;
@@ -2045,7 +2061,7 @@ function renderManualSessionTable() {
     const idxReal = sessionManual.indexOf(m);
     const codigoMostrar = m.EAN13 ? m.EAN13 : m.CODIGO; // según el EAN o código, el que esté llenado
     return `<tr class="border-b border-surface-variant last:border-0 hover:bg-surface-container-low">
-      <td class="py-2 px-3 font-data text-[#b06000]">${m.ID_DETALLE || ''}</td>
+      <td class="py-2 px-3 font-data text-[#A86612]">${m.ID_DETALLE || ''}</td>
       <td class="py-2 px-3 font-data">${m.REGISTRO || ''}</td>
       <td class="py-2 px-3 font-data">${m.USUARIO || ''}</td>
       <td class="py-2 px-3 font-data">${m.TIPO_REGISTRO || ''}</td>
@@ -2068,11 +2084,11 @@ document.getElementById('cfCantidad').addEventListener('input', () => {
   const saldo = parseFloat(selectedItem.SALDO) || 0;
   badge.classList.remove('hidden');
   if (fisica === saldo) {
-    badge.textContent = 'OK — coincide'; badge.className = 'px-3 py-2 rounded-full text-sm font-semibold border bg-success-container text-on-success-container border-[#A7F3D0]';
+    badge.textContent = 'OK — coincide'; badge.className = 'px-3 py-2 rounded-full text-sm font-semibold border bg-success-container text-on-success-container border-[#BFE3D2]';
   } else if (fisica > saldo) {
-    badge.textContent = `SOBRANTE +${fisica - saldo}`; badge.className = 'px-3 py-2 rounded-full text-sm font-semibold border bg-error-container text-on-error-container border-[#FECACA]';
+    badge.textContent = `SOBRANTE +${fisica - saldo}`; badge.className = 'px-3 py-2 rounded-full text-sm font-semibold border bg-error-container text-on-error-container border-[#F0C4C4]';
   } else {
-    badge.textContent = `FALTANTE -${saldo - fisica}`; badge.className = 'px-3 py-2 rounded-full text-sm font-semibold border bg-error-container text-on-error-container border-[#FECACA]';
+    badge.textContent = `FALTANTE -${saldo - fisica}`; badge.className = 'px-3 py-2 rounded-full text-sm font-semibold border bg-error-container text-on-error-container border-[#F0C4C4]';
   }
 });
 
@@ -2110,7 +2126,7 @@ function renderConteoTable() {
   tbody.innerHTML = rows.map(c => {
     const idxReal = sessionCounts.indexOf(c);
     return `<tr class="border-b border-surface-variant last:border-0 hover:bg-surface-container-low">
-      <td class="py-2 px-3 font-data text-[#b06000]">${c.ID_DETALLE || ''}</td>
+      <td class="py-2 px-3 font-data text-[#A86612]">${c.ID_DETALLE || ''}</td>
       <td class="py-2 px-3 font-data">${c.REGISTRO || ''}</td>
       <td class="py-2 px-3 font-data">${c.USUARIO || ''}</td>
       <td class="py-2 px-3 font-data">${c.TIPO_REGISTRO || ''}</td>
@@ -2233,7 +2249,7 @@ function renderDetalleRealTable() {
   tbody.innerHTML = rows.map(r => `
     <tr class="border-b border-surface-variant last:border-0 hover:bg-surface-container-low ${r._esDup ? 'bg-error-container/40' : ''}">
       <td class="py-2 px-3"><input type="checkbox" class="detalle-real-check rounded border-outline-variant" data-id="${r.ID_DETALLE}" ${detalleRealSeleccionados.has(r.ID_DETALLE) ? 'checked' : ''}></td>
-      <td class="py-2 px-3 font-data text-[#b06000]">${r.ID_DETALLE || ''} ${r._esDup ? '<span class="ml-1 text-error" title="Posible duplicado">⚠</span>' : ''}</td>
+      <td class="py-2 px-3 font-data text-[#A86612]">${r.ID_DETALLE || ''} ${r._esDup ? '<span class="ml-1 text-error" title="Posible duplicado">⚠</span>' : ''}</td>
       <td class="py-2 px-3 font-data">${r.REGISTRO || ''}</td>
       <td class="py-2 px-3 font-data">${r.USUARIO || ''}</td>
       <td class="py-2 px-3 font-data">${r['UBICACIÓN'] || ''}</td>
@@ -2376,7 +2392,7 @@ document.getElementById('btnEliminarDetalleSel').addEventListener('click', async
         statusEl.className = 'text-xs text-success';
       } else {
         statusEl.textContent = 'El servidor respondió OK pero no confirmó cuántas filas borró. Verifica que el Apps Script tenga desplegada la ÚLTIMA versión (Implementar > Gestionar implementaciones > Nueva versión) y revisa el Sheet DETALLE manualmente.';
-        statusEl.className = 'text-xs text-[#b06000]';
+        statusEl.className = 'text-xs text-[#A86612]';
       }
     } else {
       statusEl.textContent = 'Error al eliminar: ' + json.error;
