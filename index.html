@@ -419,6 +419,22 @@
                 </div>
               </div>
             </div>
+            <div class="bg-primary-fixed/40 border-2 border-primary/30 rounded-xl p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <span class="text-[10px] uppercase tracking-wide text-on-surface-variant font-semibold leading-tight">% Exactitud de Inventario</span>
+                  <p class="text-[9px] text-on-surface-variant leading-tight mt-0.5 max-w-[220px]">Ubicación + Código + Cantidad coincidiendo exacto, sobre todo lo ya contado.</p>
+                </div>
+                <p id="kpiSaldoExactitud" class="text-3xl font-bold font-data text-primary shrink-0">-</p>
+              </div>
+              <div class="w-full bg-surface-container-high h-2 rounded-full mt-2 overflow-hidden">
+                <div id="saldoExactitudBar" class="bg-primary h-full rounded-full transition-all" style="width:0%"></div>
+              </div>
+              <div class="flex items-center justify-between mt-1.5 text-[10px] text-on-surface-variant font-data">
+                <span id="kpiSaldoExactitudUnidTxt">- de - und.</span>
+                <span id="kpiSaldoExactitudLineasTxt">- de - líneas</span>
+              </div>
+            </div>
           </div>
           <div class="bg-white border border-outline-variant rounded-xl p-5">
             <h4 class="font-semibold mb-2 text-xs">Distribución por Estatus</h4>
@@ -1656,12 +1672,17 @@ function renderSaldoResumen() {
   const conteoUnid = { OK: 0, SOBRANTE: 0, FALTANTE: 0, PENDIENTE: 0 };
   let totalInventariadoTodo = 0;    // suma de CONTEO en TODAS las filas (cualquier estatus)
   let totalCantidadInicialTodo = 0; // suma de CANTIDAD INICIAL en TODAS las filas (cualquier estatus)
+  let lineasOK = 0, lineasEvaluadas = 0; // exactitud a nivel línea: UBICACIÓN + CÓDIGO + CANTIDAD
   filasDetalleData.forEach(d => {
     const est = normalizarEstatus(d.ESTATUS);
     const ct = parseFloat(d.CONTEO);
     if (!isNaN(ct)) totalInventariadoTodo += ct;
     const ciTodo = parseFloat(d['CANTIDAD INICIAL']);
     if (!isNaN(ciTodo)) totalCantidadInicialTodo += ciTodo;
+    if (est === 'OK' || est === 'SOBRANTE' || est === 'FALTANTE') {
+      lineasEvaluadas++;
+      if (est === 'OK') lineasOK++;
+    }
     if (!codigosSets[est]) return; // ignora estatus no contemplados (p.ej. MANUAL)
     const cod = (d.CODIGO || '').toString().trim().toUpperCase();
     if (cod) codigosSets[est].add(cod);
@@ -1677,6 +1698,16 @@ function renderSaldoResumen() {
   });
   const conteo = { OK: codigosSets.OK.size, SOBRANTE: codigosSets.SOBRANTE.size, FALTANTE: codigosSets.FALTANTE.size, PENDIENTE: codigosSets.PENDIENTE.size };
   const totalEstatusCodigos = conteo.OK + conteo.SOBRANTE + conteo.FALTANTE + conteo.PENDIENTE;
+
+  // % Exactitud de Inventario: de todo lo YA CONTADO (Conforme+Sobrante+Faltante), cuánto coincide
+  // exacto en Ubicación + Código + Cantidad (estatus OK), tanto en unidades como en líneas.
+  const unidadesEvaluadas = conteoUnid.OK + conteoUnid.SOBRANTE + conteoUnid.FALTANTE;
+  const pctExactitudUnid = unidadesEvaluadas > 0 ? (conteoUnid.OK / unidadesEvaluadas * 100) : null;
+  const pctExactitudLineas = lineasEvaluadas > 0 ? (lineasOK / lineasEvaluadas * 100) : null;
+  document.getElementById('kpiSaldoExactitud').textContent = pctExactitudUnid === null ? '—' : pctExactitudUnid.toFixed(1) + '%';
+  document.getElementById('saldoExactitudBar').style.width = (pctExactitudUnid === null ? 0 : Math.min(pctExactitudUnid, 100)).toFixed(1) + '%';
+  document.getElementById('kpiSaldoExactitudUnidTxt').textContent = `${Math.round(conteoUnid.OK).toLocaleString('es-PE')} de ${Math.round(unidadesEvaluadas).toLocaleString('es-PE')} und.`;
+  document.getElementById('kpiSaldoExactitudLineasTxt').textContent = `${lineasOK.toLocaleString('es-PE')} de ${lineasEvaluadas.toLocaleString('es-PE')} líneas (${pctExactitudLineas === null ? '—' : pctExactitudLineas.toFixed(1) + '%'})`;
 
   // "Total Real Contado": todo lo contado (columna CONTEO, cualquier estatus) menos el exceso registrado
   // en Sobrante — así el excedente no infla el total, y se refleja cuánto se lleva realmente verificado.
