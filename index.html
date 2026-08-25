@@ -407,10 +407,10 @@
           <div class="bg-white border border-outline-variant rounded-xl p-5">
             <h4 class="font-semibold mb-2 text-xs">Distribución por Estatus</h4>
             <div id="chartSaldoEstatus" class="flex items-end justify-around gap-4 border-l border-b border-outline-variant px-3 pb-1 pt-3"></div>
-            <div class="flex items-center gap-4 mt-2">
-              <span class="flex items-center gap-1.5 text-[10px] text-on-surface-variant"><span class="w-2.5 h-2.5 rounded-sm bg-primary inline-block"></span>Códigos</span>
-              <span class="flex items-center gap-1.5 text-[10px] text-on-surface-variant"><span class="w-2.5 h-2.5 rounded-sm bg-primary/40 inline-block"></span>Unidades</span>
+            <div class="flex items-center gap-4 mt-2 flex-wrap">
+              <span class="flex items-center gap-1.5 text-[10px] text-on-surface-variant"><span class="w-2.5 h-2.5 rounded-sm bg-on-surface-variant inline-block"></span>Barra clara = Unidades, oscura = Códigos</span>
             </div>
+            <p class="text-[10px] text-on-surface-variant mt-2 leading-snug">"Total Real" = todo lo contado (Conforme + Sobrante + Faltante) menos el excedente de Sobrante, para no inflar el avance real.</p>
           </div>
         </div>
 
@@ -418,7 +418,7 @@
         <div class="bg-white border border-outline-variant rounded-xl flex flex-col overflow-hidden">
           <div class="p-4 border-b border-outline-variant bg-surface-container-low flex flex-col gap-2.5 rounded-t-xl">
             <h4 class="font-semibold text-sm">Detalle de Saldo por Código</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <div class="relative">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
                 <input id="saldoFiltroCodigo" type="text" autocomplete="off" placeholder="Filtrar por código BPCS o Cliente" class="w-full pl-9 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
@@ -444,6 +444,24 @@
                   </label>
                 </div>
               </div>
+              <div class="relative" id="saldoAccionWrap">
+                <button id="saldoAccionBtn" type="button" class="w-full flex items-center pl-9 pr-2 py-2 rounded-lg border border-outline-variant focus:border-primary focus:ring-primary text-sm bg-white text-left relative">
+                  <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">fact_check</span>
+                  <span id="saldoAccionLabel" class="truncate">Todas las Acciones</span>
+                  <span class="material-symbols-outlined ml-auto text-on-surface-variant text-[18px]">expand_more</span>
+                </button>
+                <div id="saldoAccionMenu" class="hidden absolute z-20 mt-1 w-full bg-white border border-outline-variant rounded-lg shadow-lg p-1.5">
+                  <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                    <input type="radio" name="saldoAccionOpt" value="" class="saldo-accion-radio" checked> Todas las Acciones
+                  </label>
+                  <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                    <input type="radio" name="saldoAccionOpt" value="con" class="saldo-accion-radio"> Con acción (Validar)
+                  </label>
+                  <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                    <input type="radio" name="saldoAccionOpt" value="sin" class="saldo-accion-radio"> Sin acción
+                  </label>
+                </div>
+              </div>
             </div>
             <div class="flex justify-end">
               <button id="saldoFiltrosLimpiarTodo" type="button" class="flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-error font-semibold">
@@ -459,7 +477,7 @@
                 <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Cant. Inicial</th>
                 <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Inventariado</th>
                 <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Vendido</th>
-                <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Diferencia</th>
+                <th data-saldo-sort="diferencia" class="saldo-sort-th py-2 px-3 font-semibold text-right cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Diferencia <span class="sort-icon text-[10px] opacity-40">↕</span></th>
                 <th class="py-2 px-3 font-semibold whitespace-nowrap">Estatus</th>
                 <th class="py-2 px-3 font-semibold text-center whitespace-nowrap">Acción</th>
               </tr></thead>
@@ -1190,7 +1208,7 @@ function estatusBadgeHtmlV2(estNorm) {
     OK: { cls: 'bg-success-container text-on-success-container border-[#A7F3D0]', icon: 'check', label: 'Conforme' },
     SOBRANTE: { cls: 'bg-[#fef7e0] text-[#b06000] border-[#fce8b2]', icon: 'add_circle', label: 'Sobrante' },
     FALTANTE: { cls: 'bg-error-container text-on-error-container border-[#FECACA]', icon: 'warning', label: 'Faltante' },
-    PENDIENTE: { cls: 'bg-surface-container-high text-on-surface-variant border-outline-variant', icon: 'schedule', label: 'Pendiente' },
+    PENDIENTE: { cls: 'bg-[#fff4e5] text-[#c2540d] border-[#ffddb3]', icon: 'schedule', label: 'Pendiente' },
   };
   const s = map[estNorm] || map.PENDIENTE;
   return `<span class="inline-flex items-center gap-1 ${s.cls} px-2 py-1 rounded-full text-[11px] font-semibold border"><span class="material-symbols-outlined text-[12px]">${s.icon}</span>${s.label}</span>`;
@@ -1243,24 +1261,32 @@ function renderDashKpisYCharts() {
     return s + Math.max(0, cant - saldo);
   }, 0);
 
+  // Helper para pintar "valor (xx.x%)" respecto al total de esa fila
+  const conPct = (valor, totalFila) => {
+    const pct = totalFila > 0 ? (valor / totalFila * 100) : 0;
+    return `${Math.round(valor).toLocaleString('es-PE')} <span class="text-[10px] text-on-surface-variant">(${pct.toFixed(1)}%)</span>`;
+  };
+
   // Ubicaciones únicas
   const setUbi = arr => new Set(arr.map(r => (r.UBICACION || '').toString().trim()).filter(Boolean)).size;
-  document.getElementById('statUbiTotales').textContent = setUbi(DB.data).toLocaleString('es-PE');
-  document.getElementById('statUbiContadas').textContent = setUbi(enRango).toLocaleString('es-PE');
-  document.getElementById('statUbiFaltantes').textContent = setUbi(faltantesRango).toLocaleString('es-PE');
-  document.getElementById('statUbiSobrantes').textContent = setUbi(sobrantesRango).toLocaleString('es-PE');
+  const ubiTotales = setUbi(DB.data), ubiContadas = setUbi(enRango), ubiFaltantes = setUbi(faltantesRango), ubiSobrantes = setUbi(sobrantesRango);
+  document.getElementById('statUbiTotales').textContent = ubiTotales.toLocaleString('es-PE');
+  document.getElementById('statUbiContadas').innerHTML = conPct(ubiContadas, ubiTotales);
+  document.getElementById('statUbiFaltantes').innerHTML = conPct(ubiFaltantes, ubiTotales);
+  document.getElementById('statUbiSobrantes').innerHTML = conPct(ubiSobrantes, ubiTotales);
 
   // Códigos únicos
   const setCod = arr => new Set(arr.map(r => (r.CODIGO || '').toString().trim().toUpperCase()).filter(Boolean)).size;
-  document.getElementById('statCodTotales').textContent = setCod(DB.data).toLocaleString('es-PE');
-  document.getElementById('statCodContadas').textContent = setCod(enRango).toLocaleString('es-PE');
-  document.getElementById('statCodFaltantes').textContent = setCod(faltantesRango).toLocaleString('es-PE');
-  document.getElementById('statCodSobrantes').textContent = setCod(sobrantesRango).toLocaleString('es-PE');
+  const codTotales = setCod(DB.data), codContadas = setCod(enRango), codFaltantes = setCod(faltantesRango), codSobrantes = setCod(sobrantesRango);
+  document.getElementById('statCodTotales').textContent = codTotales.toLocaleString('es-PE');
+  document.getElementById('statCodContadas').innerHTML = conPct(codContadas, codTotales);
+  document.getElementById('statCodFaltantes').innerHTML = conPct(codFaltantes, codTotales);
+  document.getElementById('statCodSobrantes').innerHTML = conPct(codSobrantes, codTotales);
 
   document.getElementById('statUnidTotales').textContent = Math.round(unidTotales).toLocaleString('es-PE');
-  document.getElementById('statUnidContadas').textContent = Math.round(unidContadas).toLocaleString('es-PE');
-  document.getElementById('statUnidFaltantes').textContent = Math.round(unidFaltantes).toLocaleString('es-PE');
-  document.getElementById('statUnidSobrantes').textContent = Math.round(unidSobrantes).toLocaleString('es-PE');
+  document.getElementById('statUnidContadas').innerHTML = conPct(unidContadas, unidTotales);
+  document.getElementById('statUnidFaltantes').innerHTML = conPct(unidFaltantes, unidTotales);
+  document.getElementById('statUnidSobrantes').innerHTML = conPct(unidSobrantes, unidTotales);
 
   renderChartRangoFechas(desde, hasta);
   renderChartPorRack(desde, hasta);
@@ -1342,9 +1368,9 @@ function renderChartPorRack(desde, hasta) {
       <div class="flex items-center gap-3">
         <span class="font-data text-xs text-on-surface-variant w-16 shrink-0 truncate">${r.rack}</span>
         <div class="flex-1 bg-surface-container-high h-2.5 rounded-full overflow-hidden">
-          <div class="${r.pct >= 100 ? 'bg-primary' : r.pct >= 50 ? 'bg-primary-fixed-dim' : 'bg-error-container'} h-full rounded-full" style="width:${Math.min(100, r.pct)}%"></div>
+          <div class="${r.pct >= 100 ? 'bg-success' : r.pct >= 50 ? 'bg-[#c2540d]' : 'bg-error'} h-full rounded-full" style="width:${Math.min(100, r.pct)}%"></div>
         </div>
-        <span class="font-data text-xs w-16 text-right ${r.pct >= 50 ? 'text-primary' : 'text-error'}">${r.pct.toFixed(2)}%</span>
+        <span class="font-data text-xs w-16 text-right ${r.pct >= 100 ? 'text-success' : r.pct >= 50 ? 'text-[#c2540d]' : 'text-error'}">${r.pct.toFixed(2)}%</span>
       </div>
       <div class="pl-[76px] text-[10px] text-on-surface-variant font-data">${r.ubicaciones.toLocaleString('es-PE')} ubic. · ${r.codigos.toLocaleString('es-PE')} cód. · ${Math.round(r.unidades).toLocaleString('es-PE')} unid.</div>
     </div>`).join('');
@@ -1603,8 +1629,14 @@ function renderSaldoResumen() {
   const filasDetalleData = DB.detalle.filter(d => (d.TIPO || '').toString().trim().toUpperCase() === 'DATA');
   const codigosSets = { OK: new Set(), SOBRANTE: new Set(), FALTANTE: new Set(), PENDIENTE: new Set() };
   const conteoUnid = { OK: 0, SOBRANTE: 0, FALTANTE: 0, PENDIENTE: 0 };
+  let totalInventariadoTodo = 0;    // suma de CONTEO en TODAS las filas (cualquier estatus)
+  let totalCantidadInicialTodo = 0; // suma de CANTIDAD INICIAL en TODAS las filas (cualquier estatus)
   filasDetalleData.forEach(d => {
     const est = normalizarEstatus(d.ESTATUS);
+    const ct = parseFloat(d.CONTEO);
+    if (!isNaN(ct)) totalInventariadoTodo += ct;
+    const ciTodo = parseFloat(d['CANTIDAD INICIAL']);
+    if (!isNaN(ciTodo)) totalCantidadInicialTodo += ciTodo;
     if (!codigosSets[est]) return; // ignora estatus no contemplados (p.ej. MANUAL)
     const cod = (d.CODIGO || '').toString().trim().toUpperCase();
     if (cod) codigosSets[est].add(cod);
@@ -1612,7 +1644,6 @@ function renderSaldoResumen() {
       const ci = parseFloat(d['CANTIDAD INICIAL']);
       conteoUnid[est] += isNaN(ci) ? 0 : ci;                 // aún no contado: cantidad inicial esperada
     } else if (est === 'OK') {
-      const ct = parseFloat(d.CONTEO);
       conteoUnid[est] += isNaN(ct) ? 0 : ct;                 // conforme: lo que se contó (columna CONTEO)
     } else {
       const diff = parseFloat(d.DIFERENCIA);
@@ -1621,26 +1652,45 @@ function renderSaldoResumen() {
   });
   const conteo = { OK: codigosSets.OK.size, SOBRANTE: codigosSets.SOBRANTE.size, FALTANTE: codigosSets.FALTANTE.size, PENDIENTE: codigosSets.PENDIENTE.size };
   const totalEstatusCodigos = conteo.OK + conteo.SOBRANTE + conteo.FALTANTE + conteo.PENDIENTE;
-  const colores = { OK: 'bg-success', SOBRANTE: 'bg-[#b06000]', FALTANTE: 'bg-error', PENDIENTE: 'bg-outline-variant' };
-  const coloresUnid = { OK: 'bg-success/40', SOBRANTE: 'bg-[#b06000]/40', FALTANTE: 'bg-error/40', PENDIENTE: 'bg-outline-variant/60' };
-  const labels = { OK: 'Conforme', SOBRANTE: 'Sobrante', FALTANTE: 'Faltante', PENDIENTE: 'Pendiente' };
+
+  // "Total Real Contado": todo lo contado (columna CONTEO, cualquier estatus) menos el exceso registrado
+  // en Sobrante — así el excedente no infla el total, y se refleja cuánto se lleva realmente verificado.
+  const totalRealContado = Math.max(0, totalInventariadoTodo - conteoUnid.SOBRANTE);
+  const codigosRealSet = new Set([...codigosSets.OK, ...codigosSets.SOBRANTE, ...codigosSets.FALTANTE]);
+  const codigosTodosSet = new Set([...codigosSets.OK, ...codigosSets.SOBRANTE, ...codigosSets.FALTANTE, ...codigosSets.PENDIENTE]);
+
+  const colores = { OK: 'bg-success', SOBRANTE: 'bg-[#b06000]', FALTANTE: 'bg-error', PENDIENTE: 'bg-[#c2540d]', REAL: 'bg-[#7c2d12]' };
+  const coloresUnid = { OK: 'bg-success/40', SOBRANTE: 'bg-[#b06000]/40', FALTANTE: 'bg-error/40', PENDIENTE: 'bg-[#c2540d]/40', REAL: 'bg-[#7c2d12]/40' };
+  const labels = { OK: 'Conforme', SOBRANTE: 'Sobrante', FALTANTE: 'Faltante', PENDIENTE: 'Pendiente', REAL: 'Total Real' };
   const totalUnidEstatus = Object.values(conteoUnid).reduce((s, v) => s + v, 0);
   const MAX_BAR_PX = 100;
-  document.getElementById('chartSaldoEstatus').innerHTML = Object.keys(conteo).map(k => {
-    const v = conteo[k];
-    const vu = conteoUnid[k];
-    const pctK = totalEstatusCodigos > 0 ? (v / totalEstatusCodigos * 100) : 0;
-    const pctU = totalUnidEstatus > 0 ? (vu / totalUnidEstatus * 100) : 0;
+
+  const barrasDatos = { ...conteo, REAL: codigosRealSet.size };
+  const unidDatos = { ...conteoUnid, REAL: totalRealContado };
+
+  document.getElementById('chartSaldoEstatus').innerHTML = Object.keys(barrasDatos).map(k => {
+    const v = barrasDatos[k];
+    const vu = unidDatos[k];
+    let pctK, pctU;
+    if (k === 'REAL') {
+      pctK = codigosTodosSet.size > 0 ? (v / codigosTodosSet.size * 100) : 0;
+      pctU = totalCantidadInicialTodo > 0 ? (vu / totalCantidadInicialTodo * 100) : 0;
+    } else {
+      pctK = totalEstatusCodigos > 0 ? (v / totalEstatusCodigos * 100) : 0;
+      pctU = totalUnidEstatus > 0 ? (vu / totalUnidEstatus * 100) : 0;
+    }
     const hK = Math.max(3, Math.round(Math.min(100, pctK) * MAX_BAR_PX / 100));
     const hU = Math.max(3, Math.round(Math.min(100, pctU) * MAX_BAR_PX / 100));
     return `<div class="flex flex-col items-center gap-1">
       <div class="flex items-end gap-1.5" style="height:${MAX_BAR_PX}px">
         <div class="flex flex-col items-center justify-end h-full">
-          <span class="text-[9px] font-data mb-0.5">${v.toLocaleString('es-PE')}</span>
+          <span class="text-[9px] font-data leading-tight">${v.toLocaleString('es-PE')}</span>
+          <span class="text-[8px] font-data text-on-surface-variant mb-0.5 leading-tight">${pctK.toFixed(1)}%</span>
           <div class="${colores[k]} w-5 rounded-t transition-all" style="height:${hK}px" title="Códigos ${labels[k]}: ${v.toLocaleString('es-PE')} (${pctK.toFixed(1)}%)"></div>
         </div>
         <div class="flex flex-col items-center justify-end h-full">
-          <span class="text-[9px] font-data mb-0.5">${Math.round(vu).toLocaleString('es-PE')}</span>
+          <span class="text-[9px] font-data leading-tight">${Math.round(vu).toLocaleString('es-PE')}</span>
+          <span class="text-[8px] font-data text-on-surface-variant mb-0.5 leading-tight">${pctU.toFixed(1)}%</span>
           <div class="${coloresUnid[k]} w-5 rounded-t transition-all" style="height:${hU}px" title="Unidades ${labels[k]}: ${Math.round(vu).toLocaleString('es-PE')} (${pctU.toFixed(1)}%)"></div>
         </div>
       </div>
@@ -1651,14 +1701,26 @@ function renderSaldoResumen() {
 
 function renderSaldoDetailTable() {
   const q = (document.getElementById('saldoFiltroCodigo').value || '').toUpperCase().trim();
+  const accionFiltro = (document.querySelector('input[name="saldoAccionOpt"]:checked') || {}).value || '';
   let rows = saldoRowsCache.filter(r => {
     if (q && !(r.codBpcs.toUpperCase().includes(q) || r.codCliente.toUpperCase().includes(q))) return false;
     if (saldoEstatusSeleccionados.size > 0 && !saldoEstatusSeleccionados.has(r.estatus)) return false;
+    const tieneAccion = (r.estatus === 'FALTANTE' || r.estatus === 'SOBRANTE');
+    if (accionFiltro === 'con' && !tieneAccion) return false;
+    if (accionFiltro === 'sin' && tieneAccion) return false;
     return true;
   });
   if (saldoSortField) {
     const dir = saldoSortDir === 'asc' ? 1 : -1;
-    rows = rows.slice().sort((a, b) => (a[saldoSortField] || '').toString().localeCompare((b[saldoSortField] || '').toString(), 'es', { numeric: true, sensitivity: 'base' }) * dir);
+    if (saldoSortField === 'diferencia') {
+      rows = rows.slice().sort((a, b) => {
+        const da = (a.diferencia === null || a.diferencia === undefined) ? -Infinity : a.diferencia;
+        const db = (b.diferencia === null || b.diferencia === undefined) ? -Infinity : b.diferencia;
+        return (da - db) * dir;
+      });
+    } else {
+      rows = rows.slice().sort((a, b) => (a[saldoSortField] || '').toString().localeCompare((b[saldoSortField] || '').toString(), 'es', { numeric: true, sensitivity: 'base' }) * dir);
+    }
   }
 
   document.querySelectorAll('.saldo-sort-th').forEach(th => {
@@ -1728,27 +1790,61 @@ document.querySelectorAll('.saldo-estatus-check').forEach(chk => {
   });
 });
 
+const saldoAccionBtn = document.getElementById('saldoAccionBtn');
+const saldoAccionMenu = document.getElementById('saldoAccionMenu');
+saldoAccionBtn.addEventListener('click', () => saldoAccionMenu.classList.toggle('hidden'));
+document.addEventListener('click', (e) => {
+  if (!document.getElementById('saldoAccionWrap').contains(e.target)) saldoAccionMenu.classList.add('hidden');
+});
+document.querySelectorAll('.saldo-accion-radio').forEach(radio => {
+  radio.addEventListener('change', () => {
+    const labels = { '': 'Todas las Acciones', con: 'Con acción (Validar)', sin: 'Sin acción' };
+    document.getElementById('saldoAccionLabel').textContent = labels[radio.value] || 'Todas las Acciones';
+    saldoAccionMenu.classList.add('hidden');
+    renderSaldoDetailTable();
+  });
+});
+
 document.getElementById('saldoFiltrosLimpiarTodo').addEventListener('click', () => {
   document.getElementById('saldoFiltroCodigo').value = '';
   saldoEstatusSeleccionados.clear();
   document.querySelectorAll('.saldo-estatus-check').forEach(c => c.checked = false);
   document.getElementById('saldoEstatusLabel').textContent = 'Todos los Estatus';
+  document.querySelector('input[name="saldoAccionOpt"][value=""]').checked = true;
+  document.getElementById('saldoAccionLabel').textContent = 'Todas las Acciones';
   renderSaldoDetailTable();
 });
 
 document.getElementById('btnExportSaldo').addEventListener('click', () => {
   const q = (document.getElementById('saldoFiltroCodigo').value || '').toUpperCase().trim();
+  const accionFiltro = (document.querySelector('input[name="saldoAccionOpt"]:checked') || {}).value || '';
   let rows = saldoRowsCache.filter(r => {
     if (q && !(r.codBpcs.toUpperCase().includes(q) || r.codCliente.toUpperCase().includes(q))) return false;
     if (saldoEstatusSeleccionados.size > 0 && !saldoEstatusSeleccionados.has(r.estatus)) return false;
+    const tieneAccion = (r.estatus === 'FALTANTE' || r.estatus === 'SOBRANTE');
+    if (accionFiltro === 'con' && !tieneAccion) return false;
+    if (accionFiltro === 'sin' && tieneAccion) return false;
     return true;
   });
+  if (saldoSortField) {
+    const dir = saldoSortDir === 'asc' ? 1 : -1;
+    if (saldoSortField === 'diferencia') {
+      rows = rows.slice().sort((a, b) => {
+        const da = (a.diferencia === null || a.diferencia === undefined) ? -Infinity : a.diferencia;
+        const db = (b.diferencia === null || b.diferencia === undefined) ? -Infinity : b.diferencia;
+        return (da - db) * dir;
+      });
+    } else {
+      rows = rows.slice().sort((a, b) => (a[saldoSortField] || '').toString().localeCompare((b[saldoSortField] || '').toString(), 'es', { numeric: true, sensitivity: 'base' }) * dir);
+    }
+  }
   if (rows.length === 0) { alert('No hay filas para exportar.'); return; }
   const data = rows.map(r => ({
     'COD.PROD.BPCS': r.codBpcs, 'COD.PROD.CLIENTE': r.codCliente,
     'CANTIDAD INICIAL': r.saldoInicial, 'INVENTARIADO': r.yaContado ? r.inventariado : '',
     'VENDIDO': r.vendido,
-    'DIFERENCIA': r.diferencia === null ? '' : r.diferencia, 'ESTATUS': r.estatus
+    'DIFERENCIA': r.diferencia === null ? '' : r.diferencia, 'ESTATUS': r.estatus,
+    'ACCIÓN': (r.estatus === 'FALTANTE' || r.estatus === 'SOBRANTE') ? 'Validar' : ''
   }));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'Saldo Inicial');
