@@ -354,7 +354,7 @@
               <th data-sort="UBICACION" class="dash-sort-th py-3 px-2 font-semibold cursor-pointer select-none hover:text-on-surface truncate">Ubicación <span class="sort-icon text-[10px] opacity-40">↕</span></th>
               <th data-sort="CODIGO" class="dash-sort-th py-3 px-2 font-semibold cursor-pointer select-none hover:text-on-surface truncate">Código <span class="sort-icon text-[10px] opacity-40">↕</span></th>
               <th class="py-3 px-2 font-semibold text-right">Saldo</th><th class="py-3 px-2 font-semibold text-right">Cantidad</th>
-              <th class="py-3 px-2 font-semibold text-right">Diferencia</th><th class="py-3 px-2 font-semibold">Estatus</th>
+              <th data-sort="DIFERENCIA" class="dash-sort-th py-3 px-2 font-semibold text-right cursor-pointer select-none hover:text-on-surface"><span class="inline-flex items-center gap-1 justify-end w-full">Diferencia <span class="sort-icon text-[10px] opacity-40">↕</span></span></th><th class="py-3 px-2 font-semibold">Estatus</th>
             </tr></thead>
             <tbody id="dashDetailTableBody"></tbody>
           </table>
@@ -1428,6 +1428,13 @@ function renderDashDetailTable() {
   if (dashSortField) {
     const dir = dashSortDir === 'asc' ? 1 : -1;
     rows = rows.slice().sort((a, b) => {
+      if (dashSortField === 'DIFERENCIA') {
+        const na = parseFloat(a.DIFERENCIA);
+        const nb = parseFloat(b.DIFERENCIA);
+        const va = isNaN(na) ? -Infinity : na;
+        const vb = isNaN(nb) ? -Infinity : nb;
+        return (va - vb) * dir;
+      }
       const va = (a[dashSortField] || '').toString();
       const vb = (b[dashSortField] || '').toString();
       return va.localeCompare(vb, 'es', { numeric: true, sensitivity: 'base' }) * dir;
