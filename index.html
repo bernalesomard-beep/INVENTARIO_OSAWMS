@@ -135,6 +135,9 @@
       <button data-nav-item data-target="panelUsuarios" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container opacity-70 hover:bg-primary-fixed-dim hover:text-on-primary-fixed transition-colors text-left">
         <span class="material-symbols-outlined">group</span><span class="text-sm font-semibold">Usuarios</span>
       </button>
+      <button data-nav-item data-target="panelConfig" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container opacity-70 hover:bg-primary-fixed-dim hover:text-on-primary-fixed transition-colors text-left">
+        <span class="material-symbols-outlined">settings</span><span class="text-sm font-semibold">Configuración</span>
+      </button>
     </div>
     <div class="pt-4 border-t border-white/10">
       <div class="flex items-center gap-2 px-2 mb-3">
@@ -1013,12 +1016,63 @@
         </div>
       </div>
     </section>
+
+    <!-- ===== PANEL: CONFIGURACIÓN (cambio de Sheet asociado) ===== -->
+    <section id="panelConfig" class="tab-panel">
+      <h2 class="text-2xl font-bold font-headline mb-1">Configuración</h2>
+      <p class="text-on-surface-variant text-sm mb-4">Cambia a qué Google Sheet apunta esta app, sin tocar el código ni afectar la hoja actual. Protegido con contraseña de administrador.</p>
+
+      <!-- Bloqueo por contraseña -->
+      <div id="configLock" class="bg-white border border-outline-variant rounded-xl p-6 max-w-sm">
+        <div class="flex items-center gap-2 mb-3 text-on-surface-variant">
+          <span class="material-symbols-outlined">lock</span>
+          <p class="text-sm font-semibold">Acceso restringido</p>
+        </div>
+        <label class="block text-xs font-semibold text-on-surface-variant mb-1 uppercase tracking-wide">Contraseña de administrador</label>
+        <input id="configPass" type="password" autocomplete="off" class="w-full mb-2 rounded-lg border-outline-variant focus:border-primary focus:ring-primary">
+        <p id="configPassError" class="text-error text-sm mb-2 hidden">Contraseña incorrecta.</p>
+        <button id="configUnlockBtn" class="w-full bg-primary text-white rounded-lg py-2.5 font-semibold hover:opacity-90 transition-opacity">Desbloquear</button>
+      </div>
+
+      <!-- Contenido protegido -->
+      <div id="configContent" class="hidden space-y-4">
+        <div class="bg-warning-container border border-warning text-on-warning-container rounded-xl p-4 text-sm flex items-start gap-2">
+          <span class="material-symbols-outlined shrink-0">info</span>
+          <p>Estos enlaces solo cambian de dónde <b>esta app en este navegador</b> lee y guarda datos. No modifican la hoja actual ni afectan a otras personas que usen la app: cada quien guarda su propia configuración en su navegador. Para volver a la hoja original usa "Restaurar valores originales".</p>
+        </div>
+
+        <div class="bg-white border border-outline-variant rounded-xl p-4">
+          <p class="text-sm font-semibold mb-3">Enlaces de lectura (CSV publicado) por hoja</p>
+          <div id="configSheetUrlFields" class="space-y-3"></div>
+        </div>
+
+        <div class="bg-white border border-outline-variant rounded-xl p-4">
+          <p class="text-sm font-semibold mb-1">URL de Apps Script (guardado en Google Sheets)</p>
+          <p class="text-xs text-on-surface-variant mb-3">Termina en <span class="font-data">/exec</span>. Déjala vacía si por ahora solo quieres lectura / exportar a Excel.</p>
+          <input id="configGasUrl" type="text" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-xs">
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="configSaveBtn" class="flex items-center gap-1.5 text-sm bg-primary text-white rounded-lg px-4 py-2.5 font-semibold hover:opacity-90">
+            <span class="material-symbols-outlined text-[18px]">save</span> Guardar cambios
+          </button>
+          <button id="configResetBtn" class="flex items-center gap-1.5 text-sm border border-outline-variant rounded-lg px-4 py-2.5 hover:bg-surface-container-low">
+            <span class="material-symbols-outlined text-[18px]">restart_alt</span> Restaurar valores originales
+          </button>
+          <button id="configReloadBtn" class="flex items-center gap-1.5 text-sm border border-outline-variant rounded-lg px-4 py-2.5 hover:bg-surface-container-low">
+            <span class="material-symbols-outlined text-[18px]">refresh</span> Guardar y recargar datos ahora
+          </button>
+        </div>
+        <p id="configStatus" class="text-xs mt-1"></p>
+      </div>
+    </section>
   </main>
 </div>
 
 <script>
 /* ==================== CONFIG: LINKS CSV REALES ==================== */
-const SHEET_URLS = {
+// Valores originales de fábrica (no se modifican; sirven para "Restaurar valores originales").
+const DEFAULT_SHEET_URLS = {
   usuario: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6knd52iLgvI9mITzf58-ny_gJoTWecCkWxGHd9Am7oKzbvzA-Z9ACZ-xY49qfr1uINSV8-_PKE3Up/pub?gid=1894660867&single=true&output=csv",
   ubicaciones: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6knd52iLgvI9mITzf58-ny_gJoTWecCkWxGHd9Am7oKzbvzA-Z9ACZ-xY49qfr1uINSV8-_PKE3Up/pub?gid=1721392509&single=true&output=csv",
   data: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6knd52iLgvI9mITzf58-ny_gJoTWecCkWxGHd9Am7oKzbvzA-Z9ACZ-xY49qfr1uINSV8-_PKE3Up/pub?gid=431089307&single=true&output=csv",
@@ -1029,9 +1083,32 @@ const SHEET_URLS = {
   detalle: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6knd52iLgvI9mITzf58-ny_gJoTWecCkWxGHd9Am7oKzbvzA-Z9ACZ-xY49qfr1uINSV8-_PKE3Up/pub?gid=326530096&single=true&output=csv",
 };
 
-// Pega aquí la URL de tu Apps Script Web App (termina en /exec) una vez que lo implementes.
-// Mientras esté vacío, el botón "Guardar en Google Sheet" quedará deshabilitado y solo podrás exportar a Excel.
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwmZzME570enDyAkPV6smo4zIBGhaKzGrO58jJ-Ob43A_3Tb6yxuhGQwq29hZkglLQ/exec";
+// URL original del Apps Script Web App (termina en /exec).
+const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbwmZzME570enDyAkPV6smo4zIBGhaKzGrO58jJ-Ob43A_3Tb6yxuhGQwq29hZkglLQ/exec";
+
+// Etiquetas legibles para el panel de Configuración.
+const SHEET_URL_LABELS = {
+  usuario: 'USUARIO', ubicaciones: 'UBICACIONES', data: 'DATA', manual: 'HOJA MANUAL',
+  maestra: 'MAESTRA', saldo: 'SALDO', venta: 'VENTA', detalle: 'DETALLE',
+};
+
+const CONFIG_STORAGE_KEY = 'invent2026_sheet_config_v1';
+const CONFIG_ADMIN_PASS = 'admin';
+
+function cargarConfigGuardada() {
+  try {
+    const raw = localStorage.getItem(CONFIG_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
+}
+
+const configGuardada = cargarConfigGuardada();
+
+// SHEET_URLS y GAS_URL son "let" a propósito: se pueden reasignar desde el
+// panel de Configuración sin tocar el resto del código de la app.
+let SHEET_URLS = Object.assign({}, DEFAULT_SHEET_URLS, (configGuardada && configGuardada.sheetUrls) || {});
+let GAS_URL = (configGuardada && typeof configGuardada.gasUrl === 'string') ? configGuardada.gasUrl : DEFAULT_GAS_URL;
 
 let DB = { usuario: [], ubicaciones: [], data: [], manual: [], maestra: [], saldo: [], venta: [], detalle: [] };
 let sessionCounts = []; // conteo de esta sesión (coincide con DATA)
@@ -2798,6 +2875,73 @@ document.querySelectorAll('[data-subir]').forEach(input => {
     manejarSubidaArchivo(sheetKey, file, statusEl, modo);
     input.value = '';
   });
+});
+
+/* ==================== PANEL CONFIGURACIÓN: CAMBIO DE SHEET ASOCIADO ==================== */
+function renderConfigFields() {
+  const cont = document.getElementById('configSheetUrlFields');
+  cont.innerHTML = Object.keys(DEFAULT_SHEET_URLS).map(key => `
+    <div>
+      <label class="block text-xs font-semibold text-on-surface-variant mb-1 uppercase tracking-wide">${SHEET_URL_LABELS[key] || key}</label>
+      <input data-config-sheet="${key}" type="text" class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-data text-xs" value="${(SHEET_URLS[key] || '').replace(/"/g, '&quot;')}">
+    </div>`).join('');
+  document.getElementById('configGasUrl').value = GAS_URL || '';
+}
+
+function guardarConfigDesdeFormulario() {
+  const nuevaSheetUrls = {};
+  document.querySelectorAll('[data-config-sheet]').forEach(input => {
+    nuevaSheetUrls[input.dataset.configSheet] = input.value.trim();
+  });
+  const nuevaGasUrl = document.getElementById('configGasUrl').value.trim();
+
+  SHEET_URLS = Object.assign({}, DEFAULT_SHEET_URLS, nuevaSheetUrls);
+  GAS_URL = nuevaGasUrl;
+
+  localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify({ sheetUrls: SHEET_URLS, gasUrl: GAS_URL }));
+}
+
+const configStatusEl = document.getElementById('configStatus');
+document.getElementById('configUnlockBtn').addEventListener('click', () => {
+  const pass = document.getElementById('configPass').value;
+  if (pass === CONFIG_ADMIN_PASS) {
+    document.getElementById('configLock').classList.add('hidden');
+    document.getElementById('configContent').classList.remove('hidden');
+    document.getElementById('configPassError').classList.add('hidden');
+    document.getElementById('configPass').value = '';
+    renderConfigFields();
+  } else {
+    document.getElementById('configPassError').classList.remove('hidden');
+  }
+});
+document.getElementById('configPass').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('configUnlockBtn').click();
+});
+
+document.getElementById('configSaveBtn').addEventListener('click', () => {
+  guardarConfigDesdeFormulario();
+  configStatusEl.textContent = 'Cambios guardados en este navegador. Usa "Guardar y recargar datos ahora" o refresca la página para que la app lea de la nueva hoja.';
+  configStatusEl.className = 'text-xs text-success mt-1';
+});
+
+document.getElementById('configResetBtn').addEventListener('click', () => {
+  const conf = confirm('Esto restaurará los enlaces originales de fábrica (la hoja actual del equipo) en este navegador. ¿Continuar?');
+  if (!conf) return;
+  localStorage.removeItem(CONFIG_STORAGE_KEY);
+  SHEET_URLS = Object.assign({}, DEFAULT_SHEET_URLS);
+  GAS_URL = DEFAULT_GAS_URL;
+  renderConfigFields();
+  configStatusEl.textContent = 'Se restauraron los valores originales en este navegador.';
+  configStatusEl.className = 'text-xs text-success mt-1';
+});
+
+document.getElementById('configReloadBtn').addEventListener('click', async () => {
+  guardarConfigDesdeFormulario();
+  configStatusEl.textContent = 'Guardado. Recargando datos desde la nueva configuración...';
+  configStatusEl.className = 'text-xs text-on-surface-variant mt-1';
+  await loadAllData();
+  configStatusEl.textContent = 'Listo: datos recargados desde la nueva configuración de Sheets.';
+  configStatusEl.className = 'text-xs text-success mt-1';
 });
 
 /* ==================== UTIL ==================== */
