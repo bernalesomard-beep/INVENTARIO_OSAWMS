@@ -332,6 +332,25 @@
               <button id="dashFiltroLimpiar" title="Quitar filtro de fecha" class="text-on-surface-variant hover:text-error shrink-0"><span class="material-symbols-outlined text-[18px]">close</span></button>
             </div>
           </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">view_column</span>
+              <input id="dashFiltroRack" type="text" autocomplete="off" placeholder="Filtrar por rack" class="w-full pl-9 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+            </div>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">stairs</span>
+              <input id="dashFiltroNivel" type="text" autocomplete="off" placeholder="Filtrar por nivel" class="w-full pl-9 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data">
+            </div>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px] pointer-events-none">category</span>
+              <select id="dashFiltroTipo" class="w-full pl-9 rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm bg-white appearance-none">
+                <option value="">Todos los tipos</option>
+                <option value="ALTURA">Alturas (rack numérico)</option>
+                <option value="ANAQUEL">Anaqueles (rack con letra)</option>
+              </select>
+              <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px] pointer-events-none">expand_more</span>
+            </div>
+          </div>
           <div class="flex justify-end">
             <button id="dashFiltrosLimpiarTodo" type="button" class="flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-error font-semibold">
               <span class="material-symbols-outlined text-[16px]">filter_alt_off</span> Limpiar filtros
@@ -1344,12 +1363,17 @@ function renderDashKpisYCharts() {
   const totales = enRango.length;
   const correctas = enRango.filter(r => normalizarEstatus(r.ESTATUS) === 'OK').length;
   const diferencias = enRango.filter(r => ['SOBRANTE', 'FALTANTE'].includes(normalizarEstatus(r.ESTATUS))).length;
-  const progreso = totales > 0 ? (correctas / totales * 100) : 0;
+
+  // Progreso Global = avance real del inventario completo: líneas pendientes vs. total general de líneas
+  // (no se limita al rango de fechas, para que un rack sin contar sí baje el porcentaje).
+  const totalGeneral = DB.data.length;
+  const pendientesGeneral = DB.data.filter(r => normalizarEstatus(r.ESTATUS) === 'PENDIENTE').length;
+  const progreso = totalGeneral > 0 ? ((totalGeneral - pendientesGeneral) / totalGeneral * 100) : 0;
 
   document.getElementById('kpiLineasTotales').textContent = totales.toLocaleString('es-PE');
   document.getElementById('kpiLineasCorrectas').textContent = correctas.toLocaleString('es-PE');
   document.getElementById('kpiDiferencias').textContent = diferencias.toLocaleString('es-PE');
-  document.getElementById('kpiProgresoGlobal').textContent = totales > 0 ? progreso.toFixed(1) + '%' : '—';
+  document.getElementById('kpiProgresoGlobal').textContent = totalGeneral > 0 ? progreso.toFixed(1) + '%' : '—';
   document.getElementById('kpiProgresoBar').style.width = progreso.toFixed(1) + '%';
 
   // Totales = universo completo (todo DB.data); Contadas/Faltantes/Sobrantes = dentro del rango seleccionado
@@ -1499,6 +1523,9 @@ function dashRowKey(r, i) {
 function renderDashDetailTable() {
   const codigo = (document.getElementById('dashFiltroCodigo').value || '').toUpperCase().trim();
   const ubicacion = (document.getElementById('dashFiltroUbicacion').value || '').toUpperCase().trim();
+  const rack = (document.getElementById('dashFiltroRack').value || '').toUpperCase().trim();
+  const nivel = (document.getElementById('dashFiltroNivel').value || '').toUpperCase().trim();
+  const tipo = document.getElementById('dashFiltroTipo').value; // '' | 'ALTURA' | 'ANAQUEL'
   const desdeVal = document.getElementById('dashFiltroDesde').value;
   const hastaVal = document.getElementById('dashFiltroHasta').value;
   const desde = desdeVal ? new Date(desdeVal + 'T00:00:00') : null;
@@ -1507,6 +1534,13 @@ function renderDashDetailTable() {
   let rows = DB.data.filter(r => {
     if (codigo && !(r.CODIGO || '').toString().toUpperCase().includes(codigo)) return false;
     if (ubicacion && !(r.UBICACION || '').toString().toUpperCase().includes(ubicacion)) return false;
+    if (rack && !(r.RACK || '').toString().toUpperCase().includes(rack)) return false;
+    if (nivel && !(r.NIVEL || '').toString().toUpperCase().includes(nivel)) return false;
+    if (tipo) {
+      const esNumerico = /^\d+$/.test((r.RACK || '').toString().trim());
+      if (tipo === 'ALTURA' && !esNumerico) return false;
+      if (tipo === 'ANAQUEL' && esNumerico) return false;
+    }
     const estNorm = normalizarEstatus(r.ESTATUS);
     if (dashEstatusSeleccionados.size > 0 && !dashEstatusSeleccionados.has(estNorm)) return false;
     if (desde || hasta) {
@@ -2007,9 +2041,10 @@ document.querySelectorAll('.dash-sort-th').forEach(th => {
   });
 });
 
-['dashFiltroCodigo', 'dashFiltroUbicacion'].forEach(id => {
+['dashFiltroCodigo', 'dashFiltroUbicacion', 'dashFiltroRack', 'dashFiltroNivel'].forEach(id => {
   document.getElementById(id).addEventListener('input', debounce(renderDashDetailTable, 200));
 });
+document.getElementById('dashFiltroTipo').addEventListener('change', renderDashDetailTable);
 ['dashFiltroDesde', 'dashFiltroHasta'].forEach(id => {
   document.getElementById(id).addEventListener('change', renderDashDetailTable);
 });
@@ -2021,6 +2056,9 @@ document.getElementById('dashFiltroLimpiar').addEventListener('click', () => {
 document.getElementById('dashFiltrosLimpiarTodo').addEventListener('click', () => {
   document.getElementById('dashFiltroCodigo').value = '';
   document.getElementById('dashFiltroUbicacion').value = '';
+  document.getElementById('dashFiltroRack').value = '';
+  document.getElementById('dashFiltroNivel').value = '';
+  document.getElementById('dashFiltroTipo').value = '';
   document.getElementById('dashFiltroDesde').value = '';
   document.getElementById('dashFiltroHasta').value = '';
   dashEstatusSeleccionados.clear();
