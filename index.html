@@ -662,74 +662,6 @@
         </button>
       </div>
 
-      <!-- Sesión de conteo (coincide con DATA) — colapsable, con filtro del detalle -->
-      <div class="bg-white border border-outline-variant rounded-xl mb-4 overflow-hidden">
-        <button id="toggleConteoBox" type="button" class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low text-left">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">inventory_2</span>
-            <span class="font-semibold">Pendientes por guardar — DATA (esta sesión)</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span id="conteoCount" class="text-2xl font-bold font-data">0</span>
-            <span id="conteoChevron" class="material-symbols-outlined text-on-surface-variant transition-transform">expand_more</span>
-          </div>
-        </button>
-        <div id="conteoDetailBox" class="hidden border-t border-outline-variant p-4">
-          <div class="relative w-full mb-3">
-            <input id="conteoFiltro" type="text" placeholder="Filtrar por código, ubicación, usuario, estatus..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data pr-8">
-            <button id="conteoFiltroClear" title="Limpiar filtro" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">close</span></button>
-          </div>
-          <div class="overflow-x-auto max-h-72 overflow-y-auto border border-outline-variant rounded-lg">
-            <table class="w-full text-xs">
-              <thead class="sticky top-0 bg-white"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
-                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">ID Detalle</th>
-                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">Registro</th>
-                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">Usuario</th>
-                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">Tipo</th>
-                <th class="py-2 px-3 font-semibold">Código</th><th class="py-2 px-3 font-semibold">Ubicación</th>
-                <th class="py-2 px-3 font-semibold text-right">Saldo</th><th class="py-2 px-3 font-semibold text-right">Cant. Física</th>
-                <th class="py-2 px-3 font-semibold">Estatus</th><th class="py-2 px-3 font-semibold"></th>
-              </tr></thead>
-              <tbody id="conteoTableBody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Sesión de manuales (no encontrados en DATA) — colapsable, con filtro del detalle -->
-      <div class="bg-white border border-outline-variant rounded-xl mb-6 overflow-hidden">
-        <button id="toggleManualBox" type="button" class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low text-left">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">note_add</span>
-            <span class="font-semibold">Pendientes por guardar — No encontrados en DATA (Hoja Manual)</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span id="manualCount" class="text-2xl font-bold font-data">0</span>
-            <span id="manualChevron" class="material-symbols-outlined text-on-surface-variant transition-transform">expand_more</span>
-          </div>
-        </button>
-        <div id="manualDetailBox" class="hidden border-t border-outline-variant p-4">
-          <div class="relative w-full mb-3">
-            <input id="manualFiltro" type="text" placeholder="Filtrar por código, EAN, ubicación, usuario..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data pr-8">
-            <button id="manualFiltroClear" title="Limpiar filtro" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">close</span></button>
-          </div>
-          <div class="overflow-x-auto max-h-72 overflow-y-auto border border-outline-variant rounded-lg">
-            <table class="w-full text-xs">
-              <thead class="sticky top-0 bg-white"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
-                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">ID Detalle</th>
-                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">Registro</th>
-                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">Usuario</th>
-                <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">Tipo</th>
-                <th class="py-2 px-3 font-semibold">Código / EAN</th><th class="py-2 px-3 font-semibold">Descripción</th>
-                <th class="py-2 px-3 font-semibold">Ubicación</th><th class="py-2 px-3 font-semibold text-right">Cantidad</th>
-                <th class="py-2 px-3 font-semibold"></th>
-              </tr></thead>
-              <tbody id="manualSessionTableBody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
       <!-- Conteo real registrado (fuente: Sheet DETALLE) — colapsable, con alerta de duplicados -->
       <div class="bg-white border border-outline-variant rounded-xl mb-6 overflow-hidden">
         <button id="toggleDetalleRealBox" type="button" class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low text-left">
@@ -746,10 +678,21 @@
         <div id="detalleRealDetailBox" class="hidden border-t border-outline-variant p-4">
           <p class="text-xs text-on-surface-variant mb-3">Esto se lee directamente del Sheet DETALLE (lo que ya está guardado, de todos los que están contando). Las filas marcadas en rojo forman parte de una combinación Ubicación+Código registrada más veces de lo esperado (posible doble conteo).</p>
           <div class="flex flex-col sm:flex-row gap-2.5 mb-3">
-            <div class="relative flex-1">
-              <input id="detalleRealFiltro" type="text" placeholder="Filtrar por código, ubicación, usuario, estatus..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data pr-8">
-              <button id="detalleRealFiltroClear" title="Limpiar texto" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">close</span></button>
+            <div class="relative flex-1 min-w-[160px]">
+              <input id="detalleRealFiltroUbicacion" type="text" placeholder="Filtrar por ubicación..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data pr-8">
+              <button id="detalleRealFiltroUbicacionClear" title="Limpiar" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">close</span></button>
             </div>
+            <div class="relative flex-1 min-w-[160px]">
+              <input id="detalleRealFiltroCodigo" type="text" placeholder="Filtrar por código..." class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm font-data pr-8">
+              <button id="detalleRealFiltroCodigoClear" title="Limpiar" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">close</span></button>
+            </div>
+            <select id="detalleRealFiltroEstatus" class="rounded-lg border-outline-variant focus:border-primary focus:ring-primary text-sm min-w-[150px]">
+              <option value="">Todos los estatus</option>
+              <option value="OK">Conforme</option>
+              <option value="FALTANTE">Faltante</option>
+              <option value="SOBRANTE">Sobrante</option>
+              <option value="PENDIENTE">Pendiente</option>
+            </select>
             <label class="flex items-center gap-2 text-xs whitespace-nowrap px-3 border border-outline-variant rounded-lg cursor-pointer select-none">
               <input id="detalleRealSoloDup" type="checkbox" class="rounded border-outline-variant"> Solo duplicados
             </label>
@@ -779,8 +722,10 @@
                 <th class="py-2 px-3 font-semibold text-[#A86612] bg-[#FBEED8]">Usuario</th>
                 <th data-detalle-sort="UBICACIÓN" class="detalle-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Ubicación <span class="sort-icon text-[10px] opacity-40">↕</span></th>
                 <th data-detalle-sort="CODIGO" class="detalle-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Código <span class="sort-icon text-[10px] opacity-40">↕</span></th>
-                <th class="py-2 px-3 font-semibold text-right">Cant. Inicial</th><th class="py-2 px-3 font-semibold text-right">Conteo</th>
-                <th class="py-2 px-3 font-semibold">Estatus</th><th class="py-2 px-3 font-semibold"></th>
+                <th class="py-2 px-3 font-semibold text-right">Cant. Inicial</th>
+                <th class="py-2 px-3 font-semibold text-right">Conteo</th>
+                <th class="py-2 px-3 font-semibold text-right">Diferencia</th>
+                <th class="py-2 px-3 font-semibold">Estatus</th><th class="py-2 px-3 font-semibold text-center">Acciones</th>
               </tr></thead>
               <tbody id="detalleRealTableBody"></tbody>
             </table>
@@ -2192,44 +2137,11 @@ document.getElementById('mfAdd').addEventListener('click', () => {
     USUARIO: currentUser ? currentUser.ID_USUARIO : ''
   });
   document.getElementById('manualForm').classList.add('hidden');
-  renderManualSessionTable();
+  renderSessionKpi();
 });
 
 function generarIdDetalle() {
   return Math.random().toString(16).slice(2, 10);
-}
-
-function renderManualSessionTable() {
-  document.getElementById('manualCount').textContent = sessionManual.length;
-  const filtroEl = document.getElementById('manualFiltro');
-  const filtro = filtroEl ? filtroEl.value.toUpperCase().trim() : '';
-  const tbody = document.getElementById('manualSessionTableBody');
-  const rows = sessionManual.filter(m => {
-    if (!filtro) return true;
-    return [m.ID_DETALLE, m.REGISTRO, m.USUARIO, m.CODIGO, m.EAN13, m.UBICACION, m.DESCRIPCION].some(v => (v || '').toString().toUpperCase().includes(filtro));
-  });
-  if (rows.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" class="py-6 text-center text-on-surface-variant">${sessionManual.length === 0 ? 'Sin registros todavía.' : 'Sin resultados para ese filtro.'}</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = rows.map(m => {
-    const idxReal = sessionManual.indexOf(m);
-    const codigoMostrar = m.EAN13 ? m.EAN13 : m.CODIGO; // según el EAN o código, el que esté llenado
-    return `<tr class="border-b border-surface-variant last:border-0 hover:bg-surface-container-low">
-      <td class="py-2 px-3 font-data text-[#A86612]">${m.ID_DETALLE || ''}</td>
-      <td class="py-2 px-3 font-data">${m.REGISTRO || ''}</td>
-      <td class="py-2 px-3 font-data">${m.USUARIO || ''}</td>
-      <td class="py-2 px-3 font-data">${m.TIPO_REGISTRO || ''}</td>
-      <td class="py-2 px-3 font-data">${codigoMostrar || ''}</td>
-      <td class="py-2 px-3 truncate max-w-[160px]">${m.DESCRIPCION || ''}</td>
-      <td class="py-2 px-3 font-data">${m.UBICACION || ''}</td>
-      <td class="py-2 px-3 font-data text-right">${m.CANTIDAD || ''}</td>
-      <td class="py-2 px-3"><button data-removemanual="${idxReal}" class="text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">delete</span></button></td>
-    </tr>`;
-  }).join('');
-  tbody.querySelectorAll('[data-removemanual]').forEach(btn => {
-    btn.addEventListener('click', () => { sessionManual.splice(+btn.dataset.removemanual, 1); renderManualSessionTable(); });
-  });
 }
 
 document.getElementById('cfCantidad').addEventListener('input', () => {
@@ -2261,62 +2173,8 @@ document.getElementById('cfAdd').addEventListener('click', () => {
   });
   document.getElementById('conteoForm').classList.add('hidden');
   selectedItem = null;
-  renderConteoTable();
   renderSessionKpi();
 });
-
-function renderConteoTable() {
-  document.getElementById('conteoCount').textContent = sessionCounts.length;
-  const filtroEl = document.getElementById('conteoFiltro');
-  const filtro = filtroEl ? filtroEl.value.toUpperCase().trim() : '';
-  const tbody = document.getElementById('conteoTableBody');
-  const rows = sessionCounts.filter(c => {
-    if (!filtro) return true;
-    return [c.ID_DETALLE, c.REGISTRO, c.USUARIO, c.CODIGO, c.UBICACION, c.ESTATUS].some(v => (v || '').toString().toUpperCase().includes(filtro));
-  });
-  if (rows.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" class="py-6 text-center text-on-surface-variant">${sessionCounts.length === 0 ? 'Sin registros todavía.' : 'Sin resultados para ese filtro.'}</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = rows.map(c => {
-    const idxReal = sessionCounts.indexOf(c);
-    return `<tr class="border-b border-surface-variant last:border-0 hover:bg-surface-container-low">
-      <td class="py-2 px-3 font-data text-[#A86612]">${c.ID_DETALLE || ''}</td>
-      <td class="py-2 px-3 font-data">${c.REGISTRO || ''}</td>
-      <td class="py-2 px-3 font-data">${c.USUARIO || ''}</td>
-      <td class="py-2 px-3 font-data">${c.TIPO_REGISTRO || ''}</td>
-      <td class="py-2 px-3 font-data">${c.CODIGO || ''}</td>
-      <td class="py-2 px-3 font-data">${c.UBICACION || ''}</td>
-      <td class="py-2 px-3 font-data text-right">${c.SALDO_SISTEMA}</td>
-      <td class="py-2 px-3 font-data text-right">${c.CANTIDAD_FISICA}</td>
-      <td class="py-2 px-3">${estatusBadgeHtml(c.ESTATUS)}</td>
-      <td class="py-2 px-3"><button data-remove="${idxReal}" class="text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[16px]">delete</span></button></td>
-    </tr>`;
-  }).join('');
-  tbody.querySelectorAll('[data-remove]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      sessionCounts.splice(+btn.dataset.remove, 1);
-      renderConteoTable();
-      renderSessionKpi();
-    });
-  });
-}
-
-// Expandir/colapsar cajas de detalle + filtro en vivo
-document.getElementById('toggleConteoBox').addEventListener('click', () => {
-  const box = document.getElementById('conteoDetailBox');
-  const chev = document.getElementById('conteoChevron');
-  box.classList.toggle('hidden');
-  chev.style.transform = box.classList.contains('hidden') ? '' : 'rotate(180deg)';
-});
-document.getElementById('toggleManualBox').addEventListener('click', () => {
-  const box = document.getElementById('manualDetailBox');
-  const chev = document.getElementById('manualChevron');
-  box.classList.toggle('hidden');
-  chev.style.transform = box.classList.contains('hidden') ? '' : 'rotate(180deg)';
-});
-document.getElementById('conteoFiltro').addEventListener('input', debounce(renderConteoTable, 150));
-document.getElementById('manualFiltro').addEventListener('input', debounce(renderManualSessionTable, 150));
 
 /* ---- Conteo real registrado (DETALLE, leído del Sheet) ---- */
 document.getElementById('toggleDetalleRealBox').addEventListener('click', () => {
@@ -2326,51 +2184,76 @@ document.getElementById('toggleDetalleRealBox').addEventListener('click', () => 
   chev.style.transform = box.classList.contains('hidden') ? '' : 'rotate(180deg)';
   if (!box.classList.contains('hidden')) renderDetalleRealTable();
 });
-document.getElementById('detalleRealFiltro').addEventListener('input', debounce(renderDetalleRealTable, 150));
-document.getElementById('detalleRealFiltro').addEventListener('input', (e) => {
-  document.getElementById('detalleRealFiltroClear').classList.toggle('hidden', !e.target.value);
+document.getElementById('detalleRealFiltroUbicacion').addEventListener('input', debounce(renderDetalleRealTable, 150));
+document.getElementById('detalleRealFiltroUbicacion').addEventListener('input', (e) => {
+  document.getElementById('detalleRealFiltroUbicacionClear').classList.toggle('hidden', !e.target.value);
 });
-document.getElementById('detalleRealFiltroClear').addEventListener('click', () => {
-  const el = document.getElementById('detalleRealFiltro');
+document.getElementById('detalleRealFiltroUbicacionClear').addEventListener('click', () => {
+  const el = document.getElementById('detalleRealFiltroUbicacion');
   el.value = '';
-  document.getElementById('detalleRealFiltroClear').classList.add('hidden');
+  document.getElementById('detalleRealFiltroUbicacionClear').classList.add('hidden');
   renderDetalleRealTable();
 });
+document.getElementById('detalleRealFiltroCodigo').addEventListener('input', debounce(renderDetalleRealTable, 150));
+document.getElementById('detalleRealFiltroCodigo').addEventListener('input', (e) => {
+  document.getElementById('detalleRealFiltroCodigoClear').classList.toggle('hidden', !e.target.value);
+});
+document.getElementById('detalleRealFiltroCodigoClear').addEventListener('click', () => {
+  const el = document.getElementById('detalleRealFiltroCodigo');
+  el.value = '';
+  document.getElementById('detalleRealFiltroCodigoClear').classList.add('hidden');
+  renderDetalleRealTable();
+});
+document.getElementById('detalleRealFiltroEstatus').addEventListener('change', renderDetalleRealTable);
 document.getElementById('detalleRealSoloDup').addEventListener('change', renderDetalleRealTable);
 document.getElementById('detalleRealFiltrosLimpiarTodo').addEventListener('click', () => {
-  document.getElementById('detalleRealFiltro').value = '';
-  document.getElementById('detalleRealFiltroClear').classList.add('hidden');
+  document.getElementById('detalleRealFiltroUbicacion').value = '';
+  document.getElementById('detalleRealFiltroUbicacionClear').classList.add('hidden');
+  document.getElementById('detalleRealFiltroCodigo').value = '';
+  document.getElementById('detalleRealFiltroCodigoClear').classList.add('hidden');
+  document.getElementById('detalleRealFiltroEstatus').value = '';
   document.getElementById('detalleRealSoloDup').checked = false;
   renderDetalleRealTable();
 });
 
-function renderDetalleRealTable() {
-  const filas = DB.detalle.filter(d => (d.TIPO || '').toString().trim().toUpperCase() === 'DATA');
-  document.getElementById('detalleRealCount').textContent = filas.length;
+// Calcula la Diferencia de una fila: usa la columna DIFERENCIA del Sheet si existe,
+// y si no, la deriva de Conteo - Cantidad Inicial.
+function calcularDiferenciaFila(r) {
+  const dSheet = parseFloat(r.DIFERENCIA);
+  if (!isNaN(dSheet) && r.DIFERENCIA !== '' && r.DIFERENCIA !== undefined && r.DIFERENCIA !== null) return dSheet;
+  const conteo = parseFloat(r.CONTEO);
+  const inicial = parseFloat(r['CANTIDAD INICIAL']);
+  if (isNaN(conteo) || isNaN(inicial)) return null;
+  return conteo - inicial;
+}
 
+function diferenciaHtml(diff) {
+  if (diff === null || isNaN(diff)) return '<span class="text-on-surface-variant">-</span>';
+  if (diff === 0) return `<span class="text-success font-semibold">0</span>`;
+  const cls = diff > 0 ? 'text-[#A86612]' : 'text-error';
+  const signo = diff > 0 ? '+' : '';
+  return `<span class="${cls} font-semibold">${signo}${diff}</span>`;
+}
+
+function obtenerFilasDetalleFiltradas() {
+  const filas = DB.detalle.filter(d => (d.TIPO || '').toString().trim().toUpperCase() === 'DATA');
   const dups = computeDuplicados();
   const dupKeys = new Set(dups.map(d => d.UBICACION + '|' + d.CODIGO));
-  const dupBadge = document.getElementById('detalleRealDupBadge');
-  if (dups.length > 0) {
-    dupBadge.textContent = `${dups.length} combinación(es) duplicada(s)`;
-    dupBadge.classList.remove('hidden');
-  } else {
-    dupBadge.classList.add('hidden');
-  }
 
-  const filtroEl = document.getElementById('detalleRealFiltro');
-  const filtro = filtroEl ? filtroEl.value.toUpperCase().trim() : '';
+  const filtroUbi = document.getElementById('detalleRealFiltroUbicacion').value.toUpperCase().trim();
+  const filtroCod = document.getElementById('detalleRealFiltroCodigo').value.toUpperCase().trim();
+  const filtroEst = document.getElementById('detalleRealFiltroEstatus').value;
   const soloDup = document.getElementById('detalleRealSoloDup').checked;
-  const tbody = document.getElementById('detalleRealTableBody');
 
   let rows = filas.map(f => ({
     ...f,
     _esDup: dupKeys.has((f['UBICACIÓN'] || '').toString().trim().toUpperCase() + '|' + (f.CODIGO || '').toString().trim().toUpperCase())
   }));
   if (soloDup) rows = rows.filter(r => r._esDup);
-  if (filtro) {
-    rows = rows.filter(r => [r.ID_DETALLE, r.REGISTRO, r.USUARIO, r['UBICACIÓN'], r.CODIGO, r.ESTATUS].some(v => (v || '').toString().toUpperCase().includes(filtro)));
-  }
+  if (filtroUbi) rows = rows.filter(r => (r['UBICACIÓN'] || '').toString().toUpperCase().includes(filtroUbi));
+  if (filtroCod) rows = rows.filter(r => (r.CODIGO || '').toString().toUpperCase().includes(filtroCod));
+  if (filtroEst) rows = rows.filter(r => normalizarEstatus(r.ESTATUS) === filtroEst);
+
   if (detalleSortField) {
     const dir = detalleSortDir === 'asc' ? 1 : -1;
     if (detalleSortField === 'REGISTRO') {
@@ -2385,6 +2268,23 @@ function renderDetalleRealTable() {
       rows = rows.slice().sort((a, b) => (a[detalleSortField] || '').toString().localeCompare((b[detalleSortField] || '').toString(), 'es', { numeric: true, sensitivity: 'base' }) * dir);
     }
   }
+  return { filas, rows };
+}
+
+function renderDetalleRealTable() {
+  const { filas, rows } = obtenerFilasDetalleFiltradas();
+  document.getElementById('detalleRealCount').textContent = filas.length;
+
+  const dups = computeDuplicados();
+  const dupBadge = document.getElementById('detalleRealDupBadge');
+  if (dups.length > 0) {
+    dupBadge.textContent = `${dups.length} combinación(es) duplicada(s)`;
+    dupBadge.classList.remove('hidden');
+  } else {
+    dupBadge.classList.add('hidden');
+  }
+
+  const tbody = document.getElementById('detalleRealTableBody');
 
   document.querySelectorAll('.detalle-sort-th').forEach(th => {
     const icon = th.querySelector('.sort-icon');
@@ -2397,12 +2297,14 @@ function renderDetalleRealTable() {
   });
 
   if (rows.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" class="py-6 text-center text-on-surface-variant">${filas.length === 0 ? 'Aún no hay registros guardados en DETALLE.' : 'Sin resultados para ese filtro.'}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" class="py-6 text-center text-on-surface-variant">${filas.length === 0 ? 'Aún no hay registros guardados en DETALLE.' : 'Sin resultados para ese filtro.'}</td></tr>`;
     updateDetalleRealSelUi();
     return;
   }
-  tbody.innerHTML = rows.map(r => `
-    <tr class="border-b border-surface-variant last:border-0 hover:bg-surface-container-low ${r._esDup ? 'bg-error-container/40' : ''}">
+  tbody.innerHTML = rows.map(r => {
+    const diff = calcularDiferenciaFila(r);
+    return `
+    <tr class="border-b border-surface-variant last:border-0 hover:bg-surface-container-low ${r._esDup ? 'bg-error-container/40' : ''}" data-row-id="${r.ID_DETALLE}">
       <td class="py-2 px-3"><input type="checkbox" class="detalle-real-check rounded border-outline-variant" data-id="${r.ID_DETALLE}" ${detalleRealSeleccionados.has(r.ID_DETALLE) ? 'checked' : ''}></td>
       <td class="py-2 px-3 font-data text-[#A86612]">${r.ID_DETALLE || ''} ${r._esDup ? '<span class="ml-1 text-error" title="Posible duplicado">⚠</span>' : ''}</td>
       <td class="py-2 px-3 font-data">${r.REGISTRO || ''}</td>
@@ -2410,10 +2312,26 @@ function renderDetalleRealTable() {
       <td class="py-2 px-3 font-data">${r['UBICACIÓN'] || ''}</td>
       <td class="py-2 px-3 font-data">${r.CODIGO || ''}</td>
       <td class="py-2 px-3 font-data text-right">${r['CANTIDAD INICIAL'] || ''}</td>
-      <td class="py-2 px-3 font-data text-right">${r.CONTEO || ''}</td>
+      <td class="py-2 px-3 font-data text-right" data-field-cell="CONTEO">
+        <button type="button" class="detalle-edit-btn inline-flex items-center gap-1 hover:text-primary" data-id="${r.ID_DETALLE}" data-field="CONTEO" title="Editar conteo">
+          <span>${r.CONTEO !== undefined && r.CONTEO !== '' ? r.CONTEO : '-'}</span>
+          <span class="material-symbols-outlined text-[13px] opacity-50">edit</span>
+        </button>
+      </td>
+      <td class="py-2 px-3 font-data text-right" data-field-cell="DIFERENCIA">
+        <button type="button" class="detalle-edit-btn inline-flex items-center gap-1 hover:text-primary" data-id="${r.ID_DETALLE}" data-field="DIFERENCIA" title="Editar diferencia">
+          ${diferenciaHtml(diff)}
+          <span class="material-symbols-outlined text-[13px] opacity-50">edit</span>
+        </button>
+      </td>
       <td class="py-2 px-3">${estatusBadgeHtmlV2(normalizarEstatus(r.ESTATUS))}</td>
-      <td class="py-2 px-3"></td>
-    </tr>`).join('');
+      <td class="py-2 px-3 text-center">
+        <button type="button" class="detalle-eliminar-fila text-on-surface-variant hover:text-error" data-id="${r.ID_DETALLE}" title="Eliminar línea">
+          <span class="material-symbols-outlined text-[16px]">delete</span>
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
 
   tbody.querySelectorAll('.detalle-real-check').forEach(chk => {
     chk.addEventListener('change', () => {
@@ -2422,7 +2340,128 @@ function renderDetalleRealTable() {
       updateDetalleRealSelUi();
     });
   });
+  tbody.querySelectorAll('.detalle-edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => iniciarEdicionCeldaDetalle(btn.dataset.id, btn.dataset.field));
+  });
+  tbody.querySelectorAll('.detalle-eliminar-fila').forEach(btn => {
+    btn.addEventListener('click', () => eliminarLineasDetalle([btn.dataset.id]));
+  });
   updateDetalleRealSelUi();
+}
+
+/* ---- Edición inline de Conteo / Diferencia en el Sheet DETALLE ---- */
+function iniciarEdicionCeldaDetalle(id, campo) {
+  const tr = document.querySelector(`tr[data-row-id="${id}"]`);
+  if (!tr) return;
+  const td = tr.querySelector(`td[data-field-cell="${campo}"]`);
+  if (!td) return;
+  const fila = DB.detalle.find(d => d.ID_DETALLE === id);
+  if (!fila) return;
+  const valorActual = campo === 'CONTEO' ? fila.CONTEO : calcularDiferenciaFila(fila);
+  td.innerHTML = `
+    <div class="flex items-center justify-end gap-1">
+      <input type="number" step="any" value="${valorActual !== null && valorActual !== undefined ? valorActual : ''}" class="detalle-edit-input w-20 text-right rounded border border-primary text-xs font-data py-0.5 px-1">
+      <button type="button" class="detalle-edit-confirm text-success hover:opacity-80" title="Guardar"><span class="material-symbols-outlined text-[16px]">check</span></button>
+      <button type="button" class="detalle-edit-cancel text-error hover:opacity-80" title="Cancelar"><span class="material-symbols-outlined text-[16px]">close</span></button>
+    </div>`;
+  const input = td.querySelector('.detalle-edit-input');
+  input.focus();
+  input.select();
+  const confirmar = () => guardarEdicionCeldaDetalle(id, campo, input.value);
+  const cancelar = () => renderDetalleRealTable();
+  td.querySelector('.detalle-edit-confirm').addEventListener('click', confirmar);
+  td.querySelector('.detalle-edit-cancel').addEventListener('click', cancelar);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') confirmar();
+    if (e.key === 'Escape') cancelar();
+  });
+}
+
+async function guardarEdicionCeldaDetalle(id, campo, valorTexto) {
+  const valor = parseFloat(valorTexto);
+  if (valorTexto === '' || isNaN(valor)) { alert('Ingresa un valor numérico válido.'); return; }
+  const fila = DB.detalle.find(d => d.ID_DETALLE === id);
+  if (!fila) return;
+
+  if (campo === 'CONTEO') {
+    fila.CONTEO = valor;
+    const inicial = parseFloat(fila['CANTIDAD INICIAL']) || 0;
+    fila.DIFERENCIA = valor - inicial;
+    fila.ESTATUS = fila.DIFERENCIA === 0 ? 'OK' : (fila.DIFERENCIA > 0 ? 'SOBRANTE' : 'FALTANTE');
+  } else if (campo === 'DIFERENCIA') {
+    fila.DIFERENCIA = valor;
+    fila.ESTATUS = valor === 0 ? 'OK' : (valor > 0 ? 'SOBRANTE' : 'FALTANTE');
+  }
+
+  await persistirEdicionDetalle(fila);
+  renderDetalleRealTable();
+  renderDuplicados();
+}
+
+async function persistirEdicionDetalle(fila) {
+  const statusEl = document.getElementById('detalleRealDelStatus');
+  if (!GAS_URL) {
+    if (statusEl) { statusEl.textContent = 'GAS_URL no está configurado; el cambio solo quedó en esta sesión del navegador.'; statusEl.className = 'text-xs text-[#A86612]'; }
+    return;
+  }
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        actualizarDetalle: [{
+          ID_DETALLE: fila.ID_DETALLE,
+          CONTEO: fila.CONTEO,
+          DIFERENCIA: fila.DIFERENCIA,
+          ESTATUS: fila.ESTATUS
+        }]
+      })
+    });
+    const json = await res.json();
+    if (json.ok) {
+      if (statusEl) { statusEl.textContent = 'Cambio guardado en el Sheet DETALLE.'; statusEl.className = 'text-xs text-success'; }
+    } else {
+      if (statusEl) { statusEl.textContent = 'El cambio se aplicó localmente pero no se pudo guardar en el Sheet: ' + (json.error || 'el Apps Script aún no soporta "actualizarDetalle".'); statusEl.className = 'text-xs text-[#A86612]'; }
+    }
+  } catch (err) {
+    if (statusEl) { statusEl.textContent = 'El cambio se aplicó localmente pero no se pudo conectar con Google Sheets: ' + err.message; statusEl.className = 'text-xs text-error'; }
+  }
+}
+
+async function eliminarLineasDetalle(ids) {
+  if (!ids || ids.length === 0) return;
+  if (!confirm(`¿Eliminar ${ids.length} registro(s) del Sheet DETALLE? Esta acción no se puede deshacer.`)) return;
+  if (!GAS_URL) { alert('GAS_URL no está configurado.'); return; }
+  const statusEl = document.getElementById('detalleRealDelStatus');
+  statusEl.textContent = 'Eliminando...';
+  statusEl.className = 'text-xs text-on-surface-variant';
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ eliminarDetalle: ids })
+    });
+    const json = await res.json();
+    if (json.ok) {
+      DB.detalle = DB.detalle.filter(d => !ids.includes(d.ID_DETALLE));
+      ids.forEach(id => detalleRealSeleccionados.delete(id));
+      renderDetalleRealTable();
+      renderDuplicados();
+      if (typeof json.detalleEliminados === 'number') {
+        statusEl.textContent = `${json.detalleEliminados} registro(s) eliminado(s) del Sheet.`;
+        statusEl.className = 'text-xs text-success';
+      } else {
+        statusEl.textContent = 'El servidor respondió OK pero no confirmó cuántas filas borró. Verifica que el Apps Script tenga desplegada la ÚLTIMA versión (Implementar > Gestionar implementaciones > Nueva versión) y revisa el Sheet DETALLE manualmente.';
+        statusEl.className = 'text-xs text-[#A86612]';
+      }
+    } else {
+      statusEl.textContent = 'Error al eliminar: ' + json.error;
+      statusEl.className = 'text-xs text-error';
+    }
+  } catch (err) {
+    statusEl.textContent = 'No se pudo conectar con Google Sheets: ' + err.message;
+    statusEl.className = 'text-xs text-error';
+  }
 }
 
 function updateDetalleRealSelUi() {
@@ -2463,43 +2502,15 @@ document.getElementById('detalleRealCheckAll').addEventListener('change', (e) =>
 });
 
 document.getElementById('btnExportDetalleReal').addEventListener('click', () => {
-  const filas = DB.detalle.filter(d => (d.TIPO || '').toString().trim().toUpperCase() === 'DATA');
-  const dups = computeDuplicados();
-  const dupKeys = new Set(dups.map(d => d.UBICACION + '|' + d.CODIGO));
-
-  const filtroEl = document.getElementById('detalleRealFiltro');
-  const filtro = filtroEl ? filtroEl.value.toUpperCase().trim() : '';
+  const { rows } = obtenerFilasDetalleFiltradas();
   const soloDup = document.getElementById('detalleRealSoloDup').checked;
-
-  let rows = filas.map(f => ({
-    ...f,
-    _esDup: dupKeys.has((f['UBICACIÓN'] || '').toString().trim().toUpperCase() + '|' + (f.CODIGO || '').toString().trim().toUpperCase())
-  }));
-  if (soloDup) rows = rows.filter(r => r._esDup);
-  if (filtro) {
-    rows = rows.filter(r => [r.ID_DETALLE, r.REGISTRO, r.USUARIO, r['UBICACIÓN'], r.CODIGO, r.ESTATUS].some(v => (v || '').toString().toUpperCase().includes(filtro)));
-  }
-  if (detalleSortField) {
-    const dir = detalleSortDir === 'asc' ? 1 : -1;
-    if (detalleSortField === 'REGISTRO') {
-      rows = rows.slice().sort((a, b) => {
-        const fa = parseFechaRegistro(a.REGISTRO || a.FECHA);
-        const fb = parseFechaRegistro(b.REGISTRO || b.FECHA);
-        const ta = fa ? fa.getTime() : -Infinity;
-        const tb = fb ? fb.getTime() : -Infinity;
-        return (ta - tb) * dir;
-      });
-    } else {
-      rows = rows.slice().sort((a, b) => (a[detalleSortField] || '').toString().localeCompare((b[detalleSortField] || '').toString(), 'es', { numeric: true, sensitivity: 'base' }) * dir);
-    }
-  }
-
   if (rows.length === 0) { alert('No hay filas para exportar.'); return; }
 
   const data = rows.map(r => ({
     'ID_DETALLE': r.ID_DETALLE || '', 'REGISTRO': r.REGISTRO || '', 'USUARIO': r.USUARIO || '',
     'UBICACIÓN': r['UBICACIÓN'] || '', 'CODIGO': r.CODIGO || '', 'DESCRIPCION': r.DESCRIPCION || '',
-    'CANTIDAD INICIAL': r['CANTIDAD INICIAL'] || '', 'CONTEO': r.CONTEO || '', 'ESTATUS': r.ESTATUS || '',
+    'CANTIDAD INICIAL': r['CANTIDAD INICIAL'] || '', 'CONTEO': r.CONTEO || '',
+    'DIFERENCIA': calcularDiferenciaFila(r), 'ESTATUS': r.ESTATUS || '',
     'POSIBLE DUPLICADO': r._esDup ? 'SI' : 'NO',
     'OBSERVACIONES': ''
   }));
@@ -2522,41 +2533,9 @@ document.getElementById('btnSeleccionarDuplicados').addEventListener('click', ()
 
 document.getElementById('btnEliminarDetalleSel').addEventListener('click', async () => {
   const ids = [...detalleRealSeleccionados];
-  if (ids.length === 0) return;
-  if (!confirm(`¿Eliminar ${ids.length} registro(s) del Sheet DETALLE? Esta acción no se puede deshacer.`)) return;
-  if (!GAS_URL) { alert('GAS_URL no está configurado.'); return; }
-  const statusEl = document.getElementById('detalleRealDelStatus');
   const btn = document.getElementById('btnEliminarDetalleSel');
   btn.disabled = true;
-  statusEl.textContent = 'Eliminando...';
-  statusEl.className = 'text-xs text-on-surface-variant';
-  try {
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ eliminarDetalle: ids })
-    });
-    const json = await res.json();
-    if (json.ok) {
-      DB.detalle = DB.detalle.filter(d => !ids.includes(d.ID_DETALLE));
-      detalleRealSeleccionados.clear();
-      renderDetalleRealTable();
-      renderDuplicados();
-      if (typeof json.detalleEliminados === 'number') {
-        statusEl.textContent = `${json.detalleEliminados} registro(s) eliminado(s) del Sheet.`;
-        statusEl.className = 'text-xs text-success';
-      } else {
-        statusEl.textContent = 'El servidor respondió OK pero no confirmó cuántas filas borró. Verifica que el Apps Script tenga desplegada la ÚLTIMA versión (Implementar > Gestionar implementaciones > Nueva versión) y revisa el Sheet DETALLE manualmente.';
-        statusEl.className = 'text-xs text-[#A86612]';
-      }
-    } else {
-      statusEl.textContent = 'Error al eliminar: ' + json.error;
-      statusEl.className = 'text-xs text-error';
-    }
-  } catch (err) {
-    statusEl.textContent = 'No se pudo conectar con Google Sheets: ' + err.message;
-    statusEl.className = 'text-xs text-error';
-  }
+  await eliminarLineasDetalle(ids);
   btn.disabled = false;
 });
 
@@ -2567,8 +2546,6 @@ document.getElementById('btnClearSession').addEventListener('click', () => {
   if (confirm('¿Limpiar todos los conteos de esta sesión? Esta acción no se puede deshacer.')) {
     sessionCounts = [];
     sessionManual = [];
-    renderConteoTable();
-    renderManualSessionTable();
     renderSessionKpi();
   }
 });
@@ -2772,8 +2749,6 @@ function wireClearableFilter(inputId, clearId, onClear) {
   });
 }
 wireClearableFilter('dupFiltro', 'dupFiltroClear', renderDuplicados);
-wireClearableFilter('conteoFiltro', 'conteoFiltroClear', renderConteoTable);
-wireClearableFilter('manualFiltro', 'manualFiltroClear', renderManualSessionTable);
 wireClearableFilter('dataFilter', 'dataFilterClear', () => renderDataTable(''));
 wireClearableFilter('ubiFilter', 'ubiFilterClear', () => renderUbiTable(''));
 wireClearableFilter('maestraFilter', 'maestraFilterClear', () => renderMaestraTable(''));
