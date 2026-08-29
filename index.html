@@ -350,6 +350,10 @@
               </select>
               <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px] pointer-events-none">expand_more</span>
             </div>
+            <label class="flex items-center gap-2 px-3 py-2 rounded-lg border border-outline-variant bg-white text-sm cursor-pointer select-none">
+              <input id="dashFiltroCantidadCero" type="checkbox" class="rounded border-outline-variant">
+              Solo Cantidad en 0
+            </label>
           </div>
           <div class="flex justify-end">
             <button id="dashFiltrosLimpiarTodo" type="button" class="flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-error font-semibold">
@@ -369,6 +373,7 @@
               <col style="width:5rem">
               <col style="width:6rem">
               <col style="width:8.5rem">
+              <col style="width:7rem">
             </colgroup>
             <thead class="sticky top-0 bg-surface-container-low z-10"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
               <th class="py-3 pl-4 pr-1"><input id="dashSelAll" type="checkbox" class="rounded border-outline-variant"></th>
@@ -377,6 +382,7 @@
               <th data-sort="CODIGO" class="dash-sort-th py-3 px-2 font-semibold cursor-pointer select-none hover:text-on-surface truncate">Código <span class="sort-icon text-[10px] opacity-40">↕</span></th>
               <th class="py-3 px-2 font-semibold text-right">Saldo</th><th class="py-3 px-2 font-semibold text-right">Cantidad</th>
               <th data-sort="DIFERENCIA" class="dash-sort-th py-3 px-2 font-semibold text-right cursor-pointer select-none hover:text-on-surface"><span class="inline-flex items-center gap-1 justify-end w-full">Diferencia <span class="sort-icon text-[10px] opacity-40">↕</span></span></th><th class="py-3 px-2 font-semibold">Estatus</th>
+              <th class="py-3 px-2 font-semibold">Observación</th>
             </tr></thead>
             <tbody id="dashDetailTableBody"></tbody>
           </table>
@@ -1465,6 +1471,40 @@ function dashRowKey(r, i) {
   return r.ID_DATA ? String(r.ID_DATA) : `${r.CODIGO || ''}__${r.UBICACION || ''}__${i}`;
 }
 
+// Analiza, por código, si tiene ubicaciones Faltante y Sobrante a la vez,
+// y si la suma de sus diferencias (faltantes + sobrantes) se anula entre sí.
+function construirMapaObservacionCodigos() {
+  const map = {};
+  DB.data.forEach(r => {
+    const cod = (r.CODIGO || '').toString().toUpperCase().trim();
+    if (!cod) return;
+    const est = normalizarEstatus(r.ESTATUS);
+    if (est !== 'FALTANTE' && est !== 'SOBRANTE') return;
+    const saldo = parseFloat(r.SALDO);
+    const cant = parseFloat(r.CANTIDAD);
+    const diff = (!isNaN(saldo) && !isNaN(cant)) ? (cant - saldo) : 0;
+    if (!map[cod]) map[cod] = { faltante: false, sobrante: false, suma: 0 };
+    if (est === 'FALTANTE') map[cod].faltante = true;
+    if (est === 'SOBRANTE') map[cod].sobrante = true;
+    map[cod].suma += diff;
+  });
+  return map;
+}
+
+// Devuelve el texto/color de la columna Observación para una fila.
+// Los Conforme (OK) y Pendiente no se tocan (quedan en '-').
+function obtenerObservacionFila(r, estatusNormalizado, obsMap) {
+  if (estatusNormalizado !== 'FALTANTE' && estatusNormalizado !== 'SOBRANTE') {
+    return { texto: '-', cls: 'text-on-surface-variant' };
+  }
+  const cod = (r.CODIGO || '').toString().toUpperCase().trim();
+  const info = obsMap[cod];
+  if (info && info.faltante && info.sobrante && Math.abs(info.suma) < 0.001) {
+    return { texto: 'Homologar', cls: 'text-success' };
+  }
+  return { texto: 'Validar', cls: 'text-[#A86612]' };
+}
+
 function renderDashDetailTable() {
   const codigo = (document.getElementById('dashFiltroCodigo').value || '').toUpperCase().trim();
   const ubicacion = (document.getElementById('dashFiltroUbicacion').value || '').toUpperCase().trim();
@@ -1475,6 +1515,7 @@ function renderDashDetailTable() {
   const hastaVal = document.getElementById('dashFiltroHasta').value;
   const desde = desdeVal ? new Date(desdeVal + 'T00:00:00') : null;
   const hasta = hastaVal ? new Date(hastaVal + 'T23:59:59') : null;
+  const soloCantidadCero = document.getElementById('dashFiltroCantidadCero').checked;
 
   let rows = DB.data.filter(r => {
     if (codigo && !(r.CODIGO || '').toString().toUpperCase().includes(codigo)) return false;
@@ -1485,6 +1526,10 @@ function renderDashDetailTable() {
       const esNumerico = /^\d+$/.test((r.RACK || '').toString().trim());
       if (tipo === 'ALTURA' && !esNumerico) return false;
       if (tipo === 'ANAQUEL' && esNumerico) return false;
+    }
+    if (soloCantidadCero) {
+      const c = parseFloat(r.CANTIDAD);
+      if (isNaN(c) || c !== 0) return false;
     }
     const estNorm = normalizarEstatus(r.ESTATUS);
     if (dashEstatusSeleccionados.size > 0 && !dashEstatusSeleccionados.has(estNorm)) return false;
@@ -1529,6 +1574,8 @@ function renderDashDetailTable() {
     }
   });
 
+  const obsMap = construirMapaObservacionCodigos();
+
   document.getElementById('dashDetailTableBody').innerHTML = rows.slice(0, 500).map((r, i) => {
     const saldo = parseFloat(r.SALDO);
     const cant = parseFloat(r.CANTIDAD);
@@ -1537,6 +1584,8 @@ function renderDashDetailTable() {
     const diffCls = diff === null ? 'text-on-surface-variant' : diff === 0 ? '' : (diff > 0 ? 'text-[#A86612]' : 'text-error');
     const key = dashRowKey(r, i);
     const checked = dashSelected.has(key) ? 'checked' : '';
+    const estNormRow = normalizarEstatus(r.ESTATUS);
+    const obs = obtenerObservacionFila(r, estNormRow, obsMap);
     return `<tr class="border-b border-surface-variant hover:bg-surface-container-low">
       <td class="py-2 pl-3 pr-1"><input type="checkbox" data-dashrow="${key}" class="dash-row-check rounded border-outline-variant" ${checked}></td>
       <td class="py-2 px-2 font-data font-semibold text-primary truncate">${r.RACK || ''}</td>
@@ -1546,7 +1595,8 @@ function renderDashDetailTable() {
       <td class="py-2 px-2 font-data text-right">${r.SALDO || ''}</td>
       <td class="py-2 px-2 font-data text-right">${r.CANTIDAD || '-'}</td>
       <td class="py-2 px-2 font-data text-right ${diffCls}">${diffTxt}</td>
-      <td class="py-2 px-2">${estatusBadgeHtmlV2(normalizarEstatus(r.ESTATUS))}</td>
+      <td class="py-2 px-2">${estatusBadgeHtmlV2(estNormRow)}</td>
+      <td class="py-2 px-2 font-data font-semibold ${obs.cls}">${obs.texto}</td>
     </tr>`;
   }).join('');
   document.getElementById('dashDetailRowCount').textContent = `Mostrando ${Math.min(rows.length, 500)} de ${rows.length} filas (de ${DB.data.length} totales).`;
@@ -1593,14 +1643,17 @@ function exportarDashboardExcel(soloSeleccionados) {
     rows = dashFilteredRows.filter((r, i) => dashSelected.has(dashRowKey(r, i)));
   }
   if (rows.length === 0) { alert('No hay filas para exportar.'); return; }
+  const obsMapExport = construirMapaObservacionCodigos();
   const data = rows.map(r => {
     const saldo = parseFloat(r.SALDO);
     const cant = parseFloat(r.CANTIDAD);
     const diff = (!isNaN(saldo) && !isNaN(cant)) ? (cant - saldo) : '';
+    const estNorm = normalizarEstatus(r.ESTATUS);
+    const obs = obtenerObservacionFila(r, estNorm, obsMapExport);
     return {
       RACK: r.RACK || '', NIVEL: r.NIVEL || '', UBICACION: r.UBICACION || '', CODIGO: r.CODIGO || '',
       DESCRIPCCION: r.DESCRIPCCION || '', SALDO: r.SALDO || '', CANTIDAD: r.CANTIDAD || '',
-      DIFERENCIA: diff, ESTATUS: normalizarEstatus(r.ESTATUS), REGISTRO: r.REGISTRO || r.FECHA || ''
+      DIFERENCIA: diff, ESTATUS: estNorm, OBSERVACION: obs.texto, REGISTRO: r.REGISTRO || r.FECHA || ''
     };
   });
   const wb = XLSX.utils.book_new();
@@ -1990,6 +2043,7 @@ document.querySelectorAll('.dash-sort-th').forEach(th => {
   document.getElementById(id).addEventListener('input', debounce(renderDashDetailTable, 200));
 });
 document.getElementById('dashFiltroTipo').addEventListener('change', renderDashDetailTable);
+document.getElementById('dashFiltroCantidadCero').addEventListener('change', renderDashDetailTable);
 ['dashFiltroDesde', 'dashFiltroHasta'].forEach(id => {
   document.getElementById(id).addEventListener('change', renderDashDetailTable);
 });
@@ -2006,6 +2060,7 @@ document.getElementById('dashFiltrosLimpiarTodo').addEventListener('click', () =
   document.getElementById('dashFiltroTipo').value = '';
   document.getElementById('dashFiltroDesde').value = '';
   document.getElementById('dashFiltroHasta').value = '';
+  document.getElementById('dashFiltroCantidadCero').checked = false;
   dashEstatusSeleccionados.clear();
   document.querySelectorAll('.dash-estatus-check').forEach(cb => cb.checked = false);
   updateDashEstatusLabel();
