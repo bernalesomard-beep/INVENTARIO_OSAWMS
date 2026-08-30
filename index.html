@@ -1943,39 +1943,41 @@ function renderSaldoResumen() {
   document.getElementById('kpiSaldoSobranteBruto').textContent = '+' + Math.round(sobranteBruto).toLocaleString('es-PE');
   document.getElementById('kpiSaldoCodigosCompensan').textContent = codigosConDiferencia.toLocaleString('es-PE');
 
-  // Distribución por Estatus: se calcula directamente desde el sheet DETALLE (log real de conteos),
-  // no desde el cruce SALDO vs DATA, para que coincida con lo que se ve en el Sheet.
-  const filasDetalleData = DB.detalle.filter(d => (d.TIPO || '').toString().trim().toUpperCase() === 'DATA');
-  const codigosSets = { OK: new Set(), SOBRANTE: new Set(), FALTANTE: new Set(), PENDIENTE: new Set() };
+  // Distribución por Estatus: ahora se calcula desde el MISMO cruce SALDO vs DATA vs HOJA MANUAL
+  // que usa "Detalle de Saldo por Código" (saldoRowsCache) — por código, no por línea —
+  // para que este gráfico y esa tabla siempre coincidan.
+  const conteo = { OK: 0, SOBRANTE: 0, FALTANTE: 0, PENDIENTE: 0 };
   const conteoUnid = { OK: 0, SOBRANTE: 0, FALTANTE: 0, PENDIENTE: 0 };
-  let totalInventariadoTodo = 0;    // suma de CONTEO en TODAS las filas (cualquier estatus)
-  let totalCantidadInicialTodo = 0; // suma de CANTIDAD INICIAL en TODAS las filas (cualquier estatus)
-  let lineasOK = 0, lineasEvaluadas = 0; // exactitud a nivel línea: UBICACIÓN + CÓDIGO + CANTIDAD
+  let totalInventariadoTodo = 0;    // suma de lo contado (Inventariado + Hoja Manual) en TODOS los códigos
+  let totalCantidadInicialTodo = 0; // suma de Cantidad Inicial en TODOS los códigos
+  rows.forEach(r => {
+    totalCantidadInicialTodo += r.saldoInicial || 0;
+    const contadoCod = (r.inventariado || 0) + (r.hojaManual || 0);
+    totalInventariadoTodo += contadoCod;
+    if (!conteo.hasOwnProperty(r.estatus)) return; // por si acaso, ignora estatus no contemplados
+    conteo[r.estatus]++;
+    if (r.estatus === 'PENDIENTE') {
+      conteoUnid[r.estatus] += r.saldoInicial || 0;      // aún no contado: cantidad inicial esperada
+    } else if (r.estatus === 'OK') {
+      conteoUnid[r.estatus] += contadoCod;               // conforme: lo que se contó (Inventariado + Hoja Manual)
+    } else {
+      conteoUnid[r.estatus] += Math.abs(r.diferencia || 0); // sobrante/faltante: diferencia en positivo
+    }
+  });
+  const totalEstatusCodigos = conteo.OK + conteo.SOBRANTE + conteo.FALTANTE + conteo.PENDIENTE;
+
+  // % Exactitud de Inventario: a nivel de LÍNEA (Ubicación + Código + Cantidad exacta), tomado del
+  // log real de conteos (DB.detalle) — esto sigue siendo por línea porque un código puede tener
+  // líneas conformes y líneas con diferencia a la vez, algo que el cruce por código no distingue.
+  const filasDetalleData = DB.detalle.filter(d => (d.TIPO || '').toString().trim().toUpperCase() === 'DATA');
+  let lineasOK = 0, lineasEvaluadas = 0;
   filasDetalleData.forEach(d => {
     const est = normalizarEstatus(d.ESTATUS);
-    const ct = parseFloat(d.CONTEO);
-    if (!isNaN(ct)) totalInventariadoTodo += ct;
-    const ciTodo = parseFloat(d['CANTIDAD INICIAL']);
-    if (!isNaN(ciTodo)) totalCantidadInicialTodo += ciTodo;
     if (est === 'OK' || est === 'SOBRANTE' || est === 'FALTANTE') {
       lineasEvaluadas++;
       if (est === 'OK') lineasOK++;
     }
-    if (!codigosSets[est]) return; // ignora estatus no contemplados (p.ej. MANUAL)
-    const cod = (d.CODIGO || '').toString().trim().toUpperCase();
-    if (cod) codigosSets[est].add(cod);
-    if (est === 'PENDIENTE') {
-      const ci = parseFloat(d['CANTIDAD INICIAL']);
-      conteoUnid[est] += isNaN(ci) ? 0 : ci;                 // aún no contado: cantidad inicial esperada
-    } else if (est === 'OK') {
-      conteoUnid[est] += isNaN(ct) ? 0 : ct;                 // conforme: lo que se contó (columna CONTEO)
-    } else {
-      const diff = parseFloat(d.DIFERENCIA);
-      conteoUnid[est] += isNaN(diff) ? 0 : Math.abs(diff);   // sobrante/faltante: columna DIFERENCIA (en positivo)
-    }
   });
-  const conteo = { OK: codigosSets.OK.size, SOBRANTE: codigosSets.SOBRANTE.size, FALTANTE: codigosSets.FALTANTE.size, PENDIENTE: codigosSets.PENDIENTE.size };
-  const totalEstatusCodigos = conteo.OK + conteo.SOBRANTE + conteo.FALTANTE + conteo.PENDIENTE;
 
   // % Exactitud de Inventario: de todo lo YA CONTADO (Conforme+Sobrante+Faltante), cuánto coincide
   // exacto en Ubicación + Código + Cantidad (estatus OK), tanto en unidades como en líneas.
@@ -1987,11 +1989,11 @@ function renderSaldoResumen() {
   document.getElementById('kpiSaldoExactitudUnidTxt').textContent = `${Math.round(conteoUnid.OK).toLocaleString('es-PE')} de ${Math.round(unidadesEvaluadas).toLocaleString('es-PE')} und.`;
   document.getElementById('kpiSaldoExactitudLineasTxt').textContent = `${lineasOK.toLocaleString('es-PE')} de ${lineasEvaluadas.toLocaleString('es-PE')} líneas (${pctExactitudLineas === null ? '—' : pctExactitudLineas.toFixed(1) + '%'})`;
 
-  // "Total Real Contado": todo lo contado (columna CONTEO, cualquier estatus) menos el exceso registrado
-  // en Sobrante — así el excedente no infla el total, y se refleja cuánto se lleva realmente verificado.
+  // "Total Real Contado": todo lo contado (Inventariado + Hoja Manual, cualquier estatus) menos el
+  // exceso registrado en Sobrante — así el excedente no infla el total, y se refleja cuánto se lleva
+  // realmente verificado.
   const totalRealContado = Math.max(0, totalInventariadoTodo - conteoUnid.SOBRANTE);
-  const codigosRealSet = new Set([...codigosSets.OK, ...codigosSets.SOBRANTE, ...codigosSets.FALTANTE]);
-  const codigosTodosSet = new Set([...codigosSets.OK, ...codigosSets.SOBRANTE, ...codigosSets.FALTANTE, ...codigosSets.PENDIENTE]);
+  const codigosRealCount = conteo.OK + conteo.SOBRANTE + conteo.FALTANTE;
 
   const colores = { OK: 'bg-success', SOBRANTE: 'bg-[#A86612]', FALTANTE: 'bg-error', PENDIENTE: 'bg-[#68747A]', REAL: 'bg-[#24333B]' };
   const coloresUnid = { OK: 'bg-success/40', SOBRANTE: 'bg-[#A86612]/40', FALTANTE: 'bg-error/40', PENDIENTE: 'bg-[#68747A]/40', REAL: 'bg-[#24333B]/40' };
@@ -1999,7 +2001,7 @@ function renderSaldoResumen() {
   const totalUnidEstatus = Object.values(conteoUnid).reduce((s, v) => s + v, 0);
   const MAX_BAR_PX = 100;
 
-  const barrasDatos = { ...conteo, REAL: codigosRealSet.size };
+  const barrasDatos = { ...conteo, REAL: codigosRealCount };
   const unidDatos = { ...conteoUnid, REAL: totalRealContado };
 
   document.getElementById('chartSaldoEstatus').innerHTML = Object.keys(barrasDatos).map(k => {
@@ -2007,7 +2009,7 @@ function renderSaldoResumen() {
     const vu = unidDatos[k];
     let pctK, pctU;
     if (k === 'REAL') {
-      pctK = codigosTodosSet.size > 0 ? (v / codigosTodosSet.size * 100) : 0;
+      pctK = totalEstatusCodigos > 0 ? (v / totalEstatusCodigos * 100) : 0;
       pctU = totalCantidadInicialTodo > 0 ? (vu / totalCantidadInicialTodo * 100) : 0;
     } else {
       pctK = totalEstatusCodigos > 0 ? (v / totalEstatusCodigos * 100) : 0;
