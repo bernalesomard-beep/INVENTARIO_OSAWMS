@@ -551,6 +551,7 @@
             <table class="w-full text-xs">
               <thead class="sticky top-0 bg-surface-container-low z-10"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
                 <th class="py-2 pl-3 pr-1"><input id="saldoSelAll" type="checkbox" class="rounded border-outline-variant"></th>
+                <th class="py-2 pl-1 pr-1 w-8"></th>
                 <th data-saldo-sort="codBpcs" class="saldo-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Cód. BPCS <span class="sort-icon text-[10px] opacity-40">↕</span></th>
                 <th data-saldo-sort="codCliente" class="saldo-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Cód. Cliente <span class="sort-icon text-[10px] opacity-40">↕</span></th>
                 <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Cant. Inicial</th>
@@ -1707,12 +1708,102 @@ document.getElementById('btnExportDashSel').addEventListener('click', () => expo
 let saldoRowsCache = [];
 let saldoFilteredRows = [];
 let saldoSelected = new Set(); // codBpcs marcados con checkbox
+let saldoExpandido = new Set(); // codBpcs con el slide de ubicaciones abierto
 let saldoEstatusSeleccionados = new Set();
 let saldoSortField = null;
 let saldoSortDir = 'asc';
 let detalleSortField = null;
 let detalleSortDir = 'asc';
 let detalleRealSeleccionados = new Set();
+
+// La Hoja Manual a veces guarda en CODIGO el código de Cliente (ej. "9928") y en
+// CODICE el código BPCS completo (ej. "GK9928") cuando el tipo de registro es "CODIGO".
+// Por eso el cruce debe aceptar coincidencia contra cualquiera de los dos códigos del SALDO.
+function manualCoincideConCodigo(m, codBpcs, codCliente) {
+  const mCodigo = (m.CODIGO || '').toString().trim().toUpperCase();
+  const mCodice = (m.CODICE || '').toString().trim().toUpperCase();
+  const bpcs = (codBpcs || '').toString().trim().toUpperCase();
+  const cliente = (codCliente || '').toString().trim().toUpperCase();
+  if (!bpcs && !cliente) return false;
+  return (!!cliente && mCodigo === cliente) || (!!bpcs && mCodigo === bpcs) || (!!bpcs && mCodice === bpcs);
+}
+
+// Arma el detalle de ubicaciones inventariadas para un código (cruzando DATA y HOJA MANUAL),
+// para mostrarlo en el slide expandible de "Detalle de Saldo por Código".
+function obtenerDetalleUbicacionesCodigo(codBpcs, codCliente) {
+  const cod = (codBpcs || '').toString().trim().toUpperCase();
+  const obsMap = construirMapaObservacionCodigos();
+
+  const filasDetalle = DB.data
+    .filter(d => (d.CODIGO || '').toString().trim().toUpperCase() === cod)
+    .map(d => {
+      const saldo = parseFloat(d.SALDO);
+      const conteo = parseFloat(d.CANTIDAD);
+      const diff = (!isNaN(saldo) && !isNaN(conteo)) ? (conteo - saldo) : null;
+      const estNorm = normalizarEstatus(d.ESTATUS);
+      return {
+        origen: 'DETALLE',
+        ubicacion: d.UBICACION || '', codigo: d.CODIGO || '', descripcion: d.DESCRIPCCION || '',
+        cantidad: isNaN(saldo) ? null : saldo, conteo: isNaN(conteo) ? null : conteo, diferencia: diff,
+        observacion: obtenerObservacionFila(d, estNorm, obsMap).texto, usuario: d.USUARIO || ''
+      };
+    });
+
+  const filasManual = DB.manual
+    .filter(m => manualCoincideConCodigo(m, codBpcs, codCliente))
+    .map(m => {
+      const conteo = parseFloat(m.CANTIDAD);
+      return {
+        origen: 'MANUAL',
+        ubicacion: m['UBICACIÓN'] || '', codigo: m.CODIGO || '', descripcion: m.DESCRIPCION || '',
+        cantidad: null, conteo: isNaN(conteo) ? null : conteo, diferencia: null,
+        observacion: m.OBSERVACION || '', usuario: m.USUARIO || ''
+      };
+    });
+
+  return [...filasDetalle, ...filasManual];
+}
+
+function renderSaldoSubtablaHtml(codBpcs, codCliente, colspan) {
+  const filas = obtenerDetalleUbicacionesCodigo(codBpcs, codCliente);
+  if (filas.length === 0) {
+    return `<tr class="bg-surface-container-low"><td colspan="${colspan}" class="px-6 py-3 text-xs text-on-surface-variant">Sin ubicaciones registradas para este código.</td></tr>`;
+  }
+  const filasHtml = filas.map(f => {
+    const badge = f.origen === 'MANUAL'
+      ? '<span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 ml-1.5 align-middle">Manual</span>'
+      : '<span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant ml-1.5 align-middle">Detalle</span>';
+    const diffTxt = f.diferencia === null ? '-' : (f.diferencia > 0 ? '+' + f.diferencia.toLocaleString('es-PE') : f.diferencia.toLocaleString('es-PE'));
+    const diffCls = f.diferencia === null ? 'text-on-surface-variant' : f.diferencia === 0 ? '' : (f.diferencia > 0 ? 'text-[#A86612]' : 'text-error');
+    return `<tr class="border-b border-surface-variant/70">
+      <td class="py-1.5 px-3 font-data whitespace-nowrap">${f.ubicacion}${badge}</td>
+      <td class="py-1.5 px-3 font-data whitespace-nowrap">${f.codigo}</td>
+      <td class="py-1.5 px-3 truncate max-w-xs">${f.descripcion}</td>
+      <td class="py-1.5 px-3 font-data text-right">${f.cantidad === null ? '-' : f.cantidad.toLocaleString('es-PE')}</td>
+      <td class="py-1.5 px-3 font-data text-right">${f.conteo === null ? '-' : f.conteo.toLocaleString('es-PE')}</td>
+      <td class="py-1.5 px-3 font-data text-right ${diffCls}">${diffTxt}</td>
+      <td class="py-1.5 px-3">${f.observacion || '-'}</td>
+      <td class="py-1.5 px-3">${f.usuario || '-'}</td>
+    </tr>`;
+  }).join('');
+  return `<tr class="bg-surface-container-low"><td colspan="${colspan}" class="p-0">
+    <div class="px-4 py-3">
+      <table class="w-full text-[11px]">
+        <thead><tr class="text-left text-on-surface-variant border-b border-outline-variant">
+          <th class="py-1.5 px-3 font-semibold whitespace-nowrap">Ubicación</th>
+          <th class="py-1.5 px-3 font-semibold whitespace-nowrap">Código</th>
+          <th class="py-1.5 px-3 font-semibold whitespace-nowrap">Descripción</th>
+          <th class="py-1.5 px-3 font-semibold text-right whitespace-nowrap">Cantidad</th>
+          <th class="py-1.5 px-3 font-semibold text-right whitespace-nowrap">Conteo</th>
+          <th class="py-1.5 px-3 font-semibold text-right whitespace-nowrap">Diferencia</th>
+          <th class="py-1.5 px-3 font-semibold whitespace-nowrap">Observación</th>
+          <th class="py-1.5 px-3 font-semibold whitespace-nowrap">Usuario</th>
+        </tr></thead>
+        <tbody>${filasHtml}</tbody>
+      </table>
+    </div>
+  </td></tr>`;
+}
 
 // Cruza el SALDO (COD.PROD.BPCS / COD.PROD.CLIENTE / SALDO INICIAL) con lo contado en DATA (CODIGO / CANTIDAD)
 // y con lo reportado en HOJA MANUAL (CODIGO / OBSERVACION = "NO FIGURA EN UBICACION" o "MAL ESTADO").
@@ -1729,7 +1820,7 @@ function computeSaldoRows() {
       .reduce((s, v) => s + (parseFloat(v['CANNTIDAD']) || 0), 0);
     const OBS_HOJA_MANUAL = ['NO FIGURA EN UBICACION', 'MAL ESTADO'];
     const manualMatches = DB.manual.filter(m =>
-      (m.CODIGO || '').toString().trim().toUpperCase() === codBpcs.toUpperCase() &&
+      manualCoincideConCodigo(m, codBpcs, codCliente) &&
       OBS_HOJA_MANUAL.includes((m.OBSERVACION || '').toString().trim().toUpperCase())
     );
     const hojaManual = manualMatches.reduce((s, m) => s + (parseFloat(m.CANTIDAD) || 0), 0);
@@ -1947,6 +2038,7 @@ function renderSaldoDetailTable() {
   });
 
   document.getElementById('saldoDetailRowCount').textContent = `Mostrando ${Math.min(rows.length, 500)} de ${rows.length} código(s) (de ${saldoRowsCache.length} totales).`;
+  const COLSPAN_SALDO = 11;
   document.getElementById('saldoDetailTableBody').innerHTML = rows.slice(0, 500).map(r => {
     const diffTxt = r.diferencia === null ? '-' : (r.diferencia > 0 ? '+' + r.diferencia.toLocaleString('es-PE') : r.diferencia.toLocaleString('es-PE'));
     const diffCls = r.diferencia === null ? 'text-on-surface-variant' : r.diferencia === 0 ? '' : (r.diferencia > 0 ? 'text-[#A86612]' : 'text-error');
@@ -1954,8 +2046,10 @@ function renderSaldoDetailTable() {
       ? `<button data-validar-cod="${r.codBpcs}" class="btn-validar-saldo text-[11px] font-semibold text-primary border border-primary/30 rounded-lg px-2 py-1 hover:bg-primary/5">Validar</button>`
       : `<span class="text-on-surface-variant text-[11px]">-</span>`;
     const checked = saldoSelected.has(r.codBpcs) ? 'checked' : '';
-    return `<tr class="border-b border-surface-variant hover:bg-surface-container-low">
+    const expandido = saldoExpandido.has(r.codBpcs);
+    const filaPrincipal = `<tr class="border-b border-surface-variant hover:bg-surface-container-low">
       <td class="py-2 pl-3 pr-1"><input type="checkbox" data-saldorow="${r.codBpcs}" class="saldo-row-check rounded border-outline-variant" ${checked}></td>
+      <td class="py-2 pl-1 pr-1 text-center"><button type="button" data-saldo-toggle="${r.codBpcs}" class="saldo-toggle-btn text-on-surface-variant hover:text-primary" title="Ver ubicaciones inventariadas"><span class="material-symbols-outlined text-[18px] inline-block transition-transform ${expandido ? 'rotate-90' : ''}">chevron_right</span></button></td>
       <td class="py-2 px-3 font-data font-semibold text-primary">${r.codBpcs}</td>
       <td class="py-2 px-3 font-data">${r.codCliente}</td>
       <td class="py-2 px-3 font-data text-right">${r.saldoInicial.toLocaleString('es-PE')}</td>
@@ -1966,7 +2060,17 @@ function renderSaldoDetailTable() {
       <td class="py-2 px-3">${estatusBadgeHtmlV2(r.estatus)}</td>
       <td class="py-2 px-3 text-center">${validarBtn}</td>
     </tr>`;
+    const filaExpandida = expandido ? renderSaldoSubtablaHtml(r.codBpcs, r.codCliente, COLSPAN_SALDO) : '';
+    return filaPrincipal + filaExpandida;
   }).join('');
+
+  document.querySelectorAll('.saldo-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cod = btn.dataset.saldoToggle;
+      if (saldoExpandido.has(cod)) saldoExpandido.delete(cod); else saldoExpandido.add(cod);
+      renderSaldoDetailTable();
+    });
+  });
 
   document.querySelectorAll('.saldo-row-check').forEach(cb => {
     cb.addEventListener('change', () => {
