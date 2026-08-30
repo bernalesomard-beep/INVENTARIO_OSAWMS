@@ -354,6 +354,24 @@
               <input id="dashFiltroCantidadCero" type="checkbox" class="rounded border-outline-variant">
               Solo Cantidad en 0
             </label>
+            <div class="relative" id="dashObsWrap">
+              <button id="dashObsBtn" type="button" class="w-full flex items-center pl-9 pr-2 py-2 rounded-lg border border-outline-variant focus:border-primary focus:ring-primary text-sm bg-white text-left relative">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">rate_review</span>
+                <span id="dashObsLabel" class="truncate">Todas las Observaciones</span>
+                <span class="material-symbols-outlined ml-auto text-on-surface-variant text-[18px]">expand_more</span>
+              </button>
+              <div id="dashObsMenu" class="hidden absolute z-20 mt-1 w-full bg-white border border-outline-variant rounded-lg shadow-lg p-1.5">
+                <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                  <input type="checkbox" data-obs-opt="HOMOLOGAR" class="dash-obs-check rounded border-outline-variant"> Homologar
+                </label>
+                <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                  <input type="checkbox" data-obs-opt="VALIDAR" class="dash-obs-check rounded border-outline-variant"> Validar
+                </label>
+                <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container-low cursor-pointer text-sm">
+                  <input type="checkbox" data-obs-opt="NA" class="dash-obs-check rounded border-outline-variant"> No aplica (-)
+                </label>
+              </div>
+            </div>
           </div>
           <div class="flex justify-end">
             <button id="dashFiltrosLimpiarTodo" type="button" class="flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-error font-semibold">
@@ -382,7 +400,7 @@
               <th data-sort="CODIGO" class="dash-sort-th py-3 px-2 font-semibold cursor-pointer select-none hover:text-on-surface truncate">Código <span class="sort-icon text-[10px] opacity-40">↕</span></th>
               <th class="py-3 px-2 font-semibold text-right">Saldo</th><th class="py-3 px-2 font-semibold text-right">Cantidad</th>
               <th data-sort="DIFERENCIA" class="dash-sort-th py-3 px-2 font-semibold text-right cursor-pointer select-none hover:text-on-surface"><span class="inline-flex items-center gap-1 justify-end w-full">Diferencia <span class="sort-icon text-[10px] opacity-40">↕</span></span></th><th class="py-3 px-2 font-semibold">Estatus</th>
-              <th class="py-3 px-2 font-semibold">Observación</th>
+              <th data-sort="OBSERVACION" class="dash-sort-th py-3 px-2 font-semibold cursor-pointer select-none hover:text-on-surface truncate">Observación <span class="sort-icon text-[10px] opacity-40">↕</span></th>
             </tr></thead>
             <tbody id="dashDetailTableBody"></tbody>
           </table>
@@ -532,11 +550,13 @@
           <div class="overflow-x-auto overflow-y-auto flex-1 max-h-[55vh]">
             <table class="w-full text-xs">
               <thead class="sticky top-0 bg-surface-container-low z-10"><tr class="text-left text-on-surface-variant border-b border-outline-variant">
+                <th class="py-2 pl-3 pr-1"><input id="saldoSelAll" type="checkbox" class="rounded border-outline-variant"></th>
                 <th data-saldo-sort="codBpcs" class="saldo-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Cód. BPCS <span class="sort-icon text-[10px] opacity-40">↕</span></th>
                 <th data-saldo-sort="codCliente" class="saldo-sort-th py-2 px-3 font-semibold cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Cód. Cliente <span class="sort-icon text-[10px] opacity-40">↕</span></th>
                 <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Cant. Inicial</th>
                 <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Inventariado</th>
                 <th class="py-2 px-3 font-semibold text-right whitespace-nowrap">Vendido</th>
+                <th data-saldo-sort="hojaManual" class="saldo-sort-th py-2 px-3 font-semibold text-right cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Hoja Manual <span class="sort-icon text-[10px] opacity-40">↕</span></th>
                 <th data-saldo-sort="diferencia" class="saldo-sort-th py-2 px-3 font-semibold text-right cursor-pointer select-none hover:text-on-surface whitespace-nowrap">Diferencia <span class="sort-icon text-[10px] opacity-40">↕</span></th>
                 <th class="py-2 px-3 font-semibold whitespace-nowrap">Estatus</th>
                 <th class="py-2 px-3 font-semibold text-center whitespace-nowrap">Acción</th>
@@ -546,9 +566,15 @@
           </div>
           <div class="flex flex-wrap items-center justify-between gap-2 p-3 border-t border-outline-variant">
             <p id="saldoDetailRowCount" class="text-[11px] text-on-surface-variant"></p>
-            <button id="btnExportSaldo" class="flex items-center gap-1.5 text-xs border border-outline-variant rounded-lg px-3 py-1.5 hover:bg-surface-container-low">
-              <span class="material-symbols-outlined text-[16px]">download</span> Exportar a Excel
-            </button>
+            <div class="flex items-center gap-2">
+              <span id="saldoSelCount" class="text-xs text-on-surface-variant hidden"></span>
+              <button id="btnExportSaldoSel" class="hidden items-center gap-1.5 text-xs border border-outline-variant rounded-lg px-3 py-1.5 hover:bg-surface-container-low">
+                <span class="material-symbols-outlined text-[16px]">download</span> Exportar seleccionados
+              </button>
+              <button id="btnExportSaldo" class="flex items-center gap-1.5 text-xs border border-outline-variant rounded-lg px-3 py-1.5 hover:bg-surface-container-low">
+                <span class="material-symbols-outlined text-[16px]">download</span> Exportar a Excel
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1491,21 +1517,28 @@ function construirMapaObservacionCodigos() {
   return map;
 }
 
+// Devuelve la clave de observación de una fila: 'HOMOLOGAR' | 'VALIDAR' | 'NA'
+function obtenerObservacionClave(r, estatusNormalizado, obsMap) {
+  if (estatusNormalizado !== 'FALTANTE' && estatusNormalizado !== 'SOBRANTE') return 'NA';
+  const cod = (r.CODIGO || '').toString().toUpperCase().trim();
+  const info = obsMap[cod];
+  if (info && info.faltante && info.sobrante && Math.abs(info.suma) < 0.001) return 'HOMOLOGAR';
+  return 'VALIDAR';
+}
+
 // Devuelve el texto/color de la columna Observación para una fila.
 // Los Conforme (OK) y Pendiente no se tocan (quedan en '-').
 function obtenerObservacionFila(r, estatusNormalizado, obsMap) {
-  if (estatusNormalizado !== 'FALTANTE' && estatusNormalizado !== 'SOBRANTE') {
-    return { texto: '-', cls: 'text-on-surface-variant' };
-  }
-  const cod = (r.CODIGO || '').toString().toUpperCase().trim();
-  const info = obsMap[cod];
-  if (info && info.faltante && info.sobrante && Math.abs(info.suma) < 0.001) {
-    return { texto: 'Homologar', cls: 'text-success' };
-  }
-  return { texto: 'Validar', cls: 'text-[#A86612]' };
+  const clave = obtenerObservacionClave(r, estatusNormalizado, obsMap);
+  if (clave === 'HOMOLOGAR') return { texto: 'Homologar', cls: 'text-success' };
+  if (clave === 'VALIDAR') return { texto: 'Validar', cls: 'text-[#A86612]' };
+  return { texto: '-', cls: 'text-on-surface-variant' };
 }
 
+let dashObsSeleccionados = new Set(); // vacío = todas las observaciones
+
 function renderDashDetailTable() {
+  const obsMap = construirMapaObservacionCodigos();
   const codigo = (document.getElementById('dashFiltroCodigo').value || '').toUpperCase().trim();
   const ubicacion = (document.getElementById('dashFiltroUbicacion').value || '').toUpperCase().trim();
   const rack = (document.getElementById('dashFiltroRack').value || '').toUpperCase().trim();
@@ -1533,6 +1566,7 @@ function renderDashDetailTable() {
     }
     const estNorm = normalizarEstatus(r.ESTATUS);
     if (dashEstatusSeleccionados.size > 0 && !dashEstatusSeleccionados.has(estNorm)) return false;
+    if (dashObsSeleccionados.size > 0 && !dashObsSeleccionados.has(obtenerObservacionClave(r, estNorm, obsMap))) return false;
     if (desde || hasta) {
       const f = parseFechaRegistro(r.REGISTRO || r.FECHA);
       if (!f) return false;
@@ -1544,6 +1578,7 @@ function renderDashDetailTable() {
 
   if (dashSortField) {
     const dir = dashSortDir === 'asc' ? 1 : -1;
+    const ORDEN_OBS = { HOMOLOGAR: 0, VALIDAR: 1, NA: 2 };
     rows = rows.slice().sort((a, b) => {
       if (dashSortField === 'DIFERENCIA') {
         const saldoA = parseFloat(a.SALDO), cantA = parseFloat(a.CANTIDAD);
@@ -1553,6 +1588,11 @@ function renderDashDetailTable() {
         const va = isNaN(na) ? -Infinity : na;
         const vb = isNaN(nb) ? -Infinity : nb;
         return (va - vb) * dir;
+      }
+      if (dashSortField === 'OBSERVACION') {
+        const claveA = obtenerObservacionClave(a, normalizarEstatus(a.ESTATUS), obsMap);
+        const claveB = obtenerObservacionClave(b, normalizarEstatus(b.ESTATUS), obsMap);
+        return (ORDEN_OBS[claveA] - ORDEN_OBS[claveB]) * dir;
       }
       const va = (a[dashSortField] || '').toString();
       const vb = (b[dashSortField] || '').toString();
@@ -1573,8 +1613,6 @@ function renderDashDetailTable() {
       icon.classList.remove('text-primary', 'opacity-100');
     }
   });
-
-  const obsMap = construirMapaObservacionCodigos();
 
   document.getElementById('dashDetailTableBody').innerHTML = rows.slice(0, 500).map((r, i) => {
     const saldo = parseFloat(r.SALDO);
@@ -1667,6 +1705,8 @@ document.getElementById('btnExportDashSel').addEventListener('click', () => expo
 
 /* ==================== SALDO INICIAL (BPCS vs Cliente) ==================== */
 let saldoRowsCache = [];
+let saldoFilteredRows = [];
+let saldoSelected = new Set(); // codBpcs marcados con checkbox
 let saldoEstatusSeleccionados = new Set();
 let saldoSortField = null;
 let saldoSortDir = 'asc';
@@ -1675,6 +1715,7 @@ let detalleSortDir = 'asc';
 let detalleRealSeleccionados = new Set();
 
 // Cruza el SALDO (COD.PROD.BPCS / COD.PROD.CLIENTE / SALDO INICIAL) con lo contado en DATA (CODIGO / CANTIDAD)
+// y con lo reportado en HOJA MANUAL (CODIGO / OBSERVACION = "NO FIGURA EN UBICACION" o "MAL ESTADO").
 function computeSaldoRows() {
   return DB.saldo.map(r => {
     const codBpcs = (r['COD.PROD.BPCS'] || '').toString().trim();
@@ -1682,18 +1723,24 @@ function computeSaldoRows() {
     const saldoNum = parseFloat(r['SALDO INICIAL']) || 0;
     const matches = DB.data.filter(d => (d.CODIGO || '').toString().trim().toUpperCase() === codBpcs.toUpperCase());
     const contados = matches.filter(d => normalizarEstatus(d.ESTATUS) !== 'PENDIENTE');
-    const yaContado = contados.length > 0;
     const inventariado = contados.reduce((s, d) => s + (parseFloat(d.CANTIDAD) || 0), 0);
     const vendido = DB.venta
       .filter(v => (v['COD.PROD.BPCS'] || '').toString().trim().toUpperCase() === codBpcs.toUpperCase())
       .reduce((s, v) => s + (parseFloat(v['CANNTIDAD']) || 0), 0);
+    const OBS_HOJA_MANUAL = ['NO FIGURA EN UBICACION', 'MAL ESTADO'];
+    const manualMatches = DB.manual.filter(m =>
+      (m.CODIGO || '').toString().trim().toUpperCase() === codBpcs.toUpperCase() &&
+      OBS_HOJA_MANUAL.includes((m.OBSERVACION || '').toString().trim().toUpperCase())
+    );
+    const hojaManual = manualMatches.reduce((s, m) => s + (parseFloat(m.CANTIDAD) || 0), 0);
+    const yaContado = contados.length > 0 || manualMatches.length > 0;
     let estatus, diferencia;
     if (!yaContado) { estatus = 'PENDIENTE'; diferencia = null; }
     else {
-      diferencia = (inventariado + vendido) - saldoNum;
+      diferencia = (inventariado + vendido + hojaManual) - saldoNum;
       estatus = diferencia === 0 ? 'OK' : (diferencia > 0 ? 'SOBRANTE' : 'FALTANTE');
     }
-    return { codBpcs, codCliente, saldoInicial: saldoNum, inventariado, vendido, diferencia, estatus, yaContado };
+    return { codBpcs, codCliente, saldoInicial: saldoNum, inventariado, vendido, hojaManual, diferencia, estatus, yaContado };
   });
 }
 
@@ -1877,16 +1924,17 @@ function renderSaldoDetailTable() {
   });
   if (saldoSortField) {
     const dir = saldoSortDir === 'asc' ? 1 : -1;
-    if (saldoSortField === 'diferencia') {
+    if (saldoSortField === 'diferencia' || saldoSortField === 'hojaManual') {
       rows = rows.slice().sort((a, b) => {
-        const da = (a.diferencia === null || a.diferencia === undefined) ? -Infinity : a.diferencia;
-        const db = (b.diferencia === null || b.diferencia === undefined) ? -Infinity : b.diferencia;
+        const da = (a[saldoSortField] === null || a[saldoSortField] === undefined) ? -Infinity : a[saldoSortField];
+        const db = (b[saldoSortField] === null || b[saldoSortField] === undefined) ? -Infinity : b[saldoSortField];
         return (da - db) * dir;
       });
     } else {
       rows = rows.slice().sort((a, b) => (a[saldoSortField] || '').toString().localeCompare((b[saldoSortField] || '').toString(), 'es', { numeric: true, sensitivity: 'base' }) * dir);
     }
   }
+  saldoFilteredRows = rows;
 
   document.querySelectorAll('.saldo-sort-th').forEach(th => {
     const icon = th.querySelector('.sort-icon');
@@ -1905,17 +1953,30 @@ function renderSaldoDetailTable() {
     const validarBtn = (r.estatus === 'FALTANTE' || r.estatus === 'SOBRANTE')
       ? `<button data-validar-cod="${r.codBpcs}" class="btn-validar-saldo text-[11px] font-semibold text-primary border border-primary/30 rounded-lg px-2 py-1 hover:bg-primary/5">Validar</button>`
       : `<span class="text-on-surface-variant text-[11px]">-</span>`;
+    const checked = saldoSelected.has(r.codBpcs) ? 'checked' : '';
     return `<tr class="border-b border-surface-variant hover:bg-surface-container-low">
+      <td class="py-2 pl-3 pr-1"><input type="checkbox" data-saldorow="${r.codBpcs}" class="saldo-row-check rounded border-outline-variant" ${checked}></td>
       <td class="py-2 px-3 font-data font-semibold text-primary">${r.codBpcs}</td>
       <td class="py-2 px-3 font-data">${r.codCliente}</td>
       <td class="py-2 px-3 font-data text-right">${r.saldoInicial.toLocaleString('es-PE')}</td>
       <td class="py-2 px-3 font-data text-right">${r.yaContado ? r.inventariado.toLocaleString('es-PE') : '-'}</td>
       <td class="py-2 px-3 font-data text-right">${r.vendido.toLocaleString('es-PE')}</td>
+      <td class="py-2 px-3 font-data text-right">${r.hojaManual ? r.hojaManual.toLocaleString('es-PE') : '-'}</td>
       <td class="py-2 px-3 font-data text-right ${diffCls}">${diffTxt}</td>
       <td class="py-2 px-3">${estatusBadgeHtmlV2(r.estatus)}</td>
       <td class="py-2 px-3 text-center">${validarBtn}</td>
     </tr>`;
   }).join('');
+
+  document.querySelectorAll('.saldo-row-check').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) saldoSelected.add(cb.dataset.saldorow); else saldoSelected.delete(cb.dataset.saldorow);
+      updateSaldoSelUi();
+    });
+  });
+  const saldoSelAll = document.getElementById('saldoSelAll');
+  saldoSelAll.checked = rows.length > 0 && rows.slice(0, 500).every(r => saldoSelected.has(r.codBpcs));
+  updateSaldoSelUi();
 
   document.querySelectorAll('.btn-validar-saldo').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1926,6 +1987,31 @@ function renderSaldoDetailTable() {
     });
   });
 }
+
+function updateSaldoSelUi() {
+  const n = saldoSelected.size;
+  const countEl = document.getElementById('saldoSelCount');
+  const btnSel = document.getElementById('btnExportSaldoSel');
+  if (n > 0) {
+    countEl.textContent = `${n} seleccionado(s)`;
+    countEl.classList.remove('hidden');
+    btnSel.classList.remove('hidden');
+    btnSel.classList.add('flex');
+  } else {
+    countEl.classList.add('hidden');
+    btnSel.classList.add('hidden');
+    btnSel.classList.remove('flex');
+  }
+}
+
+document.getElementById('saldoSelAll').addEventListener('change', (e) => {
+  if (e.target.checked) {
+    saldoFilteredRows.slice(0, 500).forEach(r => saldoSelected.add(r.codBpcs));
+  } else {
+    saldoFilteredRows.slice(0, 500).forEach(r => saldoSelected.delete(r.codBpcs));
+  }
+  renderSaldoDetailTable();
+});
 
 document.getElementById('saldoFiltroCodigo').addEventListener('input', renderSaldoDetailTable);
 
@@ -1980,7 +2066,7 @@ document.getElementById('saldoFiltrosLimpiarTodo').addEventListener('click', () 
   renderSaldoDetailTable();
 });
 
-document.getElementById('btnExportSaldo').addEventListener('click', () => {
+function exportarSaldoExcel(soloSeleccionados) {
   const q = (document.getElementById('saldoFiltroCodigo').value || '').toUpperCase().trim();
   const accionFiltro = (document.querySelector('input[name="saldoAccionOpt"]:checked') || {}).value || '';
   let rows = saldoRowsCache.filter(r => {
@@ -1993,21 +2079,24 @@ document.getElementById('btnExportSaldo').addEventListener('click', () => {
   });
   if (saldoSortField) {
     const dir = saldoSortDir === 'asc' ? 1 : -1;
-    if (saldoSortField === 'diferencia') {
+    if (saldoSortField === 'diferencia' || saldoSortField === 'hojaManual') {
       rows = rows.slice().sort((a, b) => {
-        const da = (a.diferencia === null || a.diferencia === undefined) ? -Infinity : a.diferencia;
-        const db = (b.diferencia === null || b.diferencia === undefined) ? -Infinity : b.diferencia;
+        const da = (a[saldoSortField] === null || a[saldoSortField] === undefined) ? -Infinity : a[saldoSortField];
+        const db = (b[saldoSortField] === null || b[saldoSortField] === undefined) ? -Infinity : b[saldoSortField];
         return (da - db) * dir;
       });
     } else {
       rows = rows.slice().sort((a, b) => (a[saldoSortField] || '').toString().localeCompare((b[saldoSortField] || '').toString(), 'es', { numeric: true, sensitivity: 'base' }) * dir);
     }
   }
+  if (soloSeleccionados) {
+    rows = rows.filter(r => saldoSelected.has(r.codBpcs));
+  }
   if (rows.length === 0) { alert('No hay filas para exportar.'); return; }
   const data = rows.map(r => ({
     'COD.PROD.BPCS': r.codBpcs, 'COD.PROD.CLIENTE': r.codCliente,
     'CANTIDAD INICIAL': r.saldoInicial, 'INVENTARIADO': r.yaContado ? r.inventariado : '',
-    'VENDIDO': r.vendido,
+    'VENDIDO': r.vendido, 'HOJA MANUAL': r.hojaManual || '',
     'DIFERENCIA': r.diferencia === null ? '' : r.diferencia, 'ESTATUS': r.estatus,
     'ACCIÓN': (r.estatus === 'FALTANTE' || r.estatus === 'SOBRANTE') ? 'Validar' : ''
   }));
@@ -2015,7 +2104,9 @@ document.getElementById('btnExportSaldo').addEventListener('click', () => {
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'Saldo Inicial');
   const fecha = new Date().toISOString().slice(0, 10);
   XLSX.writeFile(wb, `Control_Saldo_${fecha}.xlsx`);
-});
+}
+document.getElementById('btnExportSaldo').addEventListener('click', () => exportarSaldoExcel(false));
+document.getElementById('btnExportSaldoSel').addEventListener('click', () => exportarSaldoExcel(true));
 
 ['dashKpiDesde', 'dashKpiHasta'].forEach(id => {
   document.getElementById(id).addEventListener('change', renderDashKpisYCharts);
@@ -2064,6 +2155,9 @@ document.getElementById('dashFiltrosLimpiarTodo').addEventListener('click', () =
   dashEstatusSeleccionados.clear();
   document.querySelectorAll('.dash-estatus-check').forEach(cb => cb.checked = false);
   updateDashEstatusLabel();
+  dashObsSeleccionados.clear();
+  document.querySelectorAll('.dash-obs-check').forEach(cb => cb.checked = false);
+  updateDashObsLabel();
   renderDashDetailTable();
 });
 
@@ -2089,6 +2183,30 @@ function updateDashEstatusLabel() {
   const label = document.getElementById('dashEstatusLabel');
   if (dashEstatusSeleccionados.size === 0) { label.textContent = 'Todos los Estatus'; return; }
   label.textContent = Array.from(dashEstatusSeleccionados).map(v => ESTATUS_LABELS[v] || v).join(', ');
+}
+
+// Dropdown de selección múltiple de Observación
+const OBS_LABELS = { HOMOLOGAR: 'Homologar', VALIDAR: 'Validar', NA: 'No aplica (-)' };
+document.getElementById('dashObsBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  document.getElementById('dashObsMenu').classList.toggle('hidden');
+});
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('dashObsWrap');
+  if (wrap && !wrap.contains(e.target)) document.getElementById('dashObsMenu').classList.add('hidden');
+});
+document.querySelectorAll('.dash-obs-check').forEach(cb => {
+  cb.addEventListener('change', () => {
+    if (cb.checked) dashObsSeleccionados.add(cb.dataset.obsOpt);
+    else dashObsSeleccionados.delete(cb.dataset.obsOpt);
+    updateDashObsLabel();
+    renderDashDetailTable();
+  });
+});
+function updateDashObsLabel() {
+  const label = document.getElementById('dashObsLabel');
+  if (dashObsSeleccionados.size === 0) { label.textContent = 'Todas las Observaciones'; return; }
+  label.textContent = Array.from(dashObsSeleccionados).map(v => OBS_LABELS[v] || v).join(', ');
 }
 
 // Ya no depende de la sesión actual: el dashboard ejecutivo se basa en DB.data (hoja DATA en Sheets)
